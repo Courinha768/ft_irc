@@ -16,8 +16,6 @@
 
 </p>
 
-Status
-
 <h4 align="center"> 
 	🚧  ft_irc 🚀 Under construction...  🚧
 </h4> 
@@ -29,8 +27,6 @@ Status
   <a href="#checkered_flag-starting">Starting</a> &#xa0; | &#xa0;
   <a href="https://github.com/Courinha768" target="_blank">Author</a>
 </p>
-
-<br>
 
 ## :dart: About ##
 
