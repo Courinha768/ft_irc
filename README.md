@@ -41,9 +41,7 @@ IRC clients connect to IRC servers in order to join channels. IRC servers are co
 ## :checkered_flag: Starting ##
 
 ```bash
-$ git clone https://github.com/{{YOUR_GITHUB_USERNAME}}/ft_irc
-```
-```bash
+$ git clone https://github.com/Courinha768/ft_irc
 $ cd ft_irc
 ```
 
