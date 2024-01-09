@@ -3,14 +3,20 @@
 
 //public libraries
 # include <iostream>
-# include <string>
+# include <cstring>
 # include <cstdlib> 
 # include <fstream>
 # include <queue>
+# include <netinet/in.h>
+# include <sys/types.h>
+# include <sys/socket.h>
+# include <netdb.h>
+# include <unistd.h>
 
 //my include files
 # include "defines.hpp"
 # include "functions.hpp"
 # include "structs.hpp"
+# include "Server.hpp"
 
 #endif

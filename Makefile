@@ -1,17 +1,19 @@
-NAME			= irc
+NAME			= ircserv
 
-SRCS			= main.cpp
+SRCS			= ./srcs/ftIrc.cpp ./srcs/Server.cpp
 OBJS			= $(SRCS:.cpp=.o)
 
+INC				= -I ./includes
+
 CXX				= c++
-CXXFLAGS		= -Wall -Wextra -Werror -I. -std=c++98
+CXXFLAGS		= -Wall -Wextra -Werror -std=c++98
 
 REMOVE			= rm
 
 all:			$(NAME)
 
 $(NAME):		$(OBJS)
-				@$(CXX) $(CXXFLAGS) -o $(NAME) $(OBJS)
+				@$(CXX) $(CXXFLAGS) $(INC) -o $(NAME) $(OBJS)
 
 clean:
 				@rm -rf $(OBJS)
