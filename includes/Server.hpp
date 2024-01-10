@@ -3,26 +3,23 @@
 
 #include "ftIrc.hpp"
 
-struct s_socket
-{
-	int		fd;
-	struct	sockaddr_in info;
-};
-
 class Server {
 
 	private:
-		int			port;
-		s_socket	servinfo;
-		std::string	password;
+		std::string		port;
+		std::string		password;
+		struct addrinfo	serv;
+		struct addrinfo	*servinfo;
+		int				status;
+		int				sockfd;
 
 	public:
-		Server(int port, std::string password);
+		Server(std::string port, std::string password);
 		~Server();
 		Server(Server const & src);
 		Server & operator=(Server const & rhs);
 		static bool isPortValid(std::string port);
-
+		void setup();
 		void initialize_server();
 
 };
