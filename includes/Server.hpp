@@ -21,6 +21,7 @@ class Server {
 		~Server();
 		Server(Server const & src);
 		Server & operator=(Server const & rhs);
+		static bool isPortValid(std::string port);
 
 		void initialize_server();
 
