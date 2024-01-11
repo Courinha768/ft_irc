@@ -11,6 +11,14 @@ Server::Server(std::string port, std::string password) {
 }
 
 Server::~Server() {
+
+	std::map<int, Client *>::iterator it = clients.begin();
+	while (it != clients.end()) {
+		delete it->second;
+		it++;
+	}
+	clients.clear();
+
 	close(sockfd);
 	freeaddrinfo(servinfo);
 }
@@ -63,6 +71,25 @@ void Server::initialize_server() {
 		std::cout << "LISTEN: OK" << std::endl;
 	}
 
+	acceptNewClient();
+
+
+}
+
+void Server::acceptNewClient() {
+
+	struct sockaddr_storage clientAddr;
+	socklen_t 				size = sizeof(clientAddr);
+
+	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
+
+	if (new_fd == -1) {
+		std::cout << "NEW_FD: ERROR" << std::endl;
+	} else {
+		clients[new_fd] = Client::createClient(clientAddr, size);
+		std::cout << "NEW_FD: OK" << std::endl;
+	}
+	
 }
 
 

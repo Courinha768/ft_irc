@@ -12,11 +12,13 @@
 # include <sys/socket.h>
 # include <netdb.h>
 # include <unistd.h>
+# include <map>
 
 //my include files
 # include "defines.hpp"
 # include "functions.hpp"
 # include "structs.hpp"
 # include "Server.hpp"
+# include "Client.hpp"
 
 #endif
