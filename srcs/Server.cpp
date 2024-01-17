@@ -53,6 +53,7 @@ void Server::setup() {
 void Server::initialize_server() {
 
 	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	monitored_fds.push_back(sockfd);
 	if (sockfd == -1) {
 		std::cout << "SOCKET: ERROR" << std::endl;
 	} else {
@@ -78,8 +79,9 @@ void Server::initialize_server() {
 		std::cout << "LISTEN: OK" << std::endl;
 	}
 
-
-	acceptNewClient();
+	while (1) {
+		acceptNewClient();
+	}
 
 }
 
@@ -89,34 +91,108 @@ in_addr Server::get_in_addr(struct sockaddr *sa){
 
 }
 
+void Server::setFds(fd_set *ptr) {
+	FD_ZERO(ptr);
+
+	std::vector<int>::iterator it = monitored_fds.begin();
+
+	while (it != monitored_fds.end()) {
+		FD_SET(*it, ptr);
+		it++;
+	}
+}
+
+int Server::getMaxFd() {
+	
+	int max = -1;
+
+	std::vector<int>::iterator it = monitored_fds.begin();
+
+	while (it != monitored_fds.end()){
+		if (*it > max) max = *it;
+		it++;
+	}
+	return max;
+}
+
 
 void Server::acceptNewClient() {
 
 	struct sockaddr_storage clientAddr;
 	socklen_t 				size = sizeof(clientAddr);
+	char buffer[1024];
 
-	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
+	fd_set readfds;
+	setFds(&readfds);
 
-	if (new_fd == -1) {
-		std::cout << "NEW_FD: ERROR" << std::endl;
-	} else {
-		clients[new_fd] = Client::createClient(clientAddr, size);
-		clients[new_fd]->setNickname("Anastacia");
-		std::cout << "Testing creation of Client: " << clients[new_fd]->getNickname() << std::endl;
-		std::cout << "NEW_FD: OK" << std::endl;
-	}
+	select(getMaxFd() + 1, &readfds, NULL, NULL, NULL);
 
-	clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
-	std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+	if (FD_ISSET(sockfd, &readfds)){
+		std::cout << "Connection request from a new client" << std::endl;
 
-	if (!fork()) {
-		close(sockfd);
-		if (send(new_fd, "Hello World!", 13, 0) == -1) {
-			std::cout << "error on sending" << std::endl;
+		int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
+		if (new_fd == -1) {
+			std::cout << "NEW_FD: ERROR" << std::endl;
+		} else {
+			clients[new_fd] = Client::createClient(clientAddr, size);
+			clients[new_fd]->setNickname("Anastacia");
+			std::cout << "Testing creation of Client: " << clients[new_fd]->getNickname() << std::endl;
+			std::cout << "NEW_FD: OK" << std::endl;
+
+			monitored_fds.push_back(new_fd);
+			std::cout << "new_fd added to monitored_fds" << std::endl;
+
+			clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
+			std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
 		}
-		close(new_fd);
+
+	} else { // if the fd already exist in list
+
+		int actual_fd = -1;
+		int data;
+
+		std::vector<int>::iterator it = monitored_fds.begin();
+
+		while (it != monitored_fds.end()) {
+			if (FD_ISSET(*it, &readfds)){
+				actual_fd = *it;
+
+				memset(buffer, 0, 1024);
+
+				std::cout << "waiting for data" << std::endl;
+
+				if (read(actual_fd, buffer, 1024) >= 0) {
+					memcpy(&data, buffer, sizeof(int));
+					std::cout << "message: " << buffer << std::endl;
+				}
+				if (data == 0) {
+					std::cout << "sending back to client" << std::endl;
+					memset(buffer, 0, 1024);
+					write(actual_fd, buffer, 1024);
+					close(actual_fd);
+					monitored_fds.erase(it);
+					continue;
+				}
+			}
+
+			it++;
+		}
 	}
-	close(new_fd);
+
+	
+
+	
+
+	
+
+	// if (!fork()) {
+	// 	close(sockfd);
+	// 	if (send(new_fd, "Hello World!", 13, 0) == -1) {
+	// 		std::cout << "error on sending" << std::endl;
+	// 	}
+	// 	close(new_fd);
+	// }
+	// close(new_fd);
 	
 }
 

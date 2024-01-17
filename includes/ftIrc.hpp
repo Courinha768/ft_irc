@@ -14,6 +14,7 @@
 # include <unistd.h>
 # include <map>
 # include <arpa/inet.h>
+# include <vector>
 
 //my include files
 # include "defines.hpp"
