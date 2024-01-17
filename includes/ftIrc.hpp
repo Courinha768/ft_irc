@@ -13,6 +13,7 @@
 # include <netdb.h>
 # include <unistd.h>
 # include <map>
+# include <arpa/inet.h>
 
 //my include files
 # include "defines.hpp"

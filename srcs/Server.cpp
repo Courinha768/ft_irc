@@ -58,6 +58,13 @@ void Server::initialize_server() {
 	} else {
 		std::cout << "SOCKET: OK" << std::endl;
 	}
+	int yes = 1;
+
+	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
+		std::cout << "set socket error" << std::endl;
+	} else {
+		std::cout << "set socket ok" << std::endl;
+	}
 
 	if ((status = bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen) != 0)) {
 		std::cout << "BIND: ERROR" << std::endl;
@@ -71,10 +78,17 @@ void Server::initialize_server() {
 		std::cout << "LISTEN: OK" << std::endl;
 	}
 
+
 	acceptNewClient();
 
+}
+
+in_addr Server::get_in_addr(struct sockaddr *sa){
+
+	return (((struct sockaddr_in*)sa)->sin_addr);
 
 }
+
 
 void Server::acceptNewClient() {
 
@@ -87,8 +101,22 @@ void Server::acceptNewClient() {
 		std::cout << "NEW_FD: ERROR" << std::endl;
 	} else {
 		clients[new_fd] = Client::createClient(clientAddr, size);
+		clients[new_fd]->setNickname("Anastacia");
+		std::cout << "Testing creation of Client: " << clients[new_fd]->getNickname() << std::endl;
 		std::cout << "NEW_FD: OK" << std::endl;
 	}
+
+	clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
+	std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+
+	if (!fork()) {
+		close(sockfd);
+		if (send(new_fd, "Hello World!", 13, 0) == -1) {
+			std::cout << "error on sending" << std::endl;
+		}
+		close(new_fd);
+	}
+	close(new_fd);
 	
 }
 

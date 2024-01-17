@@ -25,6 +25,7 @@ class Server {
 		static bool isPortValid(std::string port);
 		void setup();
 		void initialize_server();
+		in_addr get_in_addr(struct sockaddr *sa);
 		void acceptNewClient();
 
 };

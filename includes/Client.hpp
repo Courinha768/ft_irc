@@ -8,6 +8,7 @@ class Client {
 	private:
 		struct sockaddr_storage	addr;
 		socklen_t				size;
+		std::string				text_addr;
 		std::string				username;
 		std::string				nickname;
 
@@ -22,6 +23,8 @@ class Client {
 		void setNickname(std::string name);
 		sockaddr_storage getAddr() const;
 		socklen_t getSize() const;
+		std::string getTextAddr() const;
+		void setTextAddr(std::string addr);
 		static Client * createClient(struct sockaddr_storage addr, socklen_t size);
 
 
