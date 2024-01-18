@@ -1,5 +1,18 @@
 #include "../includes/Server.hpp"
 
+static bool isPortValid(std::string port) {
+	if (port.find_first_not_of(NUMERALS) != EOS) {
+		std::cout << "Port should be an int value" << std::endl;
+		return false;
+	}
+	int portInt = atoi(port.c_str());
+	if (portInt < RP_MIN || portInt > RP_MAX) {
+		std::cout << "Port should be a number between 1024 and 65535" << std::endl;
+		return false;
+	}
+	return true;
+}
+
 Server::Server(std::string port, std::string password) {
 	if (isPortValid(port)) {
 		this->port = port;
@@ -23,18 +36,6 @@ Server::~Server() {
 	freeaddrinfo(servinfo);
 }
 
-bool Server::isPortValid(std::string port) {
-	if (port.find_first_not_of("0123456789") != std::string::npos) {
-		std::cout << "Port should be an int value" << std::endl;
-		return false;
-	}
-	int portInt = atoi(port.c_str());
-	if (portInt < 1024 || portInt > 65535) {
-		std::cout << "Port should be a number between 1024 and 65535" << std::endl;
-		return false;
-	}
-	return true;
-}
 
 void Server::setup() {
 	memset(&serv, 0, sizeof(serv));
@@ -43,43 +44,19 @@ void Server::setup() {
 	serv.ai_socktype = SOCK_STREAM;
 	serv.ai_protocol = getprotobyname("TCP")->p_proto;
 
-	if ((status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo)) != 0) {
-		std::cout << "GETADDRINFO: ERROR" << std::endl;
-	} else {
-		std::cout << "GETADDRINFO: OK" << std::endl;
-	}
+	error("GETADDRINFO", (status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo)) == 0);
 }
 
 void Server::initialize_server() {
 
-	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-	if (sockfd == -1) {
-		std::cout << "SOCKET: ERROR" << std::endl;
-	} else {
-		std::cout << "SOCKET: OK" << std::endl;
-	}
-	int yes = 1;
-
-	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(int)) == -1) {
-		std::cout << "set socket error" << std::endl;
-	} else {
-		std::cout << "set socket ok" << std::endl;
-	}
-
-	if ((status = bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen) != 0)) {
-		std::cout << "BIND: ERROR" << std::endl;
-	} else {
-		std::cout << "BIND: OK" << std::endl;
-	}
-
-	if ((status = listen(sockfd, 5)) == -1) {
-		std::cout << "LISTEN: ERROR" << std::endl;
-	} else {
-		std::cout << "LISTEN: OK" << std::endl;
-	}
+	int option_value = 1;
+	
+	error("SOCKET", (sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) != -1);
+	error("SET SOCKET", setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) != -1);
+	error("BIND", (bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) == 0);
+	error("SOCKET", (listen(sockfd, 5)) != -1);
 
 	setupPoll();
-
 }
 
 in_addr Server::get_in_addr(struct sockaddr *sa){

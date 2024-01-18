@@ -23,5 +23,6 @@
 # include "structs.hpp"
 # include "Server.hpp"
 # include "Client.hpp"
+# include "colors.hpp"
 
 #endif

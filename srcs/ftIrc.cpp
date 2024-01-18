@@ -1,6 +1,5 @@
 # include "../includes/ftIrc.hpp"
 
-// ! Branch Courinha
 int main(int ac, char** av) {
 	
 	if (ac == 3) {
