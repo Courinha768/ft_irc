@@ -17,6 +17,7 @@ class Server {
 		int				sockfd;
 		std::map<int, Client *>	clients;
 		std::vector<int> monitored_fds;
+		char			message[BUFFER_SIZE];
 
 	public:
 		Server(std::string port, std::string password);

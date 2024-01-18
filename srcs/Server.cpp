@@ -120,14 +120,16 @@ void Server::acceptNewClient() {
 
 	struct sockaddr_storage clientAddr;
 	socklen_t 				size = sizeof(clientAddr);
-	char buffer[1024];
 
 	fd_set readfds;
 	setFds(&readfds);
 
 	select(getMaxFd() + 1, &readfds, NULL, NULL, NULL);
 
-	if (FD_ISSET(sockfd, &readfds)){
+	int status;
+
+	if ((status = FD_ISSET(sockfd, &readfds))){
+		std::cout << "status: " << status << std::endl;
 		std::cout << "Connection request from a new client" << std::endl;
 
 		int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
@@ -146,7 +148,9 @@ void Server::acceptNewClient() {
 			std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
 		}
 
-	} else { // if the fd already exist in list
+	} else {
+
+		std::cout << "status: " << status << std::endl;
 
 		int actual_fd = -1;
 		int data;
@@ -157,18 +161,18 @@ void Server::acceptNewClient() {
 			if (FD_ISSET(*it, &readfds)){
 				actual_fd = *it;
 
-				memset(buffer, 0, 1024);
+				memset(message, 0, BUFFER_SIZE);
 
 				std::cout << "waiting for data" << std::endl;
 
-				if (read(actual_fd, buffer, 1024) >= 0) {
-					memcpy(&data, buffer, sizeof(int));
-					std::cout << "message: " << buffer << std::endl;
+				if (read(actual_fd, message, BUFFER_SIZE) >= 0) {
+					memcpy(&data, message, sizeof(int));
+					std::cout << "message: " << message << std::endl;
 				}
 				if (data == 0) {
 					std::cout << "sending back to client" << std::endl;
-					memset(buffer, 0, 1024);
-					write(actual_fd, buffer, 1024);
+					memset(message, 0, BUFFER_SIZE);
+					write(actual_fd, message, BUFFER_SIZE);
 					close(actual_fd);
 					monitored_fds.erase(it);
 					continue;
@@ -178,21 +182,6 @@ void Server::acceptNewClient() {
 			it++;
 		}
 	}
-
-	
-
-	
-
-	
-
-	// if (!fork()) {
-	// 	close(sockfd);
-	// 	if (send(new_fd, "Hello World!", 13, 0) == -1) {
-	// 		std::cout << "error on sending" << std::endl;
-	// 	}
-	// 	close(new_fd);
-	// }
-	// close(new_fd);
 	
 }
 
