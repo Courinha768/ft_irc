@@ -12,4 +12,7 @@
 # define RP_MIN 1024
 # define RP_MAX 65535
 
+// Exit codes
+# define PORT_NOT_VALID 1
+
 #endif

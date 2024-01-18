@@ -6,7 +6,9 @@ int main(int ac, char** av) {
 
 		Server server = Server(av[1], av[2]);
 
-		server.initialize_server();
+		server.setup();
+		server.setupPoll();
+
 	} else {
 		std::cout << "Usage: ./ircserv <port> <password>" << std::endl;
 	}
