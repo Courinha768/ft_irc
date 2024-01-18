@@ -16,8 +16,10 @@ class Server {
 		int				status;
 		int				sockfd;
 		std::map<int, Client *>	clients;
-		std::vector<int> monitored_fds;
 		char			message[BUFFER_SIZE];
+		struct	epoll_event event;
+		struct	epoll_event events[200];
+		int		efd;
 
 	public:
 		Server(std::string port, std::string password);
@@ -29,8 +31,7 @@ class Server {
 		void initialize_server();
 		in_addr get_in_addr(struct sockaddr *sa);
 		void acceptNewClient();
-		void setFds(fd_set *ptr);
-		int getMaxFd();
+		void setupPoll();
 
 };
 

@@ -53,7 +53,6 @@ void Server::setup() {
 void Server::initialize_server() {
 
 	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-	monitored_fds.push_back(sockfd);
 	if (sockfd == -1) {
 		std::cout << "SOCKET: ERROR" << std::endl;
 	} else {
@@ -79,9 +78,7 @@ void Server::initialize_server() {
 		std::cout << "LISTEN: OK" << std::endl;
 	}
 
-	while (1) {
-		acceptNewClient();
-	}
+	setupPoll();
 
 }
 
@@ -91,97 +88,89 @@ in_addr Server::get_in_addr(struct sockaddr *sa){
 
 }
 
-void Server::setFds(fd_set *ptr) {
-	FD_ZERO(ptr);
+void Server::setupPoll() {
 
-	std::vector<int>::iterator it = monitored_fds.begin();
-
-	while (it != monitored_fds.end()) {
-		FD_SET(*it, ptr);
-		it++;
+	efd = epoll_create1(0);
+	if (efd == -1) {
+		std::cout << "error creating epoll()" << std::endl;
 	}
-}
 
-int Server::getMaxFd() {
-	
-	int max = -1;
+	event.events = EPOLLIN;
+	event.data.fd = sockfd;
 
-	std::vector<int>::iterator it = monitored_fds.begin();
-
-	while (it != monitored_fds.end()){
-		if (*it > max) max = *it;
-		it++;
+	if (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) == -1) {
+		std::cout << "error adding server socket to epoll instance" << std::endl;
 	}
-	return max;
-}
 
+	while (1) {
+		int numEvents = epoll_wait(efd, events, 200, -1);
 
-void Server::acceptNewClient() {
-
-	struct sockaddr_storage clientAddr;
-	socklen_t 				size = sizeof(clientAddr);
-
-	fd_set readfds;
-	setFds(&readfds);
-
-	select(getMaxFd() + 1, &readfds, NULL, NULL, NULL);
-
-	int status;
-
-	if ((status = FD_ISSET(sockfd, &readfds))){
-		std::cout << "status: " << status << std::endl;
-		std::cout << "Connection request from a new client" << std::endl;
-
-		int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
-		if (new_fd == -1) {
-			std::cout << "NEW_FD: ERROR" << std::endl;
-		} else {
-			clients[new_fd] = Client::createClient(clientAddr, size);
-			clients[new_fd]->setNickname("Anastacia");
-			std::cout << "Testing creation of Client: " << clients[new_fd]->getNickname() << std::endl;
-			std::cout << "NEW_FD: OK" << std::endl;
-
-			monitored_fds.push_back(new_fd);
-			std::cout << "new_fd added to monitored_fds" << std::endl;
-
-			clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
-			std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+		if (numEvents == -1) {
+			std::cout << "failed waiting for events" << std::endl;
+			break;
 		}
 
-	} else {
+		for (int i = 0; i < numEvents; ++i) {
+			if (events[i].data.fd == sockfd) {
 
-		std::cout << "status: " << status << std::endl;
+				// new client
+				acceptNewClient();
 
-		int actual_fd = -1;
-		int data;
+			} else { // client already registered
+				int client_fd = events[i].data.fd;
 
-		std::vector<int>::iterator it = monitored_fds.begin();
-
-		while (it != monitored_fds.end()) {
-			if (FD_ISSET(*it, &readfds)){
-				actual_fd = *it;
-
+				int data;
 				memset(message, 0, BUFFER_SIZE);
 
 				std::cout << "waiting for data" << std::endl;
 
-				if (read(actual_fd, message, BUFFER_SIZE) >= 0) {
+				if (read(client_fd, message, BUFFER_SIZE) >= 0) {
 					memcpy(&data, message, sizeof(int));
 					std::cout << "message: " << message << std::endl;
 				}
 				if (data == 0) {
 					std::cout << "sending back to client" << std::endl;
 					memset(message, 0, BUFFER_SIZE);
-					write(actual_fd, message, BUFFER_SIZE);
-					close(actual_fd);
-					monitored_fds.erase(it);
+					write(client_fd, message, BUFFER_SIZE);
+					close(client_fd);
+					epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
 					continue;
 				}
 			}
-
-			it++;
 		}
 	}
+}
+
+
+
+void Server::acceptNewClient() {
+
+	
+	struct sockaddr_storage clientAddr;
+	socklen_t 				size = sizeof(clientAddr);
+
+	std::cout << "Connection request from a new client" << std::endl;
+
+	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
+	if (new_fd == -1) {
+		std::cout << "NEW_FD: ERROR" << std::endl;
+	} else {
+		clients[new_fd] = Client::createClient(clientAddr, size);
+		clients[new_fd]->setNickname("Anastacia");
+		std::cout << "Testing creation of Client: " << clients[new_fd]->getNickname() << std::endl;
+		std::cout << "NEW_FD: OK" << std::endl;
+
+		event.events = EPOLLIN;
+		event.data.fd = new_fd;
+		if (epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) == -1) {
+			std::cout << "error adding new client" << std::endl;
+		}
+		std::cout << "new_fd added to monitored_fds" << std::endl;
+
+		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
+		std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+	}
+	
 	
 }
 

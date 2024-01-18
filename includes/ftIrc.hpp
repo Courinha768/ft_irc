@@ -10,6 +10,7 @@
 # include <netinet/in.h>
 # include <sys/types.h>
 # include <sys/socket.h>
+# include <sys/epoll.h>
 # include <netdb.h>
 # include <unistd.h>
 # include <map>
