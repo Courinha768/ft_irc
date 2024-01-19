@@ -98,7 +98,7 @@ void Server::setupPoll() {
 		std::cout << "error creating epoll()" << std::endl;
 	}
 
-	event.events = EPOLLIN;
+	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
 
 	if (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) == -1) {
@@ -120,21 +120,14 @@ void Server::setupPoll() {
 				acceptNewClient();
 
 			} else { // client already registered
+				bool connectionUp = true;
 				int client_fd = events[i].data.fd;
+				std::map<int, Client*>::iterator it = clients.find(client_fd);
 
-				int data;
-				memset(message, 0, BUFFER_SIZE);
-
-				std::cout << "waiting for data" << std::endl;
-
-				if (read(client_fd, message, BUFFER_SIZE) >= 0) {
-					memcpy(&data, message, sizeof(int));
-					std::cout << "message: " << message << std::endl;
+				if (it != clients.end()) {
+					it->second->handleCommunication(client_fd, &connectionUp);
 				}
-				if (data == 0) {
-					std::cout << "sending back to client" << std::endl;
-					memset(message, 0, BUFFER_SIZE);
-					write(client_fd, message, BUFFER_SIZE);
+				if (!connectionUp) {
 					close(client_fd);
 					epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
 					continue;

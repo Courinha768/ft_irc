@@ -52,3 +52,21 @@ void Client::setTextAddr(std::string addr) {
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size) {
 	return new Client(addr, size);
 }
+
+void Client::handleCommunication(int fd, bool * connectionUp) {
+	int data;
+	memset(message, 0, BUFFER_SIZE);
+
+	std::cout << "waiting for data" << std::endl;
+	if (read(fd, message, BUFFER_SIZE) >= 0) {
+		memcpy(&data, message, sizeof(int));
+		std::cout << "message: " << message << std::endl;
+	}
+	if (data == 0) {
+		*connectionUp = false;
+		std::cout << "coonection lost with client " << getTextAddr() << std::endl;
+		memset(message, 0, BUFFER_SIZE);
+		write(fd, message, BUFFER_SIZE);
+	}
+
+}

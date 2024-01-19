@@ -18,7 +18,7 @@ class Server {
 		int				status;
 		int				sockfd;
 		std::map<int, Client *>	clients;
-		char			message[BUFFER_SIZE];
+		// char			message[BUFFER_SIZE];
 		struct	epoll_event event;
 		struct	epoll_event events[200];
 		int		efd;
