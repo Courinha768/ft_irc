@@ -3,14 +3,16 @@
 
 # include "ftIrc.hpp"
 # include "Client.hpp"
+# include "Password.hpp"
 
 class Client;
+class Password;
 
 class Server {
 
 	private:
 		std::string		port;
-		std::string		password;
+		Password		*password;
 		struct addrinfo	serv;
 		struct addrinfo	*servinfo;
 		int				status;

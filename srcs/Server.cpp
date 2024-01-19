@@ -6,7 +6,7 @@ Server::Server(std::string port, std::string password) {
 	} else {
 		exit(1);
 	}
-	this->password = password;
+	this->password = new Password(password);
 	setup();
 }
 
@@ -21,6 +21,7 @@ Server::~Server() {
 
 	close(sockfd);
 	freeaddrinfo(servinfo);
+	delete password;
 }
 
 bool Server::isPortValid(std::string port) {
@@ -37,6 +38,8 @@ bool Server::isPortValid(std::string port) {
 }
 
 void Server::setup() {
+
+	std::cout << "pass: " << password->getPassword() << std::endl;
 	memset(&serv, 0, sizeof(serv));
 
 	serv.ai_family = AF_INET;
