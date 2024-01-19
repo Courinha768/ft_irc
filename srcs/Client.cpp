@@ -58,7 +58,8 @@ void Client::handleCommunication(int fd, bool * connectionUp) {
 	memset(message, 0, BUFFER_SIZE);
 
 	std::cout << "waiting for data" << std::endl;
-	if (read(fd, message, BUFFER_SIZE) >= 0) {
+
+	if (recv(fd, message, BUFFER_SIZE,MSG_DONTWAIT) >= 0) {
 		memcpy(&data, message, sizeof(int));
 		std::cout << "message: " << message << std::endl;
 	}

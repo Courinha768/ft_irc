@@ -126,6 +126,8 @@ void Server::setupPoll() {
 
 				if (it != clients.end()) {
 					it->second->handleCommunication(client_fd, &connectionUp);
+					//just to test using of send()
+					send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
 				}
 				if (!connectionUp) {
 					close(client_fd);
