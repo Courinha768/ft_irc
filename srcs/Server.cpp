@@ -73,7 +73,7 @@ void Server::setup() {
 
 void Server::setupPoll() {
 
-	
+	struct	epoll_event event;
 
 	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
@@ -96,30 +96,56 @@ void Server::setupPoll() {
 				acceptNewClient();
 
 			} else { // client already registered
-				bool connectionUp = true;
 				int client_fd = events[i].data.fd;
-				std::map<int, Client*>::iterator client = clients.find(client_fd);
-
-				if (client->second->isAuthenticated()) {
-					if (client != clients.end()) {
-						client->second->handleCommunication(client_fd, &connectionUp);
-						//just to test using of send()
-						send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
+				std::map<int, Client*>::iterator client_it = clients.find(client_fd);
+				if (client_it != clients.end()) {
+					Client client = *client_it->second;
+					client.setStatus(true);
+					
+					if (events[i].events == EPOLLIN) {
+						receiveMessage(client_fd, client);
 					}
-					if (!connectionUp) {
+						// //just to test using of send()
+						// send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
+					if (!client.getStatus()) {
 						close(client_fd);
 						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
 						continue;
 					}
-				} else {
-					//password->validate()
 				}
-
+		
 			}
 		}
 	}
 }
 
+void Server::receiveMessage(int fd, Client & client) {
+	int data;
+	memset(recv_buffer, 0, BUFFER_SIZE);
+	if (recv(fd, recv_buffer, BUFFER_SIZE,MSG_DONTWAIT) >= 0) {
+		memcpy(&data, recv_buffer, sizeof(int));
+		message.append(recv_buffer);
+		if (!client.isAuthenticated()) {
+			if(message.compare(0, 5, "PASS ") == 0) {
+				std::string pass = message.substr(5, message.size() - 6); // we need to eliminate the \n on the end of the message
+				client.setAuthentication(password->validate(pass));
+			}
+			else {
+				std::string warning = "Client authentication needed!\n";
+				send(fd, warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
+			}
+		} else {
+			std::cout << "message: " << message << std::endl;
+		}
+		message.erase();
+	}
+	if (data == 0) {
+		client.setStatus(false);
+		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
+		memset(recv_buffer, 0, BUFFER_SIZE);
+		write(fd, recv_buffer, BUFFER_SIZE);
+	}
+}
 
 
 void Server::acceptNewClient() {
@@ -132,26 +158,21 @@ void Server::acceptNewClient() {
 	std::cout << "Connection request from a new client" << std::endl;
 
 	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
-	if (new_fd == -1) {
-		std::cout << "NEW_FD: ERROR" << std::endl;
-	} else {
-		//? Why are we creating a function that is only used here and can be replaced by "new Client(clientAddr, size)"
+	error("CREATING CLIENT FD", new_fd != -1);
+	
+	if (new_fd != -1) {
 		clients[new_fd] = Client::createClient(clientAddr, size);
 		//todo: find how to get nickname from netcat
-		clients[new_fd]->setNickname("Anastacia");
-		std::cout << "Creation of Client: " << clients[new_fd]->getNickname() << std::endl;
 
+		struct	epoll_event event;
 		event.events = EPOLLIN;
 		event.data.fd = new_fd;
 
-		if (epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) == -1) {
-			std::cout << "error adding new client" << std::endl;
-		} 
+		error("ADDING CLIENT TO POLL", epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) != -1);
+
 		std::cout << "new_fd added to monitored_fds" << std::endl;
-		clients[new_fd]->setAuthentication(true);
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
 		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << std::endl;
-		std::cout << std::endl;
 	}	
 }
 

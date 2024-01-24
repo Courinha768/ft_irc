@@ -18,5 +18,8 @@ std::string Password::getPassword() const {
 }
 
 bool Password::validate(std::string pass) {
-	return password.compare(pass) == 0;
+	if (password.compare(0, sizeof(password), pass) == 0) {
+		return true;
+	}
+	return false;
 }

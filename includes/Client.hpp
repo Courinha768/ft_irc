@@ -13,6 +13,7 @@ class Client {
 		std::string				nickname;
 		char					message[BUFFER_SIZE];
 		bool					authenticated;
+		bool					status;
 
 	public:
 		Client(struct sockaddr_storage addr, socklen_t size);
@@ -29,9 +30,10 @@ class Client {
 		void setTextAddr(std::string addr);
 		bool isAuthenticated() const;
 		void setAuthentication(bool status);
+		void setStatus(bool status);
+		bool getStatus() const;
 		static Client * createClient(struct sockaddr_storage addr, socklen_t size);
 
-		void handleCommunication(int fd, bool * connectionUp);
 
 
 };

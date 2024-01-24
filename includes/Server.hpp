@@ -20,8 +20,9 @@ class Server {
 		int				sockfd;
 
 		std::map<int, Client *>	clients;
-		// char			message[BUFFER_SIZE];
-		struct	epoll_event event;
+		char			recv_buffer[BUFFER_SIZE];
+		std::string		message;
+		// struct	epoll_event event;
 		// std::vector<epoll_event> events;
 		struct	epoll_event events[200];
 		int		efd;
@@ -39,6 +40,7 @@ class Server {
 		void acceptNewClient();
 		bool authentication(std::string pass);
 		void setupPoll();
+		void receiveMessage(int fd, Client & client);
 
 };
 
