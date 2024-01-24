@@ -122,18 +122,23 @@ void Server::setupPoll() {
 			} else { // client already registered
 				bool connectionUp = true;
 				int client_fd = events[i].data.fd;
-				std::map<int, Client*>::iterator it = clients.find(client_fd);
+				std::map<int, Client*>::iterator client = clients.find(client_fd);
 
-				if (it != clients.end()) {
-					it->second->handleCommunication(client_fd, &connectionUp);
-					//just to test using of send()
-					send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
+				if (client->second->isAuthenticated()) {
+					if (client != clients.end()) {
+						client->second->handleCommunication(client_fd, &connectionUp);
+						//just to test using of send()
+						send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
+					}
+					if (!connectionUp) {
+						close(client_fd);
+						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
+						continue;
+					}
+				} else {
+					//password->validate()
 				}
-				if (!connectionUp) {
-					close(client_fd);
-					epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
-					continue;
-				}
+
 			}
 		}
 	}
@@ -162,14 +167,15 @@ void Server::acceptNewClient() {
 		event.data.fd = new_fd;
 		if (epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) == -1) {
 			std::cout << "error adding new client" << std::endl;
-		}
+		} 
 		std::cout << "new_fd added to monitored_fds" << std::endl;
-
+		clients[new_fd]->setAuthentication(true);
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
 		std::cout << "got connection from " << clients[new_fd]->getTextAddr() << std::endl;
 	}
 	
 	
 }
+
 
 

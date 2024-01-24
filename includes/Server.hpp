@@ -20,6 +20,7 @@ class Server {
 		std::map<int, Client *>	clients;
 		// char			message[BUFFER_SIZE];
 		struct	epoll_event event;
+		// std::vector<epoll_event> events;
 		struct	epoll_event events[200];
 		int		efd;
 
@@ -33,6 +34,7 @@ class Server {
 		void initialize_server();
 		in_addr get_in_addr(struct sockaddr *sa);
 		void acceptNewClient();
+		bool authentication(std::string pass);
 		void setupPoll();
 
 };

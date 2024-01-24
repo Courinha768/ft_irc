@@ -1,7 +1,9 @@
 #include "../includes/Client.hpp"
 
 
-Client::Client(struct sockaddr_storage addr, socklen_t size) : addr(addr), size(size) {}
+Client::Client(struct sockaddr_storage addr, socklen_t size) : addr(addr), size(size) {
+	authenticated = false;
+}
 
 Client::~Client() {}
 
@@ -48,6 +50,13 @@ std::string Client::getTextAddr() const {
 void Client::setTextAddr(std::string addr) {
 	this->text_addr = addr;
 }
+bool Client::isAuthenticated() const {
+	return authenticated;
+}
+
+void Client::setAuthentication(bool status) {
+	authenticated = status;
+}
 
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size) {
 	return new Client(addr, size);
@@ -71,3 +80,5 @@ void Client::handleCommunication(int fd, bool * connectionUp) {
 	}
 
 }
+
+
