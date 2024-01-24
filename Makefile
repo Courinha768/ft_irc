@@ -1,6 +1,6 @@
 NAME			= ircserv
 
-SRCS			= ./srcs/ftIrc.cpp ./srcs/Server.cpp ./srcs/Client.cpp ./srcs/Password.cpp
+SRCS			= ./srcs/ftIrc.cpp ./srcs/Server.cpp ./srcs/Client.cpp ./srcs/Password.cpp ./srcs/error.cpp
 OBJS			= $(SRCS:.cpp=.o)
 
 INC				= -I ./includes
