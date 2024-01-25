@@ -105,8 +105,6 @@ void Server::setupPoll() {
 					if (events[i].events == EPOLLIN) {
 						receiveMessage(client);
 					}
-						// //just to test using of send()
-						// send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
 					if (!client.getStatus()) {
 						close(client_fd);
 						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
@@ -120,31 +118,34 @@ void Server::setupPoll() {
 }
 
 void Server::receiveMessage(Client & client) {
-	int data;
+	// int data;
 	memset(recv_buffer, 0, BUFFER_SIZE);
-	if (recv(client.getFd(), recv_buffer, BUFFER_SIZE,MSG_DONTWAIT) >= 0) {
-		memcpy(&data, recv_buffer, sizeof(int));
-		message.append(recv_buffer);
-		if (!client.isAuthenticated()) {
-			if(message.compare(0, 5, "PASS ") == 0) {
-				std::string pass = message.substr(5, message.size() - 6); // we need to eliminate the \n on the end of the message
-				client.setAuthentication(password->validate(pass));
-			}
-			else {
-				std::string warning = "Client authentication needed!\n";
-				send(client.getFd(), warning.c_str(), sizeof(warning), 0);
-			}
-		} else {
-			std::cout << "message: " << message << std::endl;
-		}
-		message.erase();
+	int bytes_recv = 0;
+	bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
+	if (bytes_recv == -1) {
+		error("ERROR READING SOCKET", false);
 	}
-	if (data == 0) {
+	if (bytes_recv == 0) {
 		client.setStatus(false);
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
-		memset(recv_buffer, 0, BUFFER_SIZE);
-		write(client.getFd(), recv_buffer, BUFFER_SIZE);
 	}
+	message.append(recv_buffer);
+	std::cout << message << std::endl;
+	// if (recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0) >= 0) {
+	// 	if (!client.isAuthenticated()) {
+	// 		if(message.compare(0, 5, "PASS ") == 0) {
+	// 			std::string pass = message.substr(5, message.size() - 6); // we need to eliminate the \n on the end of the message
+	// 			client.setAuthentication(password->validate(pass));
+	// 		}
+	// 		else {
+	// 			std::string warning = "Client authentication needed!\n";
+	// 			send(client.getFd(), warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
+	// 		}
+	// 	} else {
+	// 		std::cout << "message: " << message << std::endl;
+	// 	}
+	// 	message.erase();
+	// }
 }
 
 
