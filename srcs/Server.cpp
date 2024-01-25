@@ -103,7 +103,7 @@ void Server::setupPoll() {
 					client.setStatus(true);
 					
 					if (events[i].events == EPOLLIN) {
-						receiveMessage(client_fd, client);
+						receiveMessage(client);
 					}
 						// //just to test using of send()
 						// send(client_fd, "Received!!\n", 11, MSG_NOSIGNAL);
@@ -119,10 +119,10 @@ void Server::setupPoll() {
 	}
 }
 
-void Server::receiveMessage(int fd, Client & client) {
+void Server::receiveMessage(Client & client) {
 	int data;
 	memset(recv_buffer, 0, BUFFER_SIZE);
-	if (recv(fd, recv_buffer, BUFFER_SIZE,MSG_DONTWAIT) >= 0) {
+	if (recv(client.getFd(), recv_buffer, BUFFER_SIZE,MSG_DONTWAIT) >= 0) {
 		memcpy(&data, recv_buffer, sizeof(int));
 		message.append(recv_buffer);
 		if (!client.isAuthenticated()) {
@@ -132,7 +132,7 @@ void Server::receiveMessage(int fd, Client & client) {
 			}
 			else {
 				std::string warning = "Client authentication needed!\n";
-				send(fd, warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
+				send(client.getFd(), warning.c_str(), sizeof(warning), 0);
 			}
 		} else {
 			std::cout << "message: " << message << std::endl;
@@ -143,7 +143,7 @@ void Server::receiveMessage(int fd, Client & client) {
 		client.setStatus(false);
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 		memset(recv_buffer, 0, BUFFER_SIZE);
-		write(fd, recv_buffer, BUFFER_SIZE);
+		write(client.getFd(), recv_buffer, BUFFER_SIZE);
 	}
 }
 
@@ -161,7 +161,7 @@ void Server::acceptNewClient() {
 	error("CREATING CLIENT FD", new_fd != -1);
 	
 	if (new_fd != -1) {
-		clients[new_fd] = Client::createClient(clientAddr, size);
+		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
 		//todo: find how to get nickname from netcat
 
 		struct	epoll_event event;

@@ -40,7 +40,7 @@ class Server {
 		void acceptNewClient();
 		bool authentication(std::string pass);
 		void setupPoll();
-		void receiveMessage(int fd, Client & client);
+		void receiveMessage(Client & client);
 
 };
 
