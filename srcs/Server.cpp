@@ -130,22 +130,24 @@ void Server::receiveMessage(Client & client) {
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 	}
 	message.append(recv_buffer);
-	std::cout << message << std::endl;
-	// if (recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0) >= 0) {
-	// 	if (!client.isAuthenticated()) {
-	// 		if(message.compare(0, 5, "PASS ") == 0) {
-	// 			std::string pass = message.substr(5, message.size() - 6); // we need to eliminate the \n on the end of the message
-	// 			client.setAuthentication(password->validate(pass));
-	// 		}
-	// 		else {
-	// 			std::string warning = "Client authentication needed!\n";
-	// 			send(client.getFd(), warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
-	// 		}
-	// 	} else {
-	// 		std::cout << "message: " << message << std::endl;
-	// 	}
-	// 	message.erase();
-	// }
+	
+	if (!client.isAuthenticated()) {
+		size_t pos = message.find("PASS");
+		if(pos != std::string::npos) {
+			size_t end = message.find("\n", pos);
+			size_t start = pos + 5;
+			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
+			client.setAuthentication(password->validate(pass));
+		}
+		else {
+			std::string warning = "Client authentication needed!\n";
+			send(client.getFd(), warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
+		}
+		message.erase();
+	} else {
+		std::cout << message << std::endl;
+	}
+	
 }
 
 
