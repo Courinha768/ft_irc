@@ -118,7 +118,6 @@ void Server::setupPoll() {
 }
 
 void Server::receiveMessage(Client & client) {
-	// int data;
 	memset(recv_buffer, 0, BUFFER_SIZE);
 	int bytes_recv = 0;
 	bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
@@ -132,22 +131,30 @@ void Server::receiveMessage(Client & client) {
 	message.append(recv_buffer);
 	
 	if (!client.isAuthenticated()) {
-		size_t pos = message.find("PASS");
+		authenticate(client);
+	} else {
+		std::cout << message << std::endl;
+	}
+	
+}
+
+void Server::authenticate(Client & client) {
+	size_t pos = message.find("PASS");
 		if(pos != std::string::npos) {
 			size_t end = message.find("\n", pos);
 			size_t start = pos + 5;
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
+			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
 		}
 		else {
-			std::string warning = "Client authentication needed!\n";
-			send(client.getFd(), warning.c_str(), sizeof(warning), MSG_NOSIGNAL);
+			sendWarning("Client authentication needed!\n", client);
 		}
 		message.erase();
-	} else {
-		std::cout << message << std::endl;
-	}
-	
+}
+
+void Server::sendWarning(std::string msg, Client & client) {
+	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }
 
 
