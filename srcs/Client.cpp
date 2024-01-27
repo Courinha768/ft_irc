@@ -1,7 +1,9 @@
 #include "../includes/Client.hpp"
 
 
-Client::Client(struct sockaddr_storage addr, socklen_t size) : addr(addr), size(size) {}
+Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
+	authenticated = false;
+}
 
 Client::~Client() {}
 
@@ -12,6 +14,7 @@ Client::Client(Client const & src) {
 Client & Client::operator=(Client const & rhs) {
 	this->addr = rhs.getAddr();
 	this->size = rhs.getSize();
+	this->fd = rhs.getFd();
 	this->username = rhs.getUsername();
 	this->nickname = rhs.getNickname();
 	return *this;
@@ -40,6 +43,9 @@ sockaddr_storage Client::getAddr() const {
 socklen_t Client::getSize() const {
 	return size;
 }
+int Client::getFd() const {
+	return fd;
+}
 
 std::string Client::getTextAddr() const {
 	return text_addr;
@@ -48,7 +54,25 @@ std::string Client::getTextAddr() const {
 void Client::setTextAddr(std::string addr) {
 	this->text_addr = addr;
 }
-
-Client * Client::createClient(struct sockaddr_storage addr, socklen_t size) {
-	return new Client(addr, size);
+bool Client::isAuthenticated() const {
+	return authenticated;
 }
+
+void Client::setAuthentication(bool status) {
+ 	authenticated = status;
+	error("CLIENT AUTHENTICATION", status);
+}
+
+Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {
+	return new Client(addr, size, fd);
+}
+
+void Client::setStatus(bool status) {
+	this->status = status;
+}
+
+bool Client::getStatus() const {
+	return status;
+}
+
+

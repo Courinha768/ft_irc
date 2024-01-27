@@ -23,7 +23,7 @@ Server::Server(std::string port, std::string password) {
 	} else {
 		exit(PORT_NOT_VALID);
 	}
-	this->password = password;
+	this->password = new Password(password);
 
 }
 
@@ -43,6 +43,7 @@ Server::~Server() {
 
 	close(sockfd);
 	freeaddrinfo(servinfo);
+	delete password;
 
 }
 
@@ -72,7 +73,9 @@ void Server::setup() {
 
 void Server::setupPoll() {
 
-	event.events = EPOLLIN;
+	struct	epoll_event event;
+
+	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
 
 	error("EPOLL", (efd = epoll_create1(0)) != -1);
@@ -93,36 +96,66 @@ void Server::setupPoll() {
 				acceptNewClient();
 
 			} else { // client already registered
-
 				int client_fd = events[i].data.fd;
-				int data;
-
-				//? What is this doing
-				memset(message, 0, BUFFER_SIZE);
-
-				if (read(client_fd, message, BUFFER_SIZE) >= 0) {
-					//? Why are we cpy the memory to data
-					memcpy(&data, message, sizeof(int));
-					//todo: find the name of the client sending the message
-					std::cout << "message: " << message << std::endl;
+				std::map<int, Client*>::iterator client_it = clients.find(client_fd);
+				if (client_it != clients.end()) {
+					Client client = *client_it->second;
+					client.setStatus(true);
+					
+					if (events[i].events == EPOLLIN) {
+						receiveMessage(client);
+					}
+					if (!client.getStatus()) {
+						close(client_fd);
+						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
+						continue;
+					}
 				}
-				if (data == 0) {
-					std::cout << "Client leaving" << std::endl;
-					//? What is this doing (same as before?)
-					memset(message, 0, BUFFER_SIZE);
-					//? Why are we writing BUFFER_SIZE and not the size of the message
-					//? Why does it print 2 \n's
-					write(client_fd, message, BUFFER_SIZE);
-					close(client_fd);
-
-					epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
-				}
-
+		
 			}
 		}
 	}
 }
 
+void Server::receiveMessage(Client & client) {
+	memset(recv_buffer, 0, BUFFER_SIZE);
+	int bytes_recv = 0;
+	bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
+	if (bytes_recv == -1) {
+		error("ERROR READING SOCKET", false);
+	}
+	if (bytes_recv == 0) {
+		client.setStatus(false);
+		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
+	}
+	message.append(recv_buffer);
+	
+	if (!client.isAuthenticated()) {
+		authenticate(client);
+	} else {
+		std::cout << message << std::endl;
+	}
+	
+}
+
+void Server::authenticate(Client & client) {
+	size_t pos = message.find("PASS");
+		if(pos != std::string::npos) {
+			size_t end = message.find("\n", pos);
+			size_t start = pos + 5;
+			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
+			client.setAuthentication(password->validate(pass));
+			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
+		}
+		else {
+			sendWarning("Client authentication needed!\n", client);
+		}
+		message.erase();
+}
+
+void Server::sendWarning(std::string msg, Client & client) {
+	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
+}
 
 
 void Server::acceptNewClient() {
@@ -135,29 +168,27 @@ void Server::acceptNewClient() {
 	std::cout << "Connection request from a new client" << std::endl;
 
 	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
-	if (new_fd == -1) {
-		std::cout << "NEW_FD: ERROR" << std::endl;
-	} else {
-		//? Why are we creating a function that is only used here and can be replaced by "new Client(clientAddr, size)"
-		clients[new_fd] = Client::createClient(clientAddr, size);
+	error("CREATING CLIENT FD", new_fd != -1);
+	
+	if (new_fd != -1) {
+		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
 		//todo: find how to get nickname from netcat
-		clients[new_fd]->setNickname("Anastacia");
-		std::cout << "Creation of Client: " << clients[new_fd]->getNickname() << std::endl;
 
+		struct	epoll_event event;
 		event.events = EPOLLIN;
 		event.data.fd = new_fd;
 
-		if (epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) == -1) {
-			std::cout << "error adding new client" << std::endl;
-		}
-		std::cout << clients[new_fd]->getNickname() << "'fd added to monitored_fds" << std::endl;
+		error("ADDING CLIENT TO POLL", epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) != -1);
 
+		std::cout << "new_fd added to monitored_fds" << std::endl;
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
 		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << std::endl;
-		std::cout << std::endl;
 	}	
 }
 
 in_addr Server::get_in_addr(struct sockaddr *sa){
 	return (((struct sockaddr_in*)sa)->sin_addr);
 }
+
+
+
