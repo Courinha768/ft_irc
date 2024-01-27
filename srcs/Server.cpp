@@ -1,5 +1,8 @@
 #include "../includes/Server.hpp"
 
+/**
+ * This function validates if the given port is a valid integer within the range of 1024 to 65535.
+ */
 static bool isPortValid(std::string port) {
 
 	if (port.find_first_not_of(NUMERALS) != EOS) {
@@ -16,6 +19,14 @@ static bool isPortValid(std::string port) {
 
 }
 
+/**
+ * Initializes a Server with the provided port and password. If the port is valid,
+ * it is assigned to the server; otherwise, the program exits with an error code.
+ * The password is used to create a Password object, which is assigned to the server.
+ *
+ * @param {port} The port for the server.
+ * @param {password} The password for the server.
+ */
 Server::Server(std::string port, std::string password) {
 
 	if (isPortValid(port)) {
@@ -27,11 +38,14 @@ Server::Server(std::string port, std::string password) {
 
 }
 
-//todo: Finnish this
-Server::Server(Server const & src) {
-	(void)src;
-}
-
+/**
+ * This destructor performs cleanup operations for a Server object:
+ * - Iterates through the clients map, deleting each Client object.
+ * - Clears the clients map.
+ * - Closes the server socket (sockfd).
+ * - Frees the address information (servinfo).
+ * - Deletes the Password object.
+ */
 Server::~Server() {
 
 	std::map<int, Client *>::iterator it = clients.begin();
@@ -47,12 +61,19 @@ Server::~Server() {
 
 }
 
-//todo: Finnish this
-Server & Server::operator=(Server const & rhs) {
-	(void)rhs;
-	return *this;
-}
-
+/**
+ * This method configures the Server by performing the following steps:
+ * - Initializes the 'serv' structure and sets relevant parameters.
+ * - Retrieves the TCP protocol and sets it for the 'serv' structure.
+ * - Initializes option_value for socket options.
+ * - Retrieves address information for the server using getaddrinfo.
+ * - Creates a socket using the obtained address information.
+ * - Sets the socket option SO_REUSEADDR.
+ * - Binds the socket to the specified address and port.
+ * - Listens on the socket for incoming connections with a maximum backlog of 5.
+ * 
+ * This method is responsible for setting up the server to start accepting client connections.
+ */
 void Server::setup() {
 
 	memset(&serv, 0, sizeof(serv));
@@ -71,8 +92,20 @@ void Server::setup() {
 
 }
 
+/**
+ * This method continuously waits for events and handles them accordingly:
+ * - If a new client connection event is detected, it calls the acceptNewClient method.
+ * - If the event is associated with an already registered client, it updates the client's
+ *   status and processes incoming data if available.
+ * - If a client's status indicates disconnection, it closes the client's file descriptor,
+ *   removes the client from the epoll set, and continues to the next event.
+ * 
+ * This method ensures that the Server can efficiently manage and respond to various events,
+ * such as new client connections and data reception from existing clients.
+ */
 void Server::setupPoll() {
 
+	//! tried moving all this part to the setup function but couldn't
 	struct	epoll_event event;
 
 	event.events = EPOLLIN | EPOLLOUT;
@@ -80,7 +113,9 @@ void Server::setupPoll() {
 
 	error("EPOLL", (efd = epoll_create1(0)) != -1);
 	error("ADDING TO EPPOL", (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
+	//!end of "this part"
 
+	//todo: clean up this function
 	while (true) {
 
 		int numEvents = epoll_wait(efd, events, 200, -1);
@@ -117,7 +152,13 @@ void Server::setupPoll() {
 	}
 }
 
+/**
+ * Receives and processes messages from a connected client.
+ *
+ * @param {client} Reference to the connected client.
+ */
 void Server::receiveMessage(Client & client) {
+	//todo: clean up this function
 	memset(recv_buffer, 0, BUFFER_SIZE);
 	int bytes_recv = 0;
 	bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
@@ -138,7 +179,16 @@ void Server::receiveMessage(Client & client) {
 	
 }
 
+/**
+ * Processes authentication messages from the client:
+ * - Searches for the "PASS" keyword in the received message. If found, extracts the password from the message and validates it. Sets client authentication status based on the validation result.
+ * - Sends a warning to the client for incorrect passwords.
+ * - If "PASS" is not found, sends a warning about the need for client authentication.
+ *
+ * @param {Client&} client - Reference to the connected client.
+ */
 void Server::authenticate(Client & client) {
+	//todo: clean up this function
 	size_t pos = message.find("PASS");
 		if(pos != std::string::npos) {
 			size_t end = message.find("\n", pos);
@@ -153,14 +203,25 @@ void Server::authenticate(Client & client) {
 		message.erase();
 }
 
+
+/**
+ * Sends a warning message to the specified client's socket.
+ *
+ * @param {msg} The warning message to be sent.
+ * @param {client} Reference to the target client.
+ */
 void Server::sendWarning(std::string msg, Client & client) {
 	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }
 
-
+/**
+ * Accepts a connection request from a new client:
+ * - Creates a new file descriptor (new_fd) for the client.
+ * - Adds the new client to the server's clients map.
+ * - Creates an epoll event for the new client and adds it to the epoll set.
+ */
 void Server::acceptNewClient() {
 
-	
 	struct sockaddr_storage clientAddr;
 	socklen_t 				size = sizeof(clientAddr);
 
@@ -172,7 +233,6 @@ void Server::acceptNewClient() {
 	
 	if (new_fd != -1) {
 		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
-		//todo: find how to get nickname from netcat
 
 		struct	epoll_event event;
 		event.events = EPOLLIN;
@@ -186,6 +246,12 @@ void Server::acceptNewClient() {
 	}	
 }
 
+/**
+ * Retrieves the IPv4 address from a sockaddr structure.
+ *
+ * @param {sa} Pointer to the sockaddr structure.
+ * @returns IPv4 address.
+ */
 in_addr Server::get_in_addr(struct sockaddr *sa){
 	return (((struct sockaddr_in*)sa)->sin_addr);
 }

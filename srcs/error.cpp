@@ -1,5 +1,11 @@
 #include "../includes/ftIrc.hpp"
 
+/**
+ * Displays the status of a service operation.
+ *
+ * @param {service} The name of the service.
+ * @param {status} The status of the service operation.
+ */
 void	error(std::string service, bool status)
 {
 	std::cout << service << ":";
