@@ -24,8 +24,8 @@ static bool isPortValid(std::string port) {
  * it is assigned to the server; otherwise, the program exits with an error code.
  * The password is used to create a Password object, which is assigned to the server.
  *
- * @param {port} The port for the server.
- * @param {password} The password for the server.
+ * @param port The port for the server.
+ * @param password The password for the server.
  */
 Server::Server(std::string port, std::string password) {
 
@@ -78,17 +78,17 @@ void Server::setup() {
 
 	memset(&serv, 0, sizeof(serv));
 
-	serv.ai_family = AF_INET;
-	serv.ai_socktype = SOCK_STREAM;
-	serv.ai_protocol = getprotobyname("TCP")->p_proto;
+	serv.ai_family		= AF_INET;
+	serv.ai_socktype	= SOCK_STREAM;
+	serv.ai_protocol	= getprotobyname("TCP")->p_proto;
 
 	int option_value = 1;
 
-	error("GETADDRINFO", (status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo)) == 0);
-	error("SOCKET", (sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) != -1);
-	error("SET SOCKET", setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) != -1);
-	error("BIND", (bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) == 0);
-	error("SOCKET", (listen(sockfd, 5)) != -1);
+	error("GETADDRINFO"	, (status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo)) == 0);
+	error("SOCKET"		, (sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) != -1);
+	error("SET SOCKET"	, setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) != -1);
+	error("BIND"		, (bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) == 0);
+	error("SOCKET"		, (listen(sockfd, 5)) != -1);
 
 }
 
@@ -108,18 +108,17 @@ void Server::setupPoll() {
 	//! tried moving all this part to the setup function but couldn't
 	struct	epoll_event event;
 
-	event.events = EPOLLIN | EPOLLOUT;
-	event.data.fd = sockfd;
+	event.events	= EPOLLIN | EPOLLOUT;
+	event.data.fd	= sockfd;
 
-	error("EPOLL", (efd = epoll_create1(0)) != -1);
-	error("ADDING TO EPPOL", (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
+	error("EPOLL"			, (efd = epoll_create1(0)) != -1);
+	error("ADDING TO EPPOL"	, (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
 	//!end of "this part"
 
-	//todo: clean up this function
 	while (true) {
 
 		int numEvents = epoll_wait(efd, events, 200, -1);
-		if (numEvents == -1) {
+		if (numEvents == EPPOL_WAIT_ERROR) {
 			std::cout << RED << "ERROR: " << CRESET << "failed waiting for events" << std::endl;
 			break;
 		}
@@ -131,8 +130,10 @@ void Server::setupPoll() {
 				acceptNewClient();
 
 			} else { // client already registered
-				int client_fd = events[i].data.fd;
-				std::map<int, Client*>::iterator client_it = clients.find(client_fd);
+
+				int				client_fd = events[i].data.fd;
+				client_iterator	client_it = clients.find(client_fd);
+
 				if (client_it != clients.end()) {
 					Client client = *client_it->second;
 					client.setStatus(true);
@@ -140,6 +141,7 @@ void Server::setupPoll() {
 					if (events[i].events == EPOLLIN) {
 						receiveMessage(client);
 					}
+
 					if (!client.getStatus()) {
 						close(client_fd);
 						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
@@ -155,16 +157,17 @@ void Server::setupPoll() {
 /**
  * Receives and processes messages from a connected client.
  *
- * @param {client} Reference to the connected client.
+ * @param client Reference to the connected client.
  */
 void Server::receiveMessage(Client & client) {
-	//todo: clean up this function
+
 	memset(recv_buffer, 0, BUFFER_SIZE);
-	int bytes_recv = 0;
-	bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
+
+	int bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
 	if (bytes_recv == -1) {
-		error("ERROR READING SOCKET", false);
+		std::cout << BRED << "ERROR READING SOCKET" << CRESET << std::endl;
 	}
+	
 	if (bytes_recv == 0) {
 		client.setStatus(false);
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
@@ -185,30 +188,33 @@ void Server::receiveMessage(Client & client) {
  * - Sends a warning to the client for incorrect passwords.
  * - If "PASS" is not found, sends a warning about the need for client authentication.
  *
- * @param {Client&} client - Reference to the connected client.
+ * @param client Reference to the connected client.
  */
 void Server::authenticate(Client & client) {
-	//todo: clean up this function
+
 	size_t pos = message.find("PASS");
-		if(pos != std::string::npos) {
-			size_t end = message.find("\n", pos);
-			size_t start = pos + 5;
-			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
-			client.setAuthentication(password->validate(pass));
-			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
-		}
-		else {
-			sendWarning("Client authentication needed!\n", client);
-		}
-		message.erase();
+
+	if(pos != std::string::npos) {
+
+		size_t end = message.find("\n", pos);
+		size_t start = pos + 5;
+		std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
+		client.setAuthentication(password->validate(pass));
+		if (!client.isAuthenticated())
+			sendWarning("Wrong password!\n", client);
+	}
+	else {
+		sendWarning("Client authentication needed! (write \"PASS <password>\")\n", client);
+	}
+	message.erase();
 }
 
 
 /**
  * Sends a warning message to the specified client's socket.
  *
- * @param {msg} The warning message to be sent.
- * @param {client} Reference to the target client.
+ * @param msg The warning message to be sent.
+ * @param client Reference to the target client.
  */
 void Server::sendWarning(std::string msg, Client & client) {
 	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
@@ -249,7 +255,7 @@ void Server::acceptNewClient() {
 /**
  * Retrieves the IPv4 address from a sockaddr structure.
  *
- * @param {sa} Pointer to the sockaddr structure.
+ * @param sa Pointer to the sockaddr structure.
  * @returns IPv4 address.
  */
 in_addr Server::get_in_addr(struct sockaddr *sa){

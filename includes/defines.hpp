@@ -15,4 +15,6 @@
 // Exit codes
 # define PORT_NOT_VALID 1
 
+# define EPPOL_WAIT_ERROR -1
+
 #endif
