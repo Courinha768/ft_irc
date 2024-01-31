@@ -43,6 +43,7 @@ class Server {
 		void receiveMessage(Client & client);
 		void authenticate(Client & client);
 		void sendWarning(std::string msg, Client & client);
+		void getClientInfo(Client & client);
 
 };
 

@@ -3,6 +3,7 @@
 
 Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
 	authenticated = false;
+	registered = false;
 }
 
 Client::~Client() {}
@@ -61,6 +62,15 @@ bool Client::isAuthenticated() const {
 void Client::setAuthentication(bool status) {
  	authenticated = status;
 	error("CLIENT AUTHENTICATION", status);
+}
+
+bool Client::isRegistered() const {
+	return registered;
+}
+
+void Client::registration(bool status) {
+	registered = status;
+	error("REGISTRATION NEDEED", status);
 }
 
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {

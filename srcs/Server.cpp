@@ -133,10 +133,31 @@ void Server::receiveMessage(Client & client) {
 	
 	if (!client.isAuthenticated()) {
 		authenticate(client);
+	} else if (!client.isRegistered()){
+		getClientInfo(client);
 	} else {
 		std::cout << message << std::endl;
 	}
 	
+}
+
+void Server::getClientInfo(Client & client) {
+	std::cout << message << std::endl;
+	size_t pos = message.find("USER");
+	if (pos == std::string::npos) sendWarning("Set username!\n", client);
+	else return;
+	size_t start = pos + 5;
+	size_t end = message.find(" ", start);
+	client.setUsername(message.substr(start, end - start));
+	
+	pos = message.find("NICK");
+	if (pos == std::string::npos) sendWarning("Set nickname!\n", client);
+	else return;
+	start = pos + 5;
+	end = message.find("\n", start);
+	client.setNickname(message.substr(start, end - start));
+	client.registration(true);
+	message.erase();
 }
 
 void Server::authenticate(Client & client) {
@@ -149,6 +170,7 @@ void Server::authenticate(Client & client) {
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
 			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
+			else getClientInfo(client);
 		}
 		else {
 			sendWarning("Client authentication needed!\n", client);
