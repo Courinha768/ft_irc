@@ -129,6 +129,7 @@ void Server::receiveMessage(Client & client) {
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 	}
 	message.append(recv_buffer);
+	sleep(3);
 	
 	if (!client.isAuthenticated()) {
 		authenticate(client);
@@ -139,9 +140,11 @@ void Server::receiveMessage(Client & client) {
 }
 
 void Server::authenticate(Client & client) {
+	
 	size_t pos = message.find("PASS");
 		if(pos != std::string::npos) {
 			size_t end = message.find("\n", pos);
+			if (message.at(end - 1) == '\r') end = end - 1;
 			size_t start = pos + 5;
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
