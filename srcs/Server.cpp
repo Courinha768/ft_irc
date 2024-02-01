@@ -133,49 +133,56 @@ void Server::receiveMessage(Client & client) {
 	
 	if (!client.isAuthenticated()) {
 		authenticate(client);
+	} else if (message.find("USER") != EOS) {
+		setClientUser(client);
+	} else if (message.find("NICK") != EOS) {
+		setClientNick(client);
 	} else {
 		std::cout << message << std::endl;
 	}
-	
+	message.erase();
 }
 
-void Server::getClientInfo(Client & client) {
-	std::cout << message << std::endl;
+void Server::setClientUser(Client & client) {
 	size_t pos = message.find("USER");
 	size_t start, end;
-	if (pos != std::string::npos) {
+	if (pos != EOS) {
 		start = pos + 5;
 		end = message.find(" ", start);
 		client.setUsername(message.substr(start, end - start));
 		client.registration(true);
 	}
-	
-	pos = message.find("NICK");
-	if (pos != std::string::npos) {
+}
+
+void Server::setClientNick(Client & client) {
+	size_t pos = message.find("NICK");
+	size_t start, end;
+	if (pos != EOS) {
 		start = pos + 5;
 		end = message.find("\n", start);
 		client.setNickname(message.substr(start, end - start));
 		client.registration(true);
 	}
-	message.erase();
 }
 
 void Server::authenticate(Client & client) {
 	
 	size_t pos = message.find("PASS");
-		if(pos != std::string::npos) {
+		if(pos != EOS) {
 			size_t end = message.find("\n", pos);
 			if (message.at(end - 1) == '\r') end = end - 1;
 			size_t start = pos + 5;
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
 			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
-			else getClientInfo(client);
+			else {
+				setClientUser(client);
+				setClientNick(client);
+			}
 		}
 		else {
-			sendWarning("Client authentication needed!\n", client);
+			sendWarning("Client authentication needed!\n", client); // we need to check the correct way to warn it!
 		}
-		message.erase();
 }
 
 void Server::sendWarning(std::string msg, Client & client) {
