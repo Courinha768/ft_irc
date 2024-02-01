@@ -22,8 +22,6 @@ class Server {
 		std::map<int, Client *>	clients;
 		char			recv_buffer[BUFFER_SIZE];
 		std::string		message;
-		// struct	epoll_event event;
-		// std::vector<epoll_event> events;
 		struct	epoll_event events[200];
 		int		efd;
 
@@ -43,9 +41,9 @@ class Server {
 		void receiveMessage(Client & client);
 		void authenticate(Client & client);
 		void sendWarning(std::string msg, Client & client);
-		// void getClientInfo(Client & client);
 		void setClientUser(Client & client);
 		void setClientNick(Client & client);
+		void sendRPL(Client & client);
 
 };
 

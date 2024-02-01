@@ -65,7 +65,8 @@ void Client::setAuthentication(bool status) {
 }
 
 bool Client::isRegistered() const {
-	return registered;
+	if (!username.empty() && !nickname.empty()) return true;
+	return false;
 }
 
 void Client::registration(bool status) {

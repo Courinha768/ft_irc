@@ -129,9 +129,9 @@ void Server::receiveMessage(Client & client) {
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 	}
 	message.append(recv_buffer);
-	sleep(2); // time to wait for the complete rgistration message from HexChat
+	sleep(2); // time to wait for the complete registration message from HexChat
 	
-	if (!client.isAuthenticated()) {
+	if (message.find("PASS") != EOS) {
 		authenticate(client);
 	} else if (message.find("USER") != EOS) {
 		setClientUser(client);
@@ -150,7 +150,6 @@ void Server::setClientUser(Client & client) {
 		start = pos + 5;
 		end = message.find(" ", start);
 		client.setUsername(message.substr(start, end - start));
-		client.registration(true);
 	}
 }
 
@@ -162,6 +161,7 @@ void Server::setClientNick(Client & client) {
 		end = message.find("\n", start);
 		client.setNickname(message.substr(start, end - start));
 		client.registration(true);
+		sendRPL(client);
 	}
 }
 
@@ -204,7 +204,6 @@ void Server::acceptNewClient() {
 	
 	if (new_fd != -1) {
 		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
-		//todo: find how to get nickname from netcat
 
 		struct	epoll_event event;
 		event.events = EPOLLIN;
@@ -215,6 +214,7 @@ void Server::acceptNewClient() {
 		std::cout << "new_fd added to monitored_fds" << std::endl;
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
 		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+	
 	}	
 }
 
@@ -222,5 +222,51 @@ in_addr Server::get_in_addr(struct sockaddr *sa){
 	return (((struct sockaddr_in*)sa)->sin_addr);
 }
 
+
+void Server::sendRPL(Client & client) {
+
+	std::string welcome = SERVER_HOST;
+	welcome += " ";
+	welcome += WELCOME;
+	welcome += " " + client.getNickname();
+	welcome += " :Welcome to the ";
+	welcome += NETWORK;
+	welcome += " Network, " + client.getNickname();
+	welcome += "\r\n";
+	send(client.getFd(), welcome.c_str(), welcome.size(), MSG_NOSIGNAL);
+
+	std::string yourHost = SERVER_HOST;
+	yourHost += " ";
+	yourHost += YOUR_HOST;
+	yourHost += " " + client.getNickname();
+	yourHost += " :Your host is ";
+	yourHost += SERVER_HOST;
+	yourHost += ", running version ";
+	yourHost += VERSION;
+	yourHost += "\r\n";
+	send(client.getFd(), yourHost.c_str(), yourHost.size(), MSG_NOSIGNAL);
+
+	std::string created = SERVER_HOST;
+	created += CREATED;
+	created += " " + client.getNickname();
+	created += " :This server was created Thu Feb 01 2024";
+	created += "\r\n";
+	send(client.getFd(), created.c_str(), created.size(), MSG_NOSIGNAL);
+
+	std::string myInfo = SERVER_HOST;
+	myInfo += " ";
+	myInfo += MY_INFO;
+	myInfo += " " + client.getNickname();
+	myInfo += " ";
+	myInfo += SERVER_HOST;
+	myInfo += VERSION;
+	// include list of user modes and channels
+	myInfo += "\r\n";
+	send(client.getFd(), myInfo.c_str(), myInfo.size(), MSG_NOSIGNAL);
+
+
+
+
+}
 
 
