@@ -129,12 +129,10 @@ void Server::receiveMessage(Client & client) {
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 	}
 	message.append(recv_buffer);
-	sleep(3);
+	sleep(2); // time to wait for the complete rgistration message from HexChat
 	
 	if (!client.isAuthenticated()) {
 		authenticate(client);
-	} else if (!client.isRegistered()){
-		getClientInfo(client);
 	} else {
 		std::cout << message << std::endl;
 	}
@@ -144,19 +142,21 @@ void Server::receiveMessage(Client & client) {
 void Server::getClientInfo(Client & client) {
 	std::cout << message << std::endl;
 	size_t pos = message.find("USER");
-	if (pos == std::string::npos) sendWarning("Set username!\n", client);
-	else return;
-	size_t start = pos + 5;
-	size_t end = message.find(" ", start);
-	client.setUsername(message.substr(start, end - start));
+	size_t start, end;
+	if (pos != std::string::npos) {
+		start = pos + 5;
+		end = message.find(" ", start);
+		client.setUsername(message.substr(start, end - start));
+		client.registration(true);
+	}
 	
 	pos = message.find("NICK");
-	if (pos == std::string::npos) sendWarning("Set nickname!\n", client);
-	else return;
-	start = pos + 5;
-	end = message.find("\n", start);
-	client.setNickname(message.substr(start, end - start));
-	client.registration(true);
+	if (pos != std::string::npos) {
+		start = pos + 5;
+		end = message.find("\n", start);
+		client.setNickname(message.substr(start, end - start));
+		client.registration(true);
+	}
 	message.erase();
 }
 

@@ -70,7 +70,7 @@ bool Client::isRegistered() const {
 
 void Client::registration(bool status) {
 	registered = status;
-	error("REGISTRATION NEDEED", status);
+	error("REGISTRATION", status);
 }
 
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {
