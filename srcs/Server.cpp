@@ -191,14 +191,14 @@ void Server::authenticate(Client & client) {
 			size_t start = pos + 5;
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
-			if (!client.isAuthenticated()) sendWarning("Wrong password!\n", client);
+			if (!client.isAuthenticated()) sendWarning("Wrong password!\r\n", client);
 			else {
 				setClientUser(client);
 				setClientNick(client);
 			}
 		}
 		else {
-			sendWarning("Client authentication needed!\n", client); // we need to check the correct way to warn it!
+			sendWarning("Client authentication needed!\r\n", client); // we need to check the correct way to warn it!
 		}
 }
 
@@ -240,40 +240,39 @@ in_addr Server::get_in_addr(struct sockaddr *sa){
 }
 
 
+// to improve!
+
 void Server::sendRPL(Client & client) {
 
 	std::string welcome = SERVER_HOST;
-	welcome += " ";
 	welcome += WELCOME;
-	welcome += " " + client.getNickname();
+	welcome += client.getNickname();
 	welcome += " :Welcome to the ";
 	welcome += NETWORK;
-	welcome += " Network, " + client.getNickname();
+	welcome += "Network, " + client.getNickname();
 	welcome += "\r\n";
 	send(client.getFd(), welcome.c_str(), welcome.size(), MSG_NOSIGNAL);
 
 	std::string yourHost = SERVER_HOST;
-	yourHost += " ";
 	yourHost += YOUR_HOST;
-	yourHost += " " + client.getNickname();
+	yourHost += client.getNickname();
 	yourHost += " :Your host is ";
 	yourHost += SERVER_HOST;
-	yourHost += ", running version ";
+	yourHost += "running version ";
 	yourHost += VERSION;
 	yourHost += "\r\n";
 	send(client.getFd(), yourHost.c_str(), yourHost.size(), MSG_NOSIGNAL);
 
 	std::string created = SERVER_HOST;
 	created += CREATED;
-	created += " " + client.getNickname();
+	created += client.getNickname();
 	created += " :This server was created Thu Feb 01 2024";
 	created += "\r\n";
 	send(client.getFd(), created.c_str(), created.size(), MSG_NOSIGNAL);
 
 	std::string myInfo = SERVER_HOST;
-	myInfo += " ";
 	myInfo += MY_INFO;
-	myInfo += " " + client.getNickname();
+	myInfo += client.getNickname();
 	myInfo += " ";
 	myInfo += SERVER_HOST;
 	myInfo += VERSION;
