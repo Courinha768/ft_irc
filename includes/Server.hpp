@@ -39,6 +39,7 @@ class Server {
 		bool authentication(std::string pass);
 		void setupPoll();
 		void receiveMessage(Client & client);
+		void parseMessage(Client & client);
 		void authenticate(Client & client);
 		void sendWarning(std::string msg, Client & client);
 		void setClientUser(Client & client);

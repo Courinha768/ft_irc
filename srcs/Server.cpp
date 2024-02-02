@@ -131,16 +131,33 @@ void Server::receiveMessage(Client & client) {
 	message.append(recv_buffer);
 	sleep(2); // time to wait for the complete registration message from HexChat
 	
-	if (message.find("PASS") != EOS) {
-		authenticate(client);
-	} else if (message.find("USER") != EOS) {
-		setClientUser(client);
-	} else if (message.find("NICK") != EOS) {
-		setClientNick(client);
-	} else {
-		std::cout << message << std::endl;
-	}
+	parseMessage(client);
+
 	message.erase();
+}
+
+void Server::parseMessage(Client & client) {
+	std::cout << message << std::endl;
+	// netcat sends messages terminating in "\n", not in "\r\n"
+	size_t end = message.find("\n");
+	size_t start = 0;
+	std::cout << "end: " << end << std::endl;
+	while (end != EOS) {
+		std::string msg = message.substr(start, end);
+
+		if (msg.find("PASS") != EOS) {
+			authenticate(client);
+		} else if (msg.find("USER") != EOS) {
+			setClientUser(client);
+		} else if (msg.find("NICK") != EOS) {
+			setClientNick(client);
+		} else {
+			std::cout << msg << std::endl;
+		}
+		start = end + 1;
+		if (start != EOS) end = message.find("\n", start);
+		else end = start;
+	}
 }
 
 void Server::setClientUser(Client & client) {
