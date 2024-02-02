@@ -20,6 +20,7 @@ Server::Server(std::string port, std::string password) {
 
 	if (isPortValid(port)) {
 		this->port = port;
+		eventsCount = 1;
 	} else {
 		exit(PORT_NOT_VALID);
 	}
@@ -72,11 +73,13 @@ void Server::setup() {
 }
 
 void Server::setupPoll() {
+	memset(&events, 0, sizeof(events));
 
 	struct	epoll_event event;
 
 	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
+	events[0].data.fd = sockfd;
 
 	error("EPOLL", (efd = epoll_create1(0)) != -1);
 	error("ADDING TO EPPOL", (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
@@ -102,12 +105,13 @@ void Server::setupPoll() {
 					Client client = *client_it->second;
 					client.setStatus(true);
 					
-					if (events[i].events == EPOLLIN) {
+					// if (events[i].events == EPOLLIN || EPOLLOUT) {
+					// }
 						receiveMessage(client);
-					}
 					if (!client.getStatus()) {
 						close(client_fd);
 						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
+						eventsCount--;
 						continue;
 					}
 				}
@@ -137,11 +141,9 @@ void Server::receiveMessage(Client & client) {
 }
 
 void Server::parseMessage(Client & client) {
-	std::cout << message << std::endl;
 	// netcat sends messages terminating in "\n", not in "\r\n"
 	size_t end = message.find("\n");
 	size_t start = 0;
-	std::cout << "end: " << end << std::endl;
 	while (end != EOS) {
 		std::string msg = message.substr(start, end);
 
@@ -152,7 +154,16 @@ void Server::parseMessage(Client & client) {
 		} else if (msg.find("NICK") != EOS) {
 			setClientNick(client);
 		} else {
-			std::cout << msg << std::endl;
+			// Sending messages to all clients connected to the server, only to test multiclients
+			for (int i = 0; i < 200; i++) {
+				if (events[i].data.fd != client.getFd()) {
+					// using stringstream to convert size_t fds to string.
+					std::stringstream ss;
+					ss << "SOCKET: " << events[i].data.fd << " :" << msg << "\r\n";
+					std::string m = ss.str();
+					send(events[i].data.fd, m.c_str(), m.size(), 0);
+				}
+			}
 		}
 		start = end + 1;
 		if (start != EOS) end = message.find("\n", start);
@@ -222,15 +233,20 @@ void Server::acceptNewClient() {
 	if (new_fd != -1) {
 		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
 
+		fcntl(new_fd, F_SETFL, O_NONBLOCK);
 		struct	epoll_event event;
 		event.events = EPOLLIN;
+		// this way it only accept one client each time
+		// event.events = EPOLLIN | EPOLLOUT;
 		event.data.fd = new_fd;
 
 		error("ADDING CLIENT TO POLL", epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) != -1);
+		events[eventsCount] = event;
+		eventsCount++;
 
 		std::cout << "new_fd added to monitored_fds" << std::endl;
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
-		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << std::endl;
+		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << std::endl;
 	
 	}	
 }

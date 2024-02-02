@@ -23,6 +23,7 @@ class Server {
 		char			recv_buffer[BUFFER_SIZE];
 		std::string		message;
 		struct	epoll_event events[200];
+		int					eventsCount;
 		int		efd;
 
 	public:
