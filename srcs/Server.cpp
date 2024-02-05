@@ -260,40 +260,17 @@ in_addr Server::get_in_addr(struct sockaddr *sa){
 
 void Server::sendRPL(Client & client) {
 
-	std::string welcome = SERVER_HOST;
-	welcome += WELCOME;
-	welcome += client.getNickname();
-	welcome += " :Welcome to the ";
-	welcome += NETWORK;
-	welcome += "Network, " + client.getNickname();
-	welcome += "\r\n";
+	std::string welcome = RPL_WELCOME(client.getNickname());
 	send(client.getFd(), welcome.c_str(), welcome.size(), MSG_NOSIGNAL);
 
-	std::string yourHost = SERVER_HOST;
-	yourHost += YOUR_HOST;
-	yourHost += client.getNickname();
-	yourHost += " :Your host is ";
-	yourHost += SERVER_HOST;
-	yourHost += "running version ";
-	yourHost += VERSION;
-	yourHost += "\r\n";
+	std::string yourHost = RPL_YOURHOST(client.getNickname());
 	send(client.getFd(), yourHost.c_str(), yourHost.size(), MSG_NOSIGNAL);
 
-	std::string created = SERVER_HOST;
-	created += CREATED;
-	created += client.getNickname();
-	created += " :This server was created Thu Feb 01 2024";
-	created += "\r\n";
+	std::string created = RPL_CREATED(client.getNickname());
 	send(client.getFd(), created.c_str(), created.size(), MSG_NOSIGNAL);
 
-	std::string myInfo = SERVER_HOST;
-	myInfo += MY_INFO;
-	myInfo += client.getNickname();
-	myInfo += " ";
-	myInfo += SERVER_HOST;
-	myInfo += VERSION;
-	// include list of user modes and channels
-	myInfo += "\r\n";
+	// // include list of user modes and channels
+	std::string myInfo = RPL_MYINFO(client.getNickname());
 	send(client.getFd(), myInfo.c_str(), myInfo.size(), MSG_NOSIGNAL);
 
 
