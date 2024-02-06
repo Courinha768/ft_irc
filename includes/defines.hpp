@@ -23,7 +23,11 @@
 #define RPL_YOURHOST(nickname)	(":ircserv.42.fr 002 " + nickname + " :Your host is ircserv.42.fr running version 001.1\r\n")
 #define RPL_CREATED(nickname)	(":ircserv.42.fr 003 " + nickname + " :This server was created on thu Feb 01 2024\r\n")
 #define RPL_MYINFO(nickname)	(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1\r\n")
-=======
 # define EPPOL_WAIT_ERROR -1
+
+# define NEED_AUTHENTICATION	"something\n"
+# define NA_SIZE				11
+# define NEED_REGISTRATION		"something else\n"
+# define NR_SIZE				16
 
 #endif

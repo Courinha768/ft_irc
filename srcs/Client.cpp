@@ -1,6 +1,5 @@
 #include "../includes/Client.hpp"
 
-
 Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
 	authenticated = false;
 	registered = false;
@@ -21,6 +20,10 @@ Client & Client::operator=(Client const & rhs) {
 	return *this;
 }
 
+/* -------------------------------------------------------------------------- */
+/*                                   getters                                  */
+/* -------------------------------------------------------------------------- */
+
 std::string Client::getUsername() const {
 	return username;
 }
@@ -29,34 +32,50 @@ std::string Client::getNickname() const {
 	return nickname;
 }
 
-void Client::setUsername(std::string name) {
-	this->username = name;
+int Client::getFd() const {
+	return fd;
 }
 
-void Client::setNickname(std::string name) {
-	this->nickname = name;
+socklen_t Client::getSize() const {
+	return size;
+}
+
+bool Client::getStatus() const {
+	return status;
 }
 
 sockaddr_storage Client::getAddr() const {
 	return addr;
 }
 
-socklen_t Client::getSize() const {
-	return size;
-}
-int Client::getFd() const {
-	return fd;
-}
-
 std::string Client::getTextAddr() const {
 	return text_addr;
 }
 
-void Client::setTextAddr(std::string addr) {
-	this->text_addr = addr;
-}
 bool Client::isAuthenticated() const {
 	return authenticated;
+}
+
+bool Client::isRegistered() const {
+	return (registered);
+}
+
+/* -------------------------------------------------------------------------- */
+/*                                   setters                                  */
+/* -------------------------------------------------------------------------- */
+
+void Client::setUsername(std::string name) {
+	this->username = name;
+	error("CLIENT USERNAME", true);
+}
+
+void Client::setNickname(std::string name) {
+	this->nickname = name;
+	error("CLIENT NICKNAME", true);
+}
+
+void Client::setTextAddr(std::string addr) {
+	this->text_addr = addr;
 }
 
 void Client::setAuthentication(bool status) {
@@ -64,10 +83,13 @@ void Client::setAuthentication(bool status) {
 	error("CLIENT AUTHENTICATION", status);
 }
 
-bool Client::isRegistered() const {
-	if (!username.empty() && !nickname.empty()) return true;
-	return false;
+void Client::setStatus(bool status) {
+	this->status = status;
 }
+
+/* -------------------------------------------------------------------------- */
+/*                                   others                                   */
+/* -------------------------------------------------------------------------- */
 
 void Client::registration(bool status) {
 	registered = status;
@@ -77,13 +99,3 @@ void Client::registration(bool status) {
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {
 	return new Client(addr, size, fd);
 }
-
-void Client::setStatus(bool status) {
-	this->status = status;
-}
-
-bool Client::getStatus() const {
-	return status;
-}
-
-

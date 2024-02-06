@@ -1,66 +1,4 @@
-#include "../includes/Server.hpp"
-
-/**
- * This function validates if the given port is a valid integer within the range of 1024 to 65535.
- */
-static bool isPortValid(std::string port) {
-
-	if (port.find_first_not_of(NUMERALS) != EOS) {
-		std::cout << "Port should be an int value" << std::endl;
-		return false;
-	}
-	int portInt = atoi(port.c_str());
-	if (portInt < RP_MIN || portInt > RP_MAX) {
-		std::cout << "Port should be a number between 1024 and 65535" << std::endl;
-		return false;
-	}
-
-	return true;
-
-}
-
-/**
- * Initializes a Server with the provided port and password. If the port is valid,
- * it is assigned to the server; otherwise, the program exits with an error code.
- * The password is used to create a Password object, which is assigned to the server.
- *
- * @param port The port for the server.
- * @param password The password for the server.
- */
-Server::Server(std::string port, std::string password) {
-
-	if (isPortValid(port)) {
-		this->port = port;
-		eventsCount = 1;
-	} else {
-		exit(PORT_NOT_VALID);
-	}
-	this->password = new Password(password);
-
-}
-
-/**
- * This destructor performs cleanup operations for a Server object:
- * - Iterates through the clients map, deleting each Client object.
- * - Clears the clients map.
- * - Closes the server socket (sockfd).
- * - Frees the address information (servinfo).
- * - Deletes the Password object.
- */
-Server::~Server() {
-
-	std::map<int, Client *>::iterator it = clients.begin();
-	while (it != clients.end()) {
-		delete it->second;
-		it++;
-	}
-	clients.clear();
-
-	close(sockfd);
-	freeaddrinfo(servinfo);
-	delete password;
-
-}
+#include "../../includes/Server.hpp"
 
 /**
  * This method configures the Server by performing the following steps:
@@ -135,16 +73,13 @@ void Server::setupPoll() {
 			} else { // client already registered
 
 				int				client_fd = events[i].data.fd;
-				client_iterator	client_it = clients.find(client_fd);
+				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
 				if (client_it != clients.end()) {
 					Client client = *client_it->second;
 					client.setStatus(true);
 					
-					// if (events[i].events == EPOLLIN || EPOLLOUT) {
-					// }
-						receiveMessage(client);
-					}
+					receiveMessage(client);
 
 					if (!client.getStatus()) {
 						close(client_fd);
@@ -181,33 +116,42 @@ void Server::receiveMessage(Client & client) {
 	sleep(2); // time to wait for the complete registration message from HexChat
 	
 	parseMessage(client);
-
 	message.erase();
 }
 
 void Server::parseMessage(Client & client) {
-	// netcat sends messages terminating in "\n", not in "\r\n"
+
 	size_t end = message.find("\n");
 	size_t start = 0;
+
 	while (end != EOS) {
 		std::string msg = message.substr(start, end);
 
 		if (msg.find("PASS") != EOS) {
 			authenticate(client);
-		} else if (msg.find("USER") != EOS) {
-			setClientUser(client);
-		} else if (msg.find("NICK") != EOS) {
+		} else if (client.isAuthenticated() && msg.find("NICK") != EOS) {
 			setClientNick(client);
-		} else {
+		} else if (client.isAuthenticated() && msg.find("USER") != EOS) {
+			setClientUser(client);
+		} else if (client.isRegistered()) {
+			// Print the message on the server
+			// ? Why is it that when we get here the client already lost his nickname
+			std::cout << client.getNickname() << ": " << msg << "\r\n";
 			// Sending messages to all clients connected to the server, only to test multiclients
 			for (int i = 0; i < 200; i++) {
-				if (events[i].data.fd != client.getFd()) {
+				if (events[i].data.fd && events[i].data.fd != client.getFd()) {
 					// using stringstream to convert size_t fds to string.
 					std::stringstream ss;
-					ss << "SOCKET: " << events[i].data.fd << " :" << msg << "\r\n";
-					std::string m = ss.str();
-					send(events[i].data.fd, m.c_str(), m.size(), 0);
+					ss << client.getNickname() << ": " << msg << "\r\n";
+					std::string message = ss.str();
+					send(events[i].data.fd, message.c_str(), message.size(), 0);
 				}
+			}
+		} else {
+			if (!client.isAuthenticated()) {
+				send(client.getFd(), NEED_AUTHENTICATION, NA_SIZE, 0);
+			} else if (!client.isRegistered()) {
+				send(client.getFd(), NEED_REGISTRATION, NR_SIZE, 0);
 			}
 		}
 		start = end + 1;
@@ -233,6 +177,8 @@ void Server::setClientNick(Client & client) {
 		start = pos + 5;
 		end = message.find("\n", start);
 		client.setNickname(message.substr(start, end - start));
+		// std::cout << "[" << client.getNickname() << "]" << std::endl;
+		//? Do we need to set nick and user for it to be registered or just nick
 		client.registration(true);
 		sendRPL(client);
 	}
@@ -255,14 +201,9 @@ void Server::authenticate(Client & client) {
 			size_t start = pos + 5;
 			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
 			client.setAuthentication(password->validate(pass));
-			if (!client.isAuthenticated()) sendWarning("Wrong password!\r\n", client);
-			else {
-				setClientUser(client);
-				setClientNick(client);
+			if (!client.isAuthenticated()) {
+				sendWarning("Wrong password!\r\n", client);
 			}
-		}
-		else {
-			sendWarning("Client authentication needed!\r\n", client); // we need to check the correct way to warn it!
 		}
 }
 
@@ -295,13 +236,12 @@ void Server::acceptNewClient() {
 	error("CREATING CLIENT FD", new_fd != -1);
 	
 	if (new_fd != -1) {
+
 		clients[new_fd] = Client::createClient(clientAddr, size, new_fd);
 
-		fcntl(new_fd, F_SETFL, O_NONBLOCK);Anastacia
+		fcntl(new_fd, F_SETFL, O_NONBLOCK);
 		struct	epoll_event event;
 		event.events = EPOLLIN;
-		// this way it only accept one client each time
-		// event.events = EPOLLIN | EPOLLOUT;
 		event.data.fd = new_fd;
 
 		error("ADDING CLIENT TO POLL", epoll_ctl(efd, EPOLL_CTL_ADD, new_fd, &event) != -1);
@@ -310,8 +250,8 @@ void Server::acceptNewClient() {
 
 		std::cout << "new_fd added to monitored_fds" << std::endl;
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
-		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << std::endl;
-	
+		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << std::endl << std::endl;
+
 	}	
 }
 
@@ -339,7 +279,7 @@ void Server::sendRPL(Client & client) {
 	std::string created = RPL_CREATED(client.getNickname());
 	send(client.getFd(), created.c_str(), created.size(), MSG_NOSIGNAL);
 
-	// // include list of user modes and channels
+	// include list of user modes and channels
 	std::string myInfo = RPL_MYINFO(client.getNickname());
 	send(client.getFd(), myInfo.c_str(), myInfo.size(), MSG_NOSIGNAL);
 

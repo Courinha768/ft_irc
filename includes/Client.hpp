@@ -12,7 +12,7 @@ class Client {
 		std::string				text_addr;
 		std::string				username;
 		std::string				nickname;
-		char					message[BUFFER_SIZE];
+		// char					message[BUFFER_SIZE];
 		bool					authenticated;
 		bool					registered;
 		bool					status;
@@ -21,22 +21,27 @@ class Client {
 		Client(struct sockaddr_storage addr, socklen_t size, int fd);
 		~Client();
 		Client(Client const & src);
+
 		Client & operator=(Client const & rhs);
-		std::string getUsername() const;
-		std::string getNickname() const;
-		void setUsername(std::string name);
-		void setNickname(std::string name);
-		sockaddr_storage getAddr() const;
-		socklen_t getSize() const;
-		int getFd() const;
-		std::string getTextAddr() const;
-		void setTextAddr(std::string addr);
-		bool isAuthenticated() const;
-		void setAuthentication(bool status);
-		bool isRegistered() const;
+
+		std::string			getUsername() const;
+		std::string			getNickname() const;
+		int					getFd() const;
+		socklen_t			getSize() const;
+		bool				getStatus() const;
+		sockaddr_storage	getAddr() const;
+		std::string			getTextAddr() const;
+		bool	isAuthenticated() const;
+		bool	isRegistered() const;
+
+		void	setUsername(std::string name);
+		void	setNickname(std::string name);
+		void	setTextAddr(std::string addr);
+		void	setAuthentication(bool status);
+		void	setStatus(bool status);
+
+
 		void registration(bool status);
-		void setStatus(bool status);
-		bool getStatus() const;
 		static Client * createClient(struct sockaddr_storage addr, socklen_t size, int fd);
 
 

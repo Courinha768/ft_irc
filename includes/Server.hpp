@@ -44,9 +44,6 @@ class Server {
 		void setClientNick(Client & client);
 		void sendRPL(Client & client);
 
-		//! maybe change this name
-		typedef typename std::map<int, Client*>::iterator client_iterator;
-
 };
 
 
