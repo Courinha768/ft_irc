@@ -22,9 +22,8 @@ class Server {
 		std::map<int, Client *>	clients;
 		char			recv_buffer[BUFFER_SIZE];
 		std::string		message;
-		// struct	epoll_event event;
-		// std::vector<epoll_event> events;
 		struct	epoll_event events[200];
+		int					eventsCount;
 		int		efd;
 
 	public:
@@ -38,8 +37,12 @@ class Server {
 		bool authentication(std::string pass);
 		void setupPoll();
 		void receiveMessage(Client & client);
+		void parseMessage(Client & client);
 		void authenticate(Client & client);
 		void sendWarning(std::string msg, Client & client);
+		void setClientUser(Client & client);
+		void setClientNick(Client & client);
+		void sendRPL(Client & client);
 
 		//! maybe change this name
 		typedef typename std::map<int, Client*>::iterator client_iterator;
