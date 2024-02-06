@@ -25,6 +25,8 @@ class Server {
 		struct	epoll_event events[200];
 		int					eventsCount;
 		int		efd;
+		
+		struct	epoll_event event;
 
 	public:
 

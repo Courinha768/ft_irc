@@ -29,6 +29,14 @@ void Server::setup() {
 	error("BIND"		, (bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) == 0);
 	error("SOCKET"		, (listen(sockfd, 5)) != -1);
 
+	event.events = EPOLLIN | EPOLLOUT;
+	event.data.fd = sockfd;
+	events[0].data.fd = sockfd;
+
+	error("EPOLL"			, (efd = epoll_create1(0)) != -1);
+	error("ADDING TO EPPOL"	, (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
+
+	memset(&events, 0, sizeof(events));
 }
 
 /**
@@ -43,18 +51,6 @@ void Server::setup() {
  * such as new client connections and data reception from existing clients.
  */
 void Server::setupPoll() {
-	memset(&events, 0, sizeof(events));
-
-	//! tried moving all this part to the setup function but couldn't
-	struct	epoll_event event;
-
-	event.events = EPOLLIN | EPOLLOUT;
-	event.data.fd = sockfd;
-	events[0].data.fd = sockfd;
-
-	error("EPOLL"			, (efd = epoll_create1(0)) != -1);
-	error("ADDING TO EPPOL"	, (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
-	//!end of "this part"
 
 	while (true) {
 
