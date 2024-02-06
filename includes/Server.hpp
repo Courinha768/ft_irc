@@ -29,10 +29,7 @@ class Server {
 	public:
 
 		Server(std::string port, std::string password);
-		Server(Server const & src);
 		~Server();
-		
-		Server & operator=(Server const & rhs);
 		
 		void setup();
 		in_addr get_in_addr(struct sockaddr *sa);
@@ -46,6 +43,9 @@ class Server {
 		void setClientUser(Client & client);
 		void setClientNick(Client & client);
 		void sendRPL(Client & client);
+
+		//! maybe change this name
+		typedef typename std::map<int, Client*>::iterator client_iterator;
 
 };
 
