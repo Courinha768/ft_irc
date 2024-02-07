@@ -8,15 +8,18 @@ void Server::receiveMessage(Client & client) {
 	if (bytes_recv == -1) {
 		std::cout << BRED << "ERROR READING SOCKET" << CRESET << std::endl;
 	}
-	
 	if (bytes_recv == 0) {
 		client.setStatus(false);
 		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
 	}
+
 	message.append(recv_buffer);
-	sleep(2); // time to wait for the complete registration message from HexChat
+
+	//? is this necessary
+	// sleep(2);
 	
 	parseMessage(client);
+
 	message.erase();
 }
 
@@ -28,15 +31,17 @@ void Server::parseMessage(Client & client) {
 	while (end != EOS) {
 		std::string msg = message.substr(start, end);
 
-		if (msg.find("PASS") != EOS) {
+		if (msg.find(PASS_COMMAND) != EOS) {
 			authenticate(client);
-		} else if (client.isAuthenticated() && msg.find("NICK") != EOS) {
+		} else if (client.isAuthenticated() && msg.find(NICK_COMMAND) != EOS) {
 			setClientNick(client);
-		} else if (client.isAuthenticated() && msg.find("USER") != EOS) {
+		} else if (client.isAuthenticated() && msg.find(USER_COMMAND) != EOS) {
 			setClientUser(client);
 		} else if (client.isRegistered()) {
-			// Print the message on the server
+
 			std::cout << client.getNickname() << ": " << msg << "\r\n";
+
+			//todo: create a seperated function for this, to help with readability
 			// Sending messages to all clients connected to the server, only to test multiclients
 			for (int i = 0; i < 200; i++) {
 				if (events[i].data.fd && events[i].data.fd != client.getFd()) {

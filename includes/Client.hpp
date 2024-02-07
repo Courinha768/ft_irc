@@ -12,12 +12,12 @@ class Client {
 		std::string				text_addr;
 		std::string				username;
 		std::string				nickname;
-		// char					message[BUFFER_SIZE];
 		bool					authenticated;
 		bool					registered;
 		bool					status;
 
 	public:
+
 		Client(struct sockaddr_storage addr, socklen_t size, int fd);
 		~Client();
 		Client(Client const & src);

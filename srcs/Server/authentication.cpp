@@ -2,37 +2,48 @@
 
 void Server::authenticate(Client & client) {
 	
-	size_t pos = message.find("PASS");
-		if(pos != EOS) {
-			size_t end = message.find("\n", pos);
-			if (message.at(end - 1) == '\r') end = end - 1;
-			size_t start = pos + 5;
-			std::string pass = message.substr(start, end - start); // we need to eliminate the \n on the end of the message
-			client.setAuthentication(password->validate(pass));
-			if (!client.isAuthenticated()) {
-				sendWarning("Wrong password!\r\n", client);
-			}
+	size_t pos = message.find(PASS_COMMAND);
+	if(pos != EOS) {
+		size_t end = message.find("\n", pos);
+		size_t start = pos + 5 + 1; //this 5 is the lenght of the PASS_COMMAND
+
+		if (message.at(end - 1) == '\r') {
+			end = end - 1;
 		}
+
+		std::string pass = message.substr(start, end - start);
+		client.setAuthentication(password->validate(pass));
+		if (!client.isAuthenticated() && pass.compare("")) {
+			sendWarning(WRONG_PASS_WARNING, client);
+		} else if (!pass.compare("")) {
+			sendWarning(PASS_COMMAND_USAGE, client);
+		}
+	}
 }
 
 void Server::setClientUser(Client & client) {
-	size_t pos = message.find("USER");
-	size_t start, end;
+	size_t pos = message.find(USER_COMMAND);
 	if (pos != EOS) {
-		start = pos + 5;
-		end = message.find(" ", start);
+		size_t start, end;
+
+		start = pos + 5 + 1; //this 5 is the lenght of the USER_COMMAND
+		end = message.find("\n", start);
+
 		client.setUsername(message.substr(start, end - start));
+		
 	}
 }
 
 void Server::setClientNick(Client & client) {
-	size_t pos = message.find("NICK");
-	size_t start, end;
+	size_t pos = message.find(NICK_COMMAND);
 	if (pos != EOS) {
-		start = pos + 5;
+		size_t start, end;
+
+		start = pos + 5 + 1;
 		end = message.find("\n", start);
+
 		client.setNickname(message.substr(start, end - start));
-		// std::cout << "[" << client.getNickname() << "]" << std::endl;
+
 		//? Do we need to set nick and user for it to be registered or just nick
 		client.registration(true);
 		sendRPL(client);

@@ -38,17 +38,19 @@ void Server::setupPoll() {
 
 		for (int i = 0; i < numEvents; ++i) {
 
-			if (events[i].data.fd == sockfd) { // new client
+			if (events[i].data.fd == sockfd) {
 
 				acceptNewClient();
 
-			} else { // client already registered
+			} else {
 
-				int				client_fd = events[i].data.fd;
+				int									client_fd = events[i].data.fd;
 				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
 				if (client_it != clients.end()) {
-					Client client = *client_it->second;
+					//! for some reason the client is losing his nickname
+					Client client(*client_it->second);
+					std::cout << "|" << client.getNickname() << "|" << std::endl; //!
 					client.setStatus(true);
 					
 					receiveMessage(client);
@@ -59,6 +61,7 @@ void Server::setupPoll() {
 						eventsCount--;
 						continue;
 					}
+					std::cout << "{" << client.getNickname() << "}" << std::endl; //!
 				}
 		
 			}

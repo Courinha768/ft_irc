@@ -25,9 +25,16 @@
 #define RPL_MYINFO(nickname)	(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1\r\n")
 # define EPPOL_WAIT_ERROR -1
 
-# define NEED_AUTHENTICATION	"something\n"
-# define NA_SIZE				11
-# define NEED_REGISTRATION		"something else\n"
-# define NR_SIZE				16
+# define NEED_AUTHENTICATION	"FT_IRC Network: Type \\pass to enter the servers password\n"
+# define NA_SIZE				57
+# define NEED_REGISTRATION		"FT_IRC Network: Type \\nick to assign yourself a nickname\n"
+# define NR_SIZE				57
+
+# define PASS_COMMAND "\\pass"
+# define USER_COMMAND "\\user"
+# define NICK_COMMAND "\\nick"
+
+# define WRONG_PASS_WARNING	"Wrong password!\r\n"
+# define PASS_COMMAND_USAGE "Usage: \\pass <password>\r\n"
 
 #endif

@@ -25,4 +25,8 @@ fclean:			clean
 
 re:				fclean $(NAME)
 
+lauch:			re
+				@clear
+				@./$(NAME) 8000 1
+
 .PHONY:			all clean fclean re
