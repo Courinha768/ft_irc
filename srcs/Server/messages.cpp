@@ -29,19 +29,31 @@ void Server::parseMessage(Client & client) {
 	size_t start = 0;
 
 	while (end != EOS) {
+		//! why is it reseting the booleans?
+		//! I really dont see why its doing this and im going crazy
+		//! Already checked everything and at the end of the receiveMessage func its still ok
+		//! When we send a new msg and get the client again (in func setupPoll) its not there anymore
 		std::string msg = message.substr(start, end);
 
+
 		if (msg.find(PASS_COMMAND) != EOS) {
-			authenticate(client);
-		} else if (client.isAuthenticated() && msg.find(NICK_COMMAND) != EOS) {
-			setClientNick(client);
+			if (client.isAuthenticated()) {
+				send(client.getFd(), ALREADY_AUTHENTICATED, 47, 0);
+			} else {
+				authenticate(client);
+			}
 		} else if (client.isAuthenticated() && msg.find(USER_COMMAND) != EOS) {
-			setClientUser(client);
-		} else if (client.isRegistered()) {
+			if (client.hasUser()) {
+				send(client.getFd(), ALREADY_USER, 45, 0);
+			} else {
+				setClientUser(client);
+			}
+		} else if (client.hasUser() && msg.find(NICK_COMMAND) != EOS) {
+			setClientNick(client);
+		} else if (client.hasNick()) {
 
 			std::cout << client.getNickname() << ": " << msg << "\r\n";
 
-			//todo: create a seperated function for this, to help with readability
 			// Sending messages to all clients connected to the server, only to test multiclients
 			for (int i = 0; i < 200; i++) {
 				if (events[i].data.fd && events[i].data.fd != client.getFd()) {
@@ -54,11 +66,14 @@ void Server::parseMessage(Client & client) {
 			}
 		} else {
 			if (!client.isAuthenticated()) {
-				send(client.getFd(), NEED_AUTHENTICATION, NA_SIZE, 0);
-			} else if (!client.isRegistered()) {
-				send(client.getFd(), NEED_REGISTRATION, NR_SIZE, 0);
+				send(client.getFd(), NEED_AUTHENTICATION, 57, 0);
+			} else if (!client.hasUser()) {
+				send(client.getFd(), NEED_USER, 57, 0);
+			} else if (!client.hasNick()) {
+				send(client.getFd(), NEED_NICK, 57, 0);
 			}
 		}
+
 		start = end + 1;
 		if (start != EOS) end = message.find("\n", start);
 		else end = start;

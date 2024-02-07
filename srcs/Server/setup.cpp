@@ -48,9 +48,7 @@ void Server::setupPoll() {
 				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
 				if (client_it != clients.end()) {
-					//! for some reason the client is losing his nickname
-					Client client(*client_it->second);
-					std::cout << "|" << client.getNickname() << "|" << std::endl; //!
+					Client client = *client_it->second;
 					client.setStatus(true);
 					
 					receiveMessage(client);
@@ -61,7 +59,6 @@ void Server::setupPoll() {
 						eventsCount--;
 						continue;
 					}
-					std::cout << "{" << client.getNickname() << "}" << std::endl; //!
 				}
 		
 			}
@@ -97,7 +94,7 @@ void Server::acceptNewClient() {
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
 		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << std::endl << std::endl;
 
-	}	
+	}
 }
 
 in_addr Server::get_in_addr(struct sockaddr *sa){

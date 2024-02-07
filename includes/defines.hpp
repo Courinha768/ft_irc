@@ -26,15 +26,17 @@
 # define EPPOL_WAIT_ERROR -1
 
 # define NEED_AUTHENTICATION	"FT_IRC Network: Type \\pass to enter the servers password\n"
-# define NA_SIZE				57
-# define NEED_REGISTRATION		"FT_IRC Network: Type \\nick to assign yourself a nickname\n"
-# define NR_SIZE				57
+# define NEED_USER				"FT_IRC Network: Type \\user to assign yourself a username\n"
+# define NEED_NICK				"FT_IRC Network: Type \\nick to assign yourself a nickname\n"
 
 # define PASS_COMMAND "\\pass"
 # define USER_COMMAND "\\user"
 # define NICK_COMMAND "\\nick"
 
-# define WRONG_PASS_WARNING	"Wrong password!\r\n"
-# define PASS_COMMAND_USAGE "Usage: \\pass <password>\r\n"
+# define WRONG_PASS_WARNING	"FT_IRC Network: Wrong password!\n"
+# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: \\pass <password>\n"
+
+# define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"
+# define ALREADY_USER "FT_IRC Network: You already have a nickname\n"
 
 #endif

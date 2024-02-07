@@ -30,6 +30,7 @@ void Server::setClientUser(Client & client) {
 		end = message.find("\n", start);
 
 		client.setUsername(message.substr(start, end - start));
+		client.setHasUser(true);
 		
 	}
 }
@@ -43,10 +44,10 @@ void Server::setClientNick(Client & client) {
 		end = message.find("\n", start);
 
 		client.setNickname(message.substr(start, end - start));
-
-		//? Do we need to set nick and user for it to be registered or just nick
-		client.registration(true);
-		sendRPL(client);
+		if (!client.hasNick()) {
+			client.setHasNick(true);
+			sendRPL(client);
+		}
 	}
 }
 
