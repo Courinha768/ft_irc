@@ -66,6 +66,10 @@ bool Client::hasUser() const {
 	return (_hasUser);
 }
 
+bool Client::hasNick() const {
+	return (_hasNick);
+}
+
 bool Client::isRegistered() const {
 	return (_isRegistered);
 }
@@ -76,13 +80,13 @@ bool Client::isRegistered() const {
 
 void Client::setUsername(std::string name) {
 	this->username = name;
-	std::cout << getFd() << ": ";
+	std::cout << getTextAddr() << ": ";
 	error("CLIENT USERNAME", true);
 }
 
 void Client::setNickname(std::string name) {
 	this->nickname = name;
-	std::cout << getFd() << ": ";
+	std::cout << getTextAddr() << ": ";
 	error("CLIENT NICKNAME", true);
 }
 
@@ -102,6 +106,10 @@ void Client::setStatus(bool status) {
 
 void Client::setHasUser(bool status) {
 	this->_hasUser = status;
+}
+
+void Client::setHasNick(bool status) {
+	this->_hasNick = status;
 }
 
 void Client::setisRegistered(bool status) {

@@ -25,25 +25,21 @@
 #define RPL_MYINFO(nickname)	(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1\r\n")
 # define EPPOL_WAIT_ERROR -1
 
-//It works with both PASS and \pass
-# define PASS_COMMAND1 "\\pass"
-# define USER_COMMAND1 "\\user"
-# define NICK_COMMAND1 "\\nick"
-# define PASS_COMMAND2 "PASS"
-# define USER_COMMAND2 "USER"
-# define NICK_COMMAND2 "NICK"
+# define PASS_COMMAND "PASS"
+# define USER_COMMAND "USER"
+# define NICK_COMMAND "NICK"
 
-# define NEED_AUTHENTICATION	"FT_IRC Network: Type \\pass to enter the servers password\n"
-# define NEED_USER				"FT_IRC Network: Type \\user to assign yourself a username\n"
+# define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
+# define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
 # define NEED_REGISTRATION		"FT_IRC Network: You need to register before sending mensages\n"
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 
 # define WRONG_PASS_WARNING	"FT_IRC Network: Wrong password!\n"
-# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: \\pass <password>\n"
+# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\n"
 
 # define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"
-# define ALREADY_USER "FT_IRC Network: You already have a nickname\n"
+# define ALREADY_USER "FT_IRC Network: You already have a username\n"
 
 # define NL "\n"
 

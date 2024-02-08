@@ -3,22 +3,14 @@
 //todo: fix problem where we can type anything in the space between the command and the input
 void Server::authenticate(Client & client) {
 	
-	size_t pos;
-	if (message.at(0) == '\\') {
-		pos = message.find(PASS_COMMAND1);
-	} else {
-		pos = message.find(PASS_COMMAND2);
-	}
+	size_t pos = message.find(PASS_COMMAND);
 	if(pos != EOS) {
 
 		size_t start;
 		size_t end = message.find("\n", pos);
 
-		if (message.at(0) == '\\') {
-			start = pos + 5 + 1; //this 5 is the lenght of the PASS_COMMAND1
-		} else {
-			start = pos + 4 + 1;
-		}
+		
+		start = pos + 4 + 1;
 
 		if (message.at(end - 1) == '\r') {
 			end = end - 1;
@@ -39,44 +31,35 @@ void Server::authenticate(Client & client) {
 //? I dont understand what is the point of the username and nickname
 void Server::setClientUser(Client & client) {
 
-	size_t pos = message.find(USER_COMMAND1);
-	if (pos == EOS) {
-		pos = message.find(USER_COMMAND2);
-	}
+	size_t pos = message.find(USER_COMMAND);
 	if (pos != EOS) {
 
 		size_t start, end;
 
-		if (message.at(0) == '\\') {
-			start = pos + 5 + 1; //this 5 is the lenght of the USER_COMMAND1
-		} else {
-			start = pos + 4 + 1;
-		}
+		start = pos + 4 + 1;
 		end = message.find("\n", start);
 
 		client.setUsername(message.substr(start, end - start));
 		client.setHasUser(true);
+		if (!client.isRegistered() && client.hasNick()) {
+			client.setisRegistered(true);
+			sendRPL(client);
+		}
 	}
 }
 
 void Server::setClientNick(Client & client) {
 
-	size_t pos = message.find(NICK_COMMAND1);
-	if (pos == EOS) {
-		pos = message.find(NICK_COMMAND2);
-	}
+	size_t pos = message.find(NICK_COMMAND);
 	if (pos != EOS) {
 		size_t start, end;
 
-		if (message.at(0) == '\\') {
-			start = pos + 5 + 1; //this 5 is the lenght of the NICK_COMMAND1
-		} else {
-			start = pos + 4 + 1;
-		}
+		start = pos + 4 + 1;
 		end = message.find("\n", start);
 
 		client.setNickname(message.substr(start, end - start));
-		if (!client.isRegistered()) {
+		client.setHasNick(true);
+		if (!client.isRegistered() && client.hasUser()) {
 			client.setisRegistered(true);
 			sendRPL(client);
 		}

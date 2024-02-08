@@ -1,8 +1,5 @@
 #include "../../includes/Server.hpp"
 
-#include <arpa/inet.h> // For inet_ntop function
-#include <netinet/in.h> // For sockaddr_in and sockaddr_in6 structures
-
 void Server::receiveMessage(Client & client) {
 
 	memset(recv_buffer, 0, BUFFER_SIZE);
@@ -18,14 +15,11 @@ void Server::receiveMessage(Client & client) {
 		Server::cout() << "connection lost with client " << client.getTextAddr() << "\n";
 
 	} else {
-		
+
 		message.append(recv_buffer);
-		if (!client.isRegistered()) {
-			sleep(2); //todo: find another solution
-		}
+		sleep(4);
 		parseMessage(client);
 		message.erase();
-
 	}
 }
 
@@ -34,21 +28,16 @@ void Server::sendWarning(std::string msg, Client & client) {
 }
 
 static bool isACommand(std::string msg)	{
-	return ((msg.size() && msg.at(0) == '\\')
-		|| (msg.find(PASS_COMMAND2) != EOS
-		|| msg.find(USER_COMMAND2) != EOS || msg.find(NICK_COMMAND2) != EOS));
+	return (msg.find(PASS_COMMAND) != EOS || msg.find(USER_COMMAND) != EOS || msg.find(NICK_COMMAND) != EOS);
 }
 
 void Server::parseMessage(Client & client) {
 
+	std::cout << message << "|" << std::endl;
 	size_t end = message.find("\n");
 	size_t start = 0;
 
 	while (end != EOS) {
-		//! why is it reseting the booleans?
-		//! I really dont see why its doing this and im going crazy
-		//! Already checked everything and at the end of the receiveMessage func its still ok
-		//! When we send a new msg and get the client again (in func setupPoll) its not there anymore
 		std::string msg = message.substr(start, end);
 
 		if (!isACommand(msg)) {
@@ -60,7 +49,7 @@ void Server::parseMessage(Client & client) {
 				for (int i = 0; i < 200; i++) {
 					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
 						// using stringstream to convert size_t fds to string.
-						//todo: wanted to do the same we are doing to server with the server::cout() with the client if possible
+						//todo: wanted to do the same we are doing to server with the server::cout() with the client if possible (just for the looks, not important)
 						std::stringstream ss;
 						ss << client.getNickname() << ": " << msg << "\r\n";
 						std::string message = ss.str();
@@ -73,7 +62,7 @@ void Server::parseMessage(Client & client) {
 
 		} else {
 
-			if (msg.find(PASS_COMMAND2) != EOS || msg.find(PASS_COMMAND1) != EOS) {
+			if (msg.find(PASS_COMMAND) != EOS) {
 
 				if (client.isAuthenticated()) {
 					sendWarning(ALREADY_AUTHENTICATED, client);
@@ -81,27 +70,24 @@ void Server::parseMessage(Client & client) {
 					authenticate(client);
 				}
 
-			} else if (msg.find(USER_COMMAND2) != EOS || msg.find(USER_COMMAND1) != EOS) {
+			} else if (msg.find(NICK_COMMAND) != EOS) {
+
+				if (!client.isAuthenticated()) {
+					sendWarning(NEED_AUTHENTICATION, client);
+				} else {
+					setClientNick(client);
+				}
+
+			} else if (msg.find(USER_COMMAND) != EOS) {
 
 				if (!client.isAuthenticated()) {
 					sendWarning(NEED_AUTHENTICATION, client);
 				} else {
 					if (client.hasUser()) {
-						//? This way the client cant change the user, do we want that?
 						sendWarning(ALREADY_USER, client);
 					} else {
 						setClientUser(client);
 					}
-				}
-
-			} else if (msg.find(NICK_COMMAND2) != EOS || msg.find(NICK_COMMAND1) != EOS) {
-
-				if (!client.isAuthenticated()) {
-					sendWarning(NEED_AUTHENTICATION, client);
-				} else if (!client.hasUser()) {
-					sendWarning(NEED_USER, client);
-				} else {
-					setClientNick(client);
 				}
 
 			} else {

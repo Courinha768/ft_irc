@@ -36,10 +36,11 @@ void Server::setupPoll() {
 			break;
 		}
 
+		
 		for (int i = 0; i < numEvents; ++i) {
 
 			if (events[i].data.fd == sockfd) {
-
+				
 				acceptNewClient();
 
 			} else {
@@ -48,12 +49,12 @@ void Server::setupPoll() {
 				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
 				if (client_it != clients.end()) {
-					Client client(*client_it->second);
-					client.setStatus(true);
+					(*client_it->second).setStatus(true);
 					
-					receiveMessage(client);
+					receiveMessage((*client_it->second));
+					
 
-					if (!client.getStatus()) {
+					if (!(*client_it->second).getStatus()) {
 						close(client_fd);
 						epoll_ctl(efd, EPOLL_CTL_DEL, client_fd, &event);
 						eventsCount--;
