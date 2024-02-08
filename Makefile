@@ -1,6 +1,6 @@
 NAME			= ircserv
 
-SRCS			= ./srcs/ftIrc.cpp ./srcs/Server.cpp ./srcs/Client.cpp
+SRCS			= $(wildcard srcs/*cpp) $(wildcard srcs/Server/*cpp)
 OBJS			= $(SRCS:.cpp=.o)
 
 INC				= -I ./includes
@@ -24,5 +24,9 @@ fclean:			clean
 				@echo "\e[1mExecutable files deleted\033[0m"
 
 re:				fclean $(NAME)
+
+lauch:			re
+				@clear
+				@./$(NAME) 8000 1
 
 .PHONY:			all clean fclean re
