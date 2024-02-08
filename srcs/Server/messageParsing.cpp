@@ -44,17 +44,16 @@ static void commandJOIN(Client & client, Server & server)
 	(void)server;
 }
 
-//todo: find a better name for this
 static int findCommand(std::string msg)	{
 
-	std::string commands[] = AVAILABLE_COMMANDS;
+	std::string commands[] = MP_AVAILABLE_COMMANDS;
 
-	for (int i = 0; i < NUMBER_OF_AVAILABLE_COMMANDS; i++)
+	for (int i = 0; i < (int)stringVectorLenght(commands); i++)
 	{
 		if (msg.find(commands[i]) != EOS)
 			return i;
 	}
-	return NOT_A_COMMAND;
+	return MP_NOT_A_COMMAND;
 
 }
 
@@ -68,9 +67,9 @@ void Server::parseMessage(Client & client) {
 		std::string msg = message.substr(start, end);
 
 		int	type = findCommand(msg);
-		if (type != NOT_A_COMMAND) {
+		if (type != MP_NOT_A_COMMAND) {
 
-			void	(*functions[NUMBER_OF_AVAILABLE_COMMANDS])(Client & client, Server & server) = COMMAND_FUNCTIONS;
+			void	(*functions[5])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
 			functions[type](client, *this);
 
 		} else {
@@ -81,7 +80,6 @@ void Server::parseMessage(Client & client) {
 				for (int i = 0; i < 200; i++) {
 					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
 						// using stringstream to convert size_t fds to string.
-						//todo: wanted to do the same we are doing to server with the server::cout() with the client if possible (just for the looks, not important)
 						std::stringstream ss;
 						ss << client.getNickname() << ": " << msg << "\r\n";
 						std::string message = ss.str();

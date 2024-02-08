@@ -6,6 +6,7 @@
 # include "Password.hpp"
 
 class Client;
+//! can we turn the password class into a local class inside server?
 class Password;
 
 class Server {

@@ -22,7 +22,6 @@
 //my include files
 # include "defines.hpp"
 # include "functions.hpp"
-# include "structs.hpp"
 # include "Server.hpp"
 # include "Client.hpp"
 # include "colors.hpp"

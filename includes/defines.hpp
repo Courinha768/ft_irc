@@ -1,9 +1,6 @@
 #ifndef	DEFINES_HPP
 # define DEFINES_HPP
 
-# include <iostream>
-# include <string>
-
 # define BUFFER_SIZE 512
 
 # define NUMERALS "0123456789"
@@ -25,22 +22,26 @@
 #define RPL_MYINFO(nickname)	(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1\r\n")
 # define EPPOL_WAIT_ERROR -1
 
-# define AVAILABLE_COMMANDS { \
+// MessageParsing
+# define MP_AVAILABLE_COMMANDS { \
 	"CAP", \
 	"PASS", \
 	"NICK", \
 	"USER", \
 	"JOIN", \
 }
-# define COMMAND_FUNCTIONS { \
+# define MP_COMMAND_FUNCTIONS { \
 	&commandCAP, \
 	&commandPASS, \
 	&commandNICK, \
 	&commandUSER, \
 	&commandJOIN \
 }
-# define NUMBER_OF_AVAILABLE_COMMANDS 5
-# define NOT_A_COMMAND -1
+# define MP_NOT_A_COMMAND -1
+
+
+
+
 
 # define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
 # define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
