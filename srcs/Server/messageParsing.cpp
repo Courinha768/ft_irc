@@ -1,32 +1,34 @@
 #include "../../includes/Server.hpp"
 
-static void commandCAP(Client & client, Server & server)
-{
+static void commandCAP(Client & client, Server & server)	{
+
 	(void)client;
 	(void)server;
-	// For now do nothing
+
 }
 
-static void commandPASS(Client & client, Server & server)
-{
+static void commandPASS(Client & client, Server & server)	{
+
 	if (client.isAuthenticated()) {
 		server.sendWarning(ALREADY_AUTHENTICATED, client);
 	} else {
 		server.authenticate(client);
 	}
+
 }
 
-static void commandNICK(Client & client, Server & server)
-{
+static void commandNICK(Client & client, Server & server)	{
+
 	if (!client.isAuthenticated()) {
 		server.sendWarning(NEED_AUTHENTICATION, client);
 	} else {
 		server.setClientNick(client);
 	}
+
 }
 
-static void commandUSER(Client & client, Server & server)
-{
+static void commandUSER(Client & client, Server & server)	{
+
 	if (!client.isAuthenticated()) {
 		server.sendWarning(NEED_AUTHENTICATION, client);
 	} else {
@@ -36,12 +38,21 @@ static void commandUSER(Client & client, Server & server)
 			server.setClientUser(client);
 		}
 	}
+
 }
 
-static void commandJOIN(Client & client, Server & server)
-{
+static void commandJOIN(Client & client, Server & server)	{
+
 	(void)client;
 	(void)server;
+
+}
+
+static void commandQUIT(Client & client, Server & server)	{
+
+	client.setStatus(false);
+	server.cout() << "connection lost with client " << client.getTextAddr() << "\n";
+
 }
 
 static int findCommand(std::string msg)	{
@@ -60,34 +71,42 @@ static int findCommand(std::string msg)	{
 void Server::parseMessage(Client & client) {
 
 	Server::cout() << message;
+
 	size_t end = message.find("\n");
 	size_t start = 0;
 
 	while (end != EOS) {
+
 		std::string msg = message.substr(start, end);
 
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(*functions[5])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
+			void	(*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
 			functions[type](client, *this);
 
 		} else {
 
-			//todo: Make this his own function
-			if (client.isRegistered()) {
-				// Sending messages to all clients connected to the server, only to test multiclients
+			if (!client.isRegistered()) {
+
+				sendWarning(ERR_NOTREGISTERED(client.getNickname()), client);
+
+			} else {
+
 				for (int i = 0; i < 200; i++) {
+
 					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
-						// using stringstream to convert size_t fds to string.
+
 						std::stringstream ss;
 						ss << client.getNickname() << ": " << msg << "\r\n";
 						std::string message = ss.str();
+
 						send(events[i].data.fd, message.c_str(), message.size(), 0);
+
 					}
+
 				}
-			} else {
-				sendWarning(ERR_NOTREGISTERED(client.getNickname()), client);
+
 			}
 		}
 
@@ -97,5 +116,7 @@ void Server::parseMessage(Client & client) {
 		} else {
 			end = start;
 		}
+
 	}
+
 }

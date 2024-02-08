@@ -29,13 +29,15 @@
 	"NICK", \
 	"USER", \
 	"JOIN", \
+	"QUIT", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&commandCAP, \
 	&commandPASS, \
 	&commandNICK, \
 	&commandUSER, \
-	&commandJOIN \
+	&commandJOIN, \
+	&commandQUIT, \
 }
 # define MP_NOT_A_COMMAND -1
 
