@@ -30,7 +30,7 @@ static void commandUSER(Client & client, Server & server)
 	if (!client.isAuthenticated()) {
 		server.sendWarning(NEED_AUTHENTICATION, client);
 	} else {
-		if (client.hasUser()) {
+		if (!client.getUsername().empty()) {
 			server.sendWarning(ALREADY_USER, client);
 		} else {
 			server.setClientUser(client);
@@ -42,12 +42,10 @@ static void commandJOIN(Client & client, Server & server)
 {
 	(void)client;
 	(void)server;
-	std::string s = "nickname!username@127.0.0.1 JOIN #hello";
-	send(client.getFd(), s.c_str(), s.size(), MSG_NOSIGNAL);
 }
 
 //todo: find a better name for this
-static int findCommandType(std::string msg)	{
+static int findCommand(std::string msg)	{
 
 	std::string commands[] = AVAILABLE_COMMANDS;
 
@@ -69,8 +67,13 @@ void Server::parseMessage(Client & client) {
 	while (end != EOS) {
 		std::string msg = message.substr(start, end);
 
-		int			type = findCommandType(msg);
-		if (type == NOT_A_COMMAND) {
+		int	type = findCommand(msg);
+		if (type != NOT_A_COMMAND) {
+
+			void	(*functions[NUMBER_OF_AVAILABLE_COMMANDS])(Client & client, Server & server) = COMMAND_FUNCTIONS;
+			functions[type](client, *this);
+
+		} else {
 
 			//todo: Make this his own function
 			if (client.isRegistered()) {
@@ -88,12 +91,6 @@ void Server::parseMessage(Client & client) {
 			} else {
 				sendWarning(ERR_NOTREGISTERED(client.getNickname()), client);
 			}
-
-		} else {
-
-			void	(*functions[NUMBER_OF_AVAILABLE_COMMANDS])(Client & client, Server & server) = COMMAND_FUNCTIONS;
-			functions[type](client, *this);
-
 		}
 
 		start = end + 1;

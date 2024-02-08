@@ -2,9 +2,10 @@
 
 Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
 	authenticated = false;
-	_hasUser = false;
-	_isRegistered = false;
+	registered = false;
 	text_addr = "";
+	username = "";
+	nickname = "";
 }
 
 Client::~Client() {}
@@ -17,12 +18,12 @@ Client & Client::operator=(Client const & rhs) {
 	this->addr = rhs.getAddr();
 	this->size = rhs.getSize();
 	this->fd = rhs.getFd();
+	this->text_addr = rhs.getTextAddr();
 	this->username = rhs.getUsername();
 	this->nickname = rhs.getNickname();
-	this->_isRegistered = rhs.isRegistered();
-	this->_hasUser = rhs.hasUser();
+	this->registered = rhs.isRegistered();
 	this->authenticated = rhs.isAuthenticated();
-	this->text_addr = rhs.getTextAddr();
+	this->status = rhs.getStatus();
 	return *this;
 }
 
@@ -62,16 +63,8 @@ bool Client::isAuthenticated() const {
 	return authenticated;
 }
 
-bool Client::hasUser() const {
-	return (_hasUser);
-}
-
-bool Client::hasNick() const {
-	return (_hasNick);
-}
-
 bool Client::isRegistered() const {
-	return (_isRegistered);
+	return (registered);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -80,14 +73,10 @@ bool Client::isRegistered() const {
 
 void Client::setUsername(std::string name) {
 	this->username = name;
-	std::cout << getTextAddr() << ": ";
-	error("CLIENT USERNAME", true);
 }
 
 void Client::setNickname(std::string name) {
 	this->nickname = name;
-	std::cout << getTextAddr() << ": ";
-	error("CLIENT NICKNAME", true);
 }
 
 void Client::setTextAddr(std::string addr) {
@@ -96,24 +85,14 @@ void Client::setTextAddr(std::string addr) {
 
 void Client::setAuthentication(bool status) {
  	this->authenticated = status;
-	std::cout << getTextAddr() << ": ";
-	error("CLIENT AUTHENTICATION", status);
 }
 
 void Client::setStatus(bool status) {
 	this->status = status;
 }
 
-void Client::setHasUser(bool status) {
-	this->_hasUser = status;
-}
-
-void Client::setHasNick(bool status) {
-	this->_hasNick = status;
-}
-
 void Client::setisRegistered(bool status) {
-	this->_isRegistered = status;
+	this->registered = status;
 }
 
 /* -------------------------------------------------------------------------- */
@@ -122,14 +101,4 @@ void Client::setisRegistered(bool status) {
 
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {
 	return new Client(addr, size, fd);
-}
-
-std::string	Client::getName()
-{
-	if (this->hasNick())
-		return (this->getNickname());
-	else if (this->hasUser())
-		return (this->getUsername());
-	else
-		return (this->getTextAddr());
 }
