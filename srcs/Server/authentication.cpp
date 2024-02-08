@@ -1,5 +1,6 @@
 #include "../../includes/Server.hpp"
 
+//todo: fix problem where we can type anything in the space between the command and the input
 void Server::authenticate(Client & client) {
 	
 	size_t pos;
@@ -79,7 +80,6 @@ void Server::setClientNick(Client & client) {
 			client.setisRegistered(true);
 			sendRPL(client);
 		}
-		//todo: after the client is registered i want to create a "client id" that looks like "<client_ip>:<client_nick>"
 	}
 }
 

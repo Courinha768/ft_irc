@@ -9,7 +9,6 @@ class Client {
 		struct sockaddr_storage	addr;
 		socklen_t				size;
 		int						fd;
-		//todo: define this variable ↓
 		std::string				text_addr;
 		std::string				username;
 		std::string				nickname;

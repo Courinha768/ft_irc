@@ -4,6 +4,7 @@ Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr
 	authenticated = false;
 	_hasUser = false;
 	_isRegistered = false;
+	text_addr = "";
 }
 
 Client::~Client() {}
@@ -21,6 +22,7 @@ Client & Client::operator=(Client const & rhs) {
 	this->_isRegistered = rhs.isRegistered();
 	this->_hasUser = rhs.hasUser();
 	this->authenticated = rhs.isAuthenticated();
+	this->text_addr = rhs.getTextAddr();
 	return *this;
 }
 
@@ -90,7 +92,7 @@ void Client::setTextAddr(std::string addr) {
 
 void Client::setAuthentication(bool status) {
  	this->authenticated = status;
-	std::cout << getNickname() << ": ";
+	std::cout << getTextAddr() << ": ";
 	error("CLIENT AUTHENTICATION", status);
 }
 

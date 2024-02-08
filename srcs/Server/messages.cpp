@@ -1,5 +1,8 @@
 #include "../../includes/Server.hpp"
 
+#include <arpa/inet.h> // For inet_ntop function
+#include <netinet/in.h> // For sockaddr_in and sockaddr_in6 structures
+
 void Server::receiveMessage(Client & client) {
 
 	memset(recv_buffer, 0, BUFFER_SIZE);
