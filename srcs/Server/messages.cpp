@@ -15,12 +15,22 @@ void Server::receiveMessage(Client & client) {
 		Server::cout() << "connection lost with client " << client.getTextAddr() << "\n";
 
 	} else {
-
+		
 		message.append(recv_buffer);
 		parseMessage(client);
 		message.erase();
 
 	}
+}
+
+void Server::sendWarning(std::string msg, Client & client) {
+	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
+}
+
+static bool isACommand(std::string msg)	{
+	return ((msg.size() && msg.at(0) == '\\')
+		|| (msg.find(PASS_COMMAND2) != EOS
+		|| msg.find(USER_COMMAND2) != EOS || msg.find(NICK_COMMAND2) != EOS));
 }
 
 void Server::parseMessage(Client & client) {
@@ -35,55 +45,66 @@ void Server::parseMessage(Client & client) {
 		//! When we send a new msg and get the client again (in func setupPoll) its not there anymore
 		std::string msg = message.substr(start, end);
 
-		if (client.isRegistered()) {
+		if (!isACommand(msg)) {
 
-			std::cout << client.getNickname() << ": " << msg << "\r\n";
+			if (client.isRegistered()) {
+				std::cout << client.getNickname() << ": " << msg << "\r\n";
 
-			// Sending messages to all clients connected to the server, only to test multiclients
-			for (int i = 0; i < 200; i++) {
-				if (events[i].data.fd && events[i].data.fd != client.getFd()) {
-					// using stringstream to convert size_t fds to string.
-					std::stringstream ss;
-					ss << client.getNickname() << ": " << msg << "\r\n";
-					std::string message = ss.str();
-					send(events[i].data.fd, message.c_str(), message.size(), 0);
+				// Sending messages to all clients connected to the server, only to test multiclients
+				for (int i = 0; i < 200; i++) {
+					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
+						// using stringstream to convert size_t fds to string.
+						//todo: wanted to do the same we are doing to server with the server::cout() with the client if possible
+						std::stringstream ss;
+						ss << client.getNickname() << ": " << msg << "\r\n";
+						std::string message = ss.str();
+						send(events[i].data.fd, message.c_str(), message.size(), 0);
+					}
 				}
+			} else {
+				sendWarning(NEED_REGISTRATION, client);
 			}
 
 		} else {
 
-			if (msg.find(PASS_COMMAND) != EOS) {
+			if (msg.find(PASS_COMMAND2) != EOS || msg.find(PASS_COMMAND1) != EOS) {
 
 				if (client.isAuthenticated()) {
-					send(client.getFd(), ALREADY_AUTHENTICATED, 47, 0);
+					sendWarning(ALREADY_AUTHENTICATED, client);
 				} else {
 					authenticate(client);
 				}
 
-			} else if (client.isAuthenticated() && msg.find(USER_COMMAND) != EOS) {
+			} else if (msg.find(USER_COMMAND2) != EOS || msg.find(USER_COMMAND1) != EOS) {
 
-				if (client.hasUser()) {
-					send(client.getFd(), ALREADY_USER, 45, 0);
+				if (!client.isAuthenticated()) {
+					sendWarning(NEED_AUTHENTICATION, client);
 				} else {
-					setClientUser(client);
+					if (client.hasUser()) {
+						//? This way the client cant change the user, do we want that?
+						sendWarning(ALREADY_USER, client);
+					} else {
+						setClientUser(client);
+					}
 				}
 
-			} else if (client.hasUser() && msg.find(NICK_COMMAND) != EOS) {
+			} else if (msg.find(NICK_COMMAND2) != EOS || msg.find(NICK_COMMAND1) != EOS) {
 
-				setClientNick(client);
+				if (!client.isAuthenticated()) {
+					sendWarning(NEED_AUTHENTICATION, client);
+				} else if (!client.hasUser()) {
+					sendWarning(NEED_USER, client);
+				} else {
+					setClientNick(client);
+				}
 
 			} else {
 
-				if (!client.isAuthenticated()) {
-					send(client.getFd(), NEED_AUTHENTICATION, 57, 0);
-				} else if (!client.hasUser()) {
-					send(client.getFd(), NEED_USER, 57, 0);
-				} else if (!client.isRegistered()) {
-					send(client.getFd(), NEED_NICK, 57, 0);
-				}
+				sendWarning(COMMAND_NF, client);
 
 			}
 		}
+
 		start = end + 1;
 		if (start != EOS) {
 			end = message.find("\n", start);
@@ -91,8 +112,4 @@ void Server::parseMessage(Client & client) {
 			end = start;
 		}
 	}
-}
-
-void Server::sendWarning(std::string msg, Client & client) {
-	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }

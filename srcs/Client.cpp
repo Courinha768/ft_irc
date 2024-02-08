@@ -90,7 +90,7 @@ void Client::setTextAddr(std::string addr) {
 
 void Client::setAuthentication(bool status) {
  	this->authenticated = status;
-	std::cout << getFd() << ": ";
+	std::cout << getNickname() << ": ";
 	error("CLIENT AUTHENTICATION", status);
 }
 
