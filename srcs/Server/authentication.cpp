@@ -20,7 +20,7 @@ void Server::authenticate(Client & client) {
 		client.setAuthentication(password->validate(pass));
 
 		if (!client.isAuthenticated() && pass.compare("")) {
-			sendWarning(WRONG_PASS_WARNING, client);
+			sendWarning(ERR_PASSWDMISMATCH, client);
 		} else if (!pass.compare("")) {
 			sendWarning(PASS_COMMAND_USAGE, client);
 		}
@@ -54,15 +54,47 @@ void Server::setClientNick(Client & client) {
 	if (pos != EOS) {
 		size_t start, end;
 
-		start = pos + 4 + 1;
+		start = pos + 4;
 		end = message.find("\n", start);
+		if (isspace(message.at(end - 1))) end--;
+		if (message.at(start) == ' ') {
+			std::string newNick = message.substr(start + 1, end - (start + 1));
 
-		client.setNickname(message.substr(start, end - start));
-		client.setHasNick(true);
-		if (!client.isRegistered() && client.hasUser()) {
-			client.setisRegistered(true);
-			sendRPL(client);
+			std::cout << "newNick:" << newNick << ":"<< std::endl;
+			if (isspace(newNick.at(0))) std::cout << "empty" << std::endl;
+			
+		
+		
+		// if (start >= message.size()) {
+		// 	sendWarning(ERR_NONICKNAMEGIVEN, client);
+		// 	return ;
+		// }
+		// if (message.at(start - 1) != ' ') {
+		// 	std::cout << "missing space" << std::endl;
+		// 	return;
+		// }
+
+		// if (client.hasNick() && client.getNickname().compare(newNick) == 0) {
+		// 	sendWarning(ERR_NICKNAMEINUSE, client);
+		// 	return ;
+		// }
+		// } else if (start >= message.size() || newNick.empty()) {
+		// 	sendWarning(ERR_NONICKNAMEGIVEN, client);
+		// 	return ;
+		// }
+		 
+			client.setNickname(newNick);
+			client.setHasNick(true);
+			if (!client.isRegistered() && client.hasUser()) {
+				client.setisRegistered(true);
+				sendRPL(client);
+			}
 		}
+
+		// after changing nick name, server must send a message informing the change.
+		// It should be sent to all other clients!
+		// <old nickname> NICK <new nickname>
+		// it means we will need a list of nicknames to store this history
 	}
 }
 

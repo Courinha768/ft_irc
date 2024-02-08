@@ -17,7 +17,6 @@ void Server::receiveMessage(Client & client) {
 	} else {
 
 		message.append(recv_buffer);
-		sleep(4);
 		parseMessage(client);
 		message.erase();
 	}

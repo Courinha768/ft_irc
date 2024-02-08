@@ -35,7 +35,9 @@
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 
-# define WRONG_PASS_WARNING	"FT_IRC Network: Wrong password!\n"
+# define ERR_PASSWDMISMATCH ":ircserv.42.fr 464 :Password incorrect\r\n"
+# define ERR_NICKNAMEINUSE ":ircserv.42.fr 433 :Nickname is already in use\r\n"
+# define ERR_NONICKNAMEGIVEN ":ircserv.42.fr 431 :No nickname given\r\n"
 # define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\n"
 
 # define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"
