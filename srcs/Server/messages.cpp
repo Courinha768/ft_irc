@@ -20,6 +20,9 @@ void Server::receiveMessage(Client & client) {
 	} else {
 		
 		message.append(recv_buffer);
+		if (!client.isRegistered()) {
+			sleep(2); //todo: find another solution
+		}
 		parseMessage(client);
 		message.erase();
 
