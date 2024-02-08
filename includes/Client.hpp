@@ -38,6 +38,8 @@ class Client {
 		bool				hasNick() const;
 		bool				isRegistered() const;
 
+		std::string			getName();
+
 		void	setUsername(std::string name);
 		void	setNickname(std::string name);
 		void	setTextAddr(std::string addr);

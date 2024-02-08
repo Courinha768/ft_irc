@@ -17,7 +17,6 @@ void Server::receiveMessage(Client & client) {
 	} else {
 
 		message.append(recv_buffer);
-		sleep(4);
 		parseMessage(client);
 		message.erase();
 	}
@@ -28,12 +27,13 @@ void Server::sendWarning(std::string msg, Client & client) {
 }
 
 static bool isACommand(std::string msg)	{
-	return (msg.find(PASS_COMMAND) != EOS || msg.find(USER_COMMAND) != EOS || msg.find(NICK_COMMAND) != EOS);
+	return (msg.find(PASS_COMMAND) != EOS || msg.find(USER_COMMAND) != EOS
+				|| msg.find(NICK_COMMAND) != EOS || msg.find("CAP LS 302"));
 }
 
 void Server::parseMessage(Client & client) {
 
-	std::cout << message << "|" << std::endl;
+	Server::cout() << client.getName() << ": " << message;
 	size_t end = message.find("\n");
 	size_t start = 0;
 
@@ -43,7 +43,6 @@ void Server::parseMessage(Client & client) {
 		if (!isACommand(msg)) {
 
 			if (client.isRegistered()) {
-				std::cout << client.getNickname() << ": " << msg << "\r\n";
 
 				// Sending messages to all clients connected to the server, only to test multiclients
 				for (int i = 0; i < 200; i++) {
@@ -62,7 +61,11 @@ void Server::parseMessage(Client & client) {
 
 		} else {
 
-			if (msg.find(PASS_COMMAND) != EOS) {
+			if (msg.find("CAP LS 302") != EOS) {
+
+				//*For now it does nothing
+
+			} else if (msg.find(PASS_COMMAND) != EOS) {
 
 				if (client.isAuthenticated()) {
 					sendWarning(ALREADY_AUTHENTICATED, client);

@@ -123,3 +123,13 @@ void Client::setisRegistered(bool status) {
 Client * Client::createClient(struct sockaddr_storage addr, socklen_t size, int fd) {
 	return new Client(addr, size, fd);
 }
+
+std::string	Client::getName()
+{
+	if (this->hasNick())
+		return (this->getNickname());
+	else if (this->hasUser())
+		return (this->getUsername());
+	else
+		return (this->getTextAddr());
+}
