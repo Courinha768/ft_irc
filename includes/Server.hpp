@@ -12,21 +12,24 @@ class Server {
 
 	private:
 
-		std::string		port;
-		Password		*password;
-		struct addrinfo	serv;
-		struct addrinfo	*servinfo;
-		int				status;
-		int				sockfd;
+		std::string				port;
+		Password				*password;
+
+		struct addrinfo			serv;
+		struct addrinfo			*servinfo;
 
 		std::map<int, Client *>	clients;
-		char			recv_buffer[BUFFER_SIZE];
-		std::string		message;
-		struct	epoll_event events[200];
-		int					eventsCount;
-		int		efd;
+		char					recv_buffer[BUFFER_SIZE];
+		std::string				message;
+
+		struct	epoll_event 	events[200];
+		struct	epoll_event 	event;
 		
-		struct	epoll_event event;
+		int						eventsCount;
+		int						status;
+		int						sockfd;
+		int						efd;
+		
 
 	public:
 
@@ -36,7 +39,6 @@ class Server {
 		void setup();
 		in_addr get_in_addr(struct sockaddr *sa);
 		void acceptNewClient();
-		bool authentication(std::string pass);
 		void setupPoll();
 		void receiveMessage(Client & client);
 		void parseMessage(Client & client);
@@ -45,6 +47,15 @@ class Server {
 		void setClientUser(Client & client);
 		void setClientNick(Client & client);
 		void sendRPL(Client & client);
+
+		template<typename T>
+		Server& operator<<(const T& data) {
+			std::cout << data;
+			return *this;
+		}
+		Server& cout() {
+			return *this;
+		}
 
 };
 

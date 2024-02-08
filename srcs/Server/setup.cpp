@@ -32,7 +32,7 @@ void Server::setupPoll() {
 
 		int numEvents = epoll_wait(efd, events, 200, -1);
 		if (numEvents == EPPOL_WAIT_ERROR) {
-			std::cout << RED << "ERROR: " << CRESET << "failed waiting for events" << std::endl;
+			Server::cout() << RED << "ERROR: " << CRESET << "failed waiting for events" << NL;
 			break;
 		}
 
@@ -48,7 +48,7 @@ void Server::setupPoll() {
 				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
 				if (client_it != clients.end()) {
-					Client client = *client_it->second;
+					Client client(*client_it->second);
 					client.setStatus(true);
 					
 					receiveMessage(client);
@@ -60,7 +60,6 @@ void Server::setupPoll() {
 						continue;
 					}
 				}
-		
 			}
 		}
 	}
@@ -71,8 +70,7 @@ void Server::acceptNewClient() {
 	struct sockaddr_storage clientAddr;
 	socklen_t 				size = sizeof(clientAddr);
 
-	std::cout << std::endl;
-	std::cout << "Connection request from a new client" << std::endl;
+	Server::cout() << NL << "Connection request from a new client" << NL;
 
 	int new_fd = accept(sockfd, (struct sockaddr *)&clientAddr, &size);
 	error("CREATING CLIENT FD", new_fd != -1);
@@ -90,9 +88,9 @@ void Server::acceptNewClient() {
 		events[eventsCount] = event;
 		eventsCount++;
 
-		std::cout << "new_fd added to monitored_fds" << std::endl;
+		Server::cout() << "new_fd added to monitored_fds" << NL;
 		clients[new_fd]->setTextAddr(inet_ntoa(get_in_addr((struct sockaddr *)&clientAddr)));
-		std::cout << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << std::endl << std::endl;
+		Server::cout() << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << NL << NL;
 
 	}
 }

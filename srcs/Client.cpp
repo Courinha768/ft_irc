@@ -3,7 +3,7 @@
 Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
 	authenticated = false;
 	_hasUser = false;
-	_hasNick = false;
+	_isRegistered = false;
 }
 
 Client::~Client() {}
@@ -18,7 +18,7 @@ Client & Client::operator=(Client const & rhs) {
 	this->fd = rhs.getFd();
 	this->username = rhs.getUsername();
 	this->nickname = rhs.getNickname();
-	this->_hasNick = rhs.hasNick();
+	this->_isRegistered = rhs.isRegistered();
 	this->_hasUser = rhs.hasUser();
 	this->authenticated = rhs.isAuthenticated();
 	return *this;
@@ -64,8 +64,8 @@ bool Client::hasUser() const {
 	return (_hasUser);
 }
 
-bool Client::hasNick() const {
-	return (_hasNick);
+bool Client::isRegistered() const {
+	return (_isRegistered);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -102,8 +102,8 @@ void Client::setHasUser(bool status) {
 	this->_hasUser = status;
 }
 
-void Client::setHasNick(bool status) {
-	this->_hasNick = status;
+void Client::setisRegistered(bool status) {
+	this->_isRegistered = status;
 }
 
 /* -------------------------------------------------------------------------- */

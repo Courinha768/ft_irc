@@ -39,4 +39,6 @@
 # define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"
 # define ALREADY_USER "FT_IRC Network: You already have a nickname\n"
 
+# define NL "\n"
+
 #endif

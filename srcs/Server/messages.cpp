@@ -6,21 +6,21 @@ void Server::receiveMessage(Client & client) {
 
 	int bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
 	if (bytes_recv == -1) {
-		std::cout << BRED << "ERROR READING SOCKET" << CRESET << std::endl;
-	}
-	if (bytes_recv == 0) {
+
+		Server::cout() << BRED << "ERROR READING SOCKET" << CRESET << "\n";
+
+	} else if (bytes_recv == 0) {
+
 		client.setStatus(false);
-		std::cout << "connection lost with client " << client.getTextAddr() << std::endl;
+		Server::cout() << "connection lost with client " << client.getTextAddr() << "\n";
+
+	} else {
+
+		message.append(recv_buffer);
+		parseMessage(client);
+		message.erase();
+
 	}
-
-	message.append(recv_buffer);
-
-	//? is this necessary
-	// sleep(2);
-	
-	parseMessage(client);
-
-	message.erase();
 }
 
 void Server::parseMessage(Client & client) {
@@ -35,22 +35,7 @@ void Server::parseMessage(Client & client) {
 		//! When we send a new msg and get the client again (in func setupPoll) its not there anymore
 		std::string msg = message.substr(start, end);
 
-
-		if (msg.find(PASS_COMMAND) != EOS) {
-			if (client.isAuthenticated()) {
-				send(client.getFd(), ALREADY_AUTHENTICATED, 47, 0);
-			} else {
-				authenticate(client);
-			}
-		} else if (client.isAuthenticated() && msg.find(USER_COMMAND) != EOS) {
-			if (client.hasUser()) {
-				send(client.getFd(), ALREADY_USER, 45, 0);
-			} else {
-				setClientUser(client);
-			}
-		} else if (client.hasUser() && msg.find(NICK_COMMAND) != EOS) {
-			setClientNick(client);
-		} else if (client.hasNick()) {
+		if (client.isRegistered()) {
 
 			std::cout << client.getNickname() << ": " << msg << "\r\n";
 
@@ -64,19 +49,47 @@ void Server::parseMessage(Client & client) {
 					send(events[i].data.fd, message.c_str(), message.size(), 0);
 				}
 			}
+
 		} else {
-			if (!client.isAuthenticated()) {
-				send(client.getFd(), NEED_AUTHENTICATION, 57, 0);
-			} else if (!client.hasUser()) {
-				send(client.getFd(), NEED_USER, 57, 0);
-			} else if (!client.hasNick()) {
-				send(client.getFd(), NEED_NICK, 57, 0);
+
+			if (msg.find(PASS_COMMAND) != EOS) {
+
+				if (client.isAuthenticated()) {
+					send(client.getFd(), ALREADY_AUTHENTICATED, 47, 0);
+				} else {
+					authenticate(client);
+				}
+
+			} else if (client.isAuthenticated() && msg.find(USER_COMMAND) != EOS) {
+
+				if (client.hasUser()) {
+					send(client.getFd(), ALREADY_USER, 45, 0);
+				} else {
+					setClientUser(client);
+				}
+
+			} else if (client.hasUser() && msg.find(NICK_COMMAND) != EOS) {
+
+				setClientNick(client);
+
+			} else {
+
+				if (!client.isAuthenticated()) {
+					send(client.getFd(), NEED_AUTHENTICATION, 57, 0);
+				} else if (!client.hasUser()) {
+					send(client.getFd(), NEED_USER, 57, 0);
+				} else if (!client.isRegistered()) {
+					send(client.getFd(), NEED_NICK, 57, 0);
+				}
+
 			}
 		}
-
 		start = end + 1;
-		if (start != EOS) end = message.find("\n", start);
-		else end = start;
+		if (start != EOS) {
+			end = message.find("\n", start);
+		} else {
+			end = start;
+		}
 	}
 }
 

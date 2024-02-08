@@ -44,8 +44,8 @@ void Server::setClientNick(Client & client) {
 		end = message.find("\n", start);
 
 		client.setNickname(message.substr(start, end - start));
-		if (!client.hasNick()) {
-			client.setHasNick(true);
+		if (!client.isRegistered()) {
+			client.setisRegistered(true);
 			sendRPL(client);
 		}
 	}
