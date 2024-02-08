@@ -25,13 +25,26 @@
 #define RPL_MYINFO(nickname)	(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1\r\n")
 # define EPPOL_WAIT_ERROR -1
 
-# define PASS_COMMAND "PASS"
-# define USER_COMMAND "USER"
-# define NICK_COMMAND "NICK"
+# define AVAILABLE_COMMANDS { \
+	"CAP", \
+	"PASS", \
+	"NICK", \
+	"USER", \
+	"JOIN", \
+}
+# define COMMAND_FUNCTIONS { \
+	&commandCAP, \
+	&commandPASS, \
+	&commandNICK, \
+	&commandUSER, \
+	&commandJOIN \
+}
+# define NUMBER_OF_AVAILABLE_COMMANDS 5
+# define NOT_A_COMMAND -1
 
 # define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
 # define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
-# define NEED_REGISTRATION		"FT_IRC Network: You need to register before sending mensages\n"
+# define ERR_NOTREGISTERED(nickname) nickname + " :You have not registered"
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 

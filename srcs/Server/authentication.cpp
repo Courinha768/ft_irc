@@ -3,7 +3,7 @@
 //todo: fix problem where we can type anything in the space between the command and the input
 void Server::authenticate(Client & client) {
 	
-	size_t pos = message.find(PASS_COMMAND);
+	size_t pos = message.find("PASS");
 	if(pos != EOS) {
 
 		size_t start;
@@ -31,7 +31,7 @@ void Server::authenticate(Client & client) {
 //? I dont understand what is the point of the username and nickname
 void Server::setClientUser(Client & client) {
 
-	size_t pos = message.find(USER_COMMAND);
+	size_t pos = message.find("USER");
 	if (pos != EOS) {
 
 		size_t start, end;
@@ -50,7 +50,7 @@ void Server::setClientUser(Client & client) {
 
 void Server::setClientNick(Client & client) {
 
-	size_t pos = message.find(NICK_COMMAND);
+	size_t pos = message.find("NICK");
 	if (pos != EOS) {
 		size_t start, end;
 

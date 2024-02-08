@@ -2,6 +2,7 @@
 
 void Server::setup() {
 
+	//todo: take care of this errors
 	memset(&serv, 0, sizeof(serv));
 
 	serv.ai_family		= AF_INET;
@@ -10,20 +11,23 @@ void Server::setup() {
 
 	int option_value = 1;
 
-	error("GETADDRINFO"	, (status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo)) == 0);
-	error("SOCKET"		, (sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol)) != -1);
-	error("SET SOCKET"	, setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int)) != -1);
-	error("BIND"		, (bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen)) == 0);
-	error("SOCKET"		, (listen(sockfd, 5)) != -1);
+	status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo);
+	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
+	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
+	bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
+	listen(sockfd, 5);
 
 	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
 	events[0].data.fd = sockfd;
 
-	error("EPOLL"			, (efd = epoll_create1(0)) != -1);
-	error("ADDING TO EPPOL"	, (epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event) != -1));
+	efd = epoll_create1(0);
+	epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event);
 
 	memset(&events, 0, sizeof(events));
+
+	Server::cout() << BCYN << "Server:" << CRESET;
+	std::cout << std::endl;
 }
 
 void Server::setupPoll() {

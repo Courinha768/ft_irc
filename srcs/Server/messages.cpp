@@ -26,24 +26,79 @@ void Server::sendWarning(std::string msg, Client & client) {
 	send(client.getFd(), msg.c_str(), msg.size(), MSG_NOSIGNAL);
 }
 
-static bool isACommand(std::string msg)	{
-	return (msg.find(PASS_COMMAND) != EOS || msg.find(USER_COMMAND) != EOS
-				|| msg.find(NICK_COMMAND) != EOS || msg.find("CAP LS 302"));
+static void commandCAP(Client & client, Server & server)
+{
+	(void)client;
+	(void)server;
+	// For now do nothing
+}
+
+static void commandPASS(Client & client, Server & server)
+{
+	if (client.isAuthenticated()) {
+		server.sendWarning(ALREADY_AUTHENTICATED, client);
+	} else {
+		server.authenticate(client);
+	}
+}
+
+static void commandNICK(Client & client, Server & server)
+{
+	if (!client.isAuthenticated()) {
+		server.sendWarning(NEED_AUTHENTICATION, client);
+	} else {
+		server.setClientNick(client);
+	}
+}
+
+static void commandUSER(Client & client, Server & server)
+{
+	if (!client.isAuthenticated()) {
+		server.sendWarning(NEED_AUTHENTICATION, client);
+	} else {
+		if (client.hasUser()) {
+			server.sendWarning(ALREADY_USER, client);
+		} else {
+			server.setClientUser(client);
+		}
+	}
+}
+
+static void commandJOIN(Client & client, Server & server)
+{
+	(void)client;
+	(void)server;
+	std::string s = "nickname!username@127.0.0.1 JOIN #hello";
+	send(client.getFd(), s.c_str(), s.size(), MSG_NOSIGNAL);
+}
+
+//todo: find a better name for this
+static int findCommandType(std::string msg)	{
+
+	std::string commands[] = AVAILABLE_COMMANDS;
+
+	for (int i = 0; i < NUMBER_OF_AVAILABLE_COMMANDS; i++)
+	{
+		if (msg.find(commands[i]) != EOS)
+			return i;
+	}
+	return NOT_A_COMMAND;
+
 }
 
 void Server::parseMessage(Client & client) {
 
-	Server::cout() << client.getName() << ": " << message;
+	Server::cout() << message;
 	size_t end = message.find("\n");
 	size_t start = 0;
 
 	while (end != EOS) {
 		std::string msg = message.substr(start, end);
 
-		if (!isACommand(msg)) {
+		int			type = findCommandType(msg);
+		if (type == NOT_A_COMMAND) {
 
 			if (client.isRegistered()) {
-
 				// Sending messages to all clients connected to the server, only to test multiclients
 				for (int i = 0; i < 200; i++) {
 					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
@@ -56,48 +111,14 @@ void Server::parseMessage(Client & client) {
 					}
 				}
 			} else {
-				sendWarning(NEED_REGISTRATION, client);
+				sendWarning(ERR_NOTREGISTERED(client.getNickname()), client);
 			}
 
 		} else {
 
-			if (msg.find("CAP LS 302") != EOS) {
+			void	(*functions[NUMBER_OF_AVAILABLE_COMMANDS])(Client & client, Server & server) = COMMAND_FUNCTIONS;
+			functions[type](client, *this);
 
-				//*For now it does nothing
-
-			} else if (msg.find(PASS_COMMAND) != EOS) {
-
-				if (client.isAuthenticated()) {
-					sendWarning(ALREADY_AUTHENTICATED, client);
-				} else {
-					authenticate(client);
-				}
-
-			} else if (msg.find(NICK_COMMAND) != EOS) {
-
-				if (!client.isAuthenticated()) {
-					sendWarning(NEED_AUTHENTICATION, client);
-				} else {
-					setClientNick(client);
-				}
-
-			} else if (msg.find(USER_COMMAND) != EOS) {
-
-				if (!client.isAuthenticated()) {
-					sendWarning(NEED_AUTHENTICATION, client);
-				} else {
-					if (client.hasUser()) {
-						sendWarning(ALREADY_USER, client);
-					} else {
-						setClientUser(client);
-					}
-				}
-
-			} else {
-
-				sendWarning(COMMAND_NF, client);
-
-			}
 		}
 
 		start = end + 1;
