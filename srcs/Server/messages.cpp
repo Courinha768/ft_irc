@@ -32,7 +32,6 @@ static bool isACommand(std::string msg)	{
 
 void Server::parseMessage(Client & client) {
 
-	std::cout << message << "|" << std::endl;
 	size_t end = message.find("\n");
 	size_t start = 0;
 

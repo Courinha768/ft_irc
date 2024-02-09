@@ -54,48 +54,57 @@ void Server::setClientNick(Client & client) {
 	if (pos != EOS) {
 		size_t start, end;
 
-		start = pos + 4;
-		end = message.find("\n", start);
-		if (isspace(message.at(end - 1))) end--;
-		if (message.at(start) == ' ') {
-			std::string newNick = message.substr(start + 1, end - (start + 1));
-
-			std::cout << "newNick:" << newNick << ":"<< std::endl;
-			if (isspace(newNick.at(0))) std::cout << "empty" << std::endl;
-			
-		
-		
-		// if (start >= message.size()) {
-		// 	sendWarning(ERR_NONICKNAMEGIVEN, client);
-		// 	return ;
-		// }
-		// if (message.at(start - 1) != ' ') {
-		// 	std::cout << "missing space" << std::endl;
-		// 	return;
-		// }
-
-		// if (client.hasNick() && client.getNickname().compare(newNick) == 0) {
-		// 	sendWarning(ERR_NICKNAMEINUSE, client);
-		// 	return ;
-		// }
-		// } else if (start >= message.size() || newNick.empty()) {
-		// 	sendWarning(ERR_NONICKNAMEGIVEN, client);
-		// 	return ;
-		// }
-		 
-			client.setNickname(newNick);
-			client.setHasNick(true);
-			if (!client.isRegistered() && client.hasUser()) {
-				client.setisRegistered(true);
-				sendRPL(client);
-			}
+		start = pos + 5;
+		if (start >= message.size()) {
+			sendWarning(ERR_NONICKNAMEGIVEN, client);
+			return;
 		}
+		if (!isspace(message.at(start - 1))) return;
+		
+		end = message.find("\n", start);
+		if (isspace(message.at(end - 1))) end--; // to skip the \r when it exists
+		
+		std::string newNick = message.substr(start, end - start);
+		if (isMsgEmpty(newNick)) {
+			sendWarning(ERR_NONICKNAMEGIVEN, client);
+			return;
+		}
+		std::cout << "newNick:" << newNick << ":"<< std::endl;
+		
 
-		// after changing nick name, server must send a message informing the change.
-		// It should be sent to all other clients!
-		// <old nickname> NICK <new nickname>
-		// it means we will need a list of nicknames to store this history
+
+		if (client.hasNick() && client.getNickname().compare(newNick) == 0) {
+			sendWarning(ERR_NICKNAMEINUSE, client);
+			return ;
+		}
+		
+		// maybe we will need a list of nicknames to store this history
+		std::string oldNick;
+		if (client.hasNick()) oldNick = client.getNickname();
+		client.setNickname(newNick);
+		client.setHasNick(true);
+		if (!client.isRegistered() && client.hasUser()) {
+			client.setisRegistered(true);
+			sendRPL(client);
+		} else if (client.isRegistered()) {
+			// It should be sent to all other clients!
+			std::string acknowledge = ":" + oldNick + " NICK " + newNick + "\r\n";
+			sendWarning(acknowledge, client);
+		}
+		
+		// todo: limit characters on nickname
 	}
+}
+
+bool Server::isMsgEmpty(std::string msg) {
+	size_t pos = 0;
+	while (pos < msg.size()) {
+		if (!isspace(msg.at(pos))) {
+			return false;
+		}
+		pos++;
+	}
+	return true;
 }
 
 // to improve!
