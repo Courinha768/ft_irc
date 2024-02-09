@@ -33,9 +33,10 @@ void Server::setClientUser(Client & client) {
 
 		size_t start = pos + 4 + 1;
 		size_t end = message.find(" ", start);
-		if (message.at(end - 1) == '\r') {
+		if (end != EOS && message.at(end - 1) == '\r') {
 			end = end - 1;
 		}
+
 		std::string user = message.substr(start, end - start);
 
 		if (user.empty()) {

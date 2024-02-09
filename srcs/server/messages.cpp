@@ -40,8 +40,6 @@ static int findCommand(std::string msg)	{
 
 void Server::parseMessage(Client & client) {
 
-	Server::cout() << message;
-
 	size_t end = message.find("\n");
 	size_t start = 0;
 
@@ -63,6 +61,7 @@ void Server::parseMessage(Client & client) {
 
 			} else {
 
+				Server::cout() << client.getNickname() << ": " << msg << "\r\n";
 				for (int i = 0; i < 200; i++) {
 
 					// *Temporary
