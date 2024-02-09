@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../../includes/ftIrc.hpp"
 
 void commandCAP(Client & client, Server & server)	{
 

@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../../includes/ftIrc.hpp"
 
 /**
  * This function validates if the given port is a valid integer within the range of 1024 to 65535.

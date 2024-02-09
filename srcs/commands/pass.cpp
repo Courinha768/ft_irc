@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../../includes/ftIrc.hpp"
 
 void commandPASS(Client & client, Server & server)	{
 

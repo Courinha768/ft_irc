@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../../includes/ftIrc.hpp"
 
 static int findCommand(std::string msg)	{
 

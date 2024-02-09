@@ -1,4 +1,4 @@
-#include "../../includes/Server.hpp"
+#include "../../includes/ftIrc.hpp"
 
 //todo: fix problem where we can type anything in the space between the command and the input
 void Server::authenticate(Client & client) {
