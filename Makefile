@@ -1,6 +1,6 @@
 NAME			= ircserv
 
-SRCS			= $(wildcard srcs/*cpp) $(wildcard srcs/Server/*cpp)
+SRCS			= $(wildcard srcs/*cpp) $(wildcard srcs/server/*cpp) $(wildcard srcs/commands/*cpp)
 OBJS			= $(SRCS:.cpp=.o)
 
 INC				= -I ./includes

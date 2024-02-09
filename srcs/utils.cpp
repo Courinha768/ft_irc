@@ -1,11 +1,12 @@
-#include "../includes/ftIrc.hpp"
+# include "../includes/Password.hpp"
 
-/**
- * Displays the status of a service operation.
- *
- * @param service The name of the service.
- * @param status The status of the service operation.
- */
+size_t	stringVectorLenght(std::string vector[]) {
+	size_t	i = -1;
+
+	while (!vector[++i].empty()) {}
+	return (i);
+}
+
 void	error(std::string service, bool status)
 {
 	std::cout << service << ":";

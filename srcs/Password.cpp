@@ -1,5 +1,7 @@
 # include "../includes/Password.hpp"
 
+
+//? Can ew move all this things into the header file? its all so small that i dont see why not
 Password::Password(std::string pass) : password(pass) {}
 
 Password::Password(Password const & src) {

@@ -12,9 +12,7 @@ class Client {
 		std::string				text_addr;
 		std::string				username;
 		std::string				nickname;
-		bool					_hasUser;
-		bool					_hasNick;
-		bool					_isRegistered;
+		bool					registered;
 		bool					authenticated;
 		bool					status;
 
@@ -34,8 +32,6 @@ class Client {
 		sockaddr_storage	getAddr() const;
 		std::string			getTextAddr() const;
 		bool				isAuthenticated() const;
-		bool				hasUser() const;
-		bool				hasNick() const;
 		bool				isRegistered() const;
 
 		void	setUsername(std::string name);
@@ -43,8 +39,6 @@ class Client {
 		void	setTextAddr(std::string addr);
 		void	setAuthentication(bool status);
 		void	setStatus(bool status);
-		void	setHasUser(bool status);
-		void	setHasNick(bool status);
 		void	setisRegistered(bool status);
 
 		static Client * createClient(struct sockaddr_storage addr, socklen_t size, int fd);
