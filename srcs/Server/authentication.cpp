@@ -90,9 +90,14 @@ void Server::setClientNick(Client & client) {
 			client.setisRegistered(true);
 			sendRPL(client);
 		} else if (client.isRegistered()) {
-			// It should be sent to all other clients!
 			std::string acknowledge = ":" + oldNick + " NICK " + client.getNickname() + "\r\n";
 			sendWarning(acknowledge, client);
+			std::stringstream ss;
+			ss << ":" << oldNick << " NICK " << client.getNickname() << "\r\n";
+			std::string message = ss.str();
+
+			sendMessageToAllClients(message, client.getFd());
+
 		}
 	}
 }
