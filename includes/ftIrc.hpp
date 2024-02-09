@@ -25,5 +25,6 @@
 # include "Server.hpp"
 # include "Client.hpp"
 # include "colors.hpp"
+# include "Password.hpp"
 
 #endif

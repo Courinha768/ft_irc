@@ -2,11 +2,8 @@
 # define _SERVER_HPP_
 
 # include "ftIrc.hpp"
-# include "Client.hpp"
-# include "Password.hpp"
 
 class Client;
-//! can we turn the password class into a local class inside server?
 class Password;
 
 class Server {
@@ -37,8 +34,9 @@ class Server {
 		Server(std::string port, std::string password);
 		~Server();
 		
-		void setup();
 		in_addr get_in_addr(struct sockaddr *sa);
+
+		void setup();
 		void acceptNewClient();
 		void setupPoll();
 		void receiveMessage(Client & client);

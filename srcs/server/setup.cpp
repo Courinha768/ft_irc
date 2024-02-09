@@ -2,7 +2,7 @@
 
 void Server::setup() {
 
-	//todo: take care of this errors
+	//todo: take care of errors
 	memset(&serv, 0, sizeof(serv));
 
 	serv.ai_family		= AF_INET;
@@ -98,10 +98,6 @@ void Server::acceptNewClient() {
 		Server::cout() << "Got connection from " << clients[new_fd]->getTextAddr() << " on " << new_fd << NL << NL;
 
 	}
-}
-
-in_addr Server::get_in_addr(struct sockaddr *sa){
-	return (((struct sockaddr_in*)sa)->sin_addr);
 }
 
 
