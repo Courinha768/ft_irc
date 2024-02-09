@@ -8,6 +8,9 @@
 
 # define NUMERALS "0123456789"
 
+# define INVALID_LEADING_CHARS "#&:"
+# define WHITESPACES " \t\n\v\f\r"
+
 // End Of String
 # define EOS std::string::npos
 
@@ -38,6 +41,7 @@
 # define ERR_PASSWDMISMATCH ":ircserv.42.fr 464 :Password incorrect\r\n"
 # define ERR_NICKNAMEINUSE ":ircserv.42.fr 433 :Nickname is already in use\r\n"
 # define ERR_NONICKNAMEGIVEN ":ircserv.42.fr 431 :No nickname given\r\n"
+# define ERR_ERRONEUSNICKNAME(nickname) (":ircserv.42.fr 432 " + nickname + " :Erroneus nickname\r\n")
 # define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\n"
 
 # define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"

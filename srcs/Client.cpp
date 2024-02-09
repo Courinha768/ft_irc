@@ -85,7 +85,7 @@ void Client::setUsername(std::string name) {
 }
 
 void Client::setNickname(std::string name) {
-	this->nickname = name;
+	this->nickname = name.substr(0,9);
 	std::cout << getTextAddr() << ": ";
 	error("CLIENT NICKNAME", true);
 }

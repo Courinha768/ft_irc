@@ -69,9 +69,12 @@ void Server::setClientNick(Client & client) {
 			sendWarning(ERR_NONICKNAMEGIVEN, client);
 			return;
 		}
-		std::cout << "newNick:" << newNick << ":"<< std::endl;
-		
 
+		if (hasInvalidChars(newNick)) {
+			std::string invalid_nickname = ERR_ERRONEUSNICKNAME(newNick);
+			sendWarning(invalid_nickname, client);
+			return;
+		}
 
 		if (client.hasNick() && client.getNickname().compare(newNick) == 0) {
 			sendWarning(ERR_NICKNAMEINUSE, client);
@@ -88,11 +91,9 @@ void Server::setClientNick(Client & client) {
 			sendRPL(client);
 		} else if (client.isRegistered()) {
 			// It should be sent to all other clients!
-			std::string acknowledge = ":" + oldNick + " NICK " + newNick + "\r\n";
+			std::string acknowledge = ":" + oldNick + " NICK " + client.getNickname() + "\r\n";
 			sendWarning(acknowledge, client);
 		}
-		
-		// todo: limit characters on nickname
 	}
 }
 
@@ -105,6 +106,15 @@ bool Server::isMsgEmpty(std::string msg) {
 		pos++;
 	}
 	return true;
+}
+
+bool Server::hasInvalidChars(std::string msg) {
+
+	if (msg.find_first_of(INVALID_LEADING_CHARS) == 0 || msg.find_first_of(WHITESPACES) != EOS) {
+		return true;
+	}
+	return false;
+	
 }
 
 // to improve!
