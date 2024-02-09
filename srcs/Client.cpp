@@ -39,6 +39,14 @@ std::string Client::getNickname() const {
 	return nickname;
 }
 
+bool Client::hasNick() const {
+	return !nickname.empty();
+}
+
+bool Client::hasUser() const {
+	return !username.empty();
+}
+
 int Client::getFd() const {
 	return fd;
 }

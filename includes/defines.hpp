@@ -1,12 +1,35 @@
 #ifndef	DEFINES_HPP
 # define DEFINES_HPP
 
+# define NETWORK ":ircserv.42.fr"
+
 # define BUFFER_SIZE 512
 # define NL "\n"
 # define NUMERALS "0123456789"
 
 # define INVALID_LEADING_CHARS "#&:"
 # define WHITESPACES " \t\n\v\f\r"
+
+
+/* ----------------------------- MessageParsing ----------------------------- */
+# define MP_AVAILABLE_COMMANDS { \
+	"CAP", \
+	"PASS", \
+	"NICK", \
+	"USER", \
+	"JOIN", \
+	"QUIT", \
+}
+# define MP_COMMAND_FUNCTIONS { \
+	&commandCAP, \
+	&commandPASS, \
+	&commandNICK, \
+	&commandUSER, \
+	&commandJOIN, \
+	&commandQUIT, \
+}
+# define MP_NOT_A_COMMAND -1
+
 
 // End Of String
 # define EOS std::string::npos
@@ -25,10 +48,6 @@
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 
-# define ERR_PASSWDMISMATCH ":ircserv.42.fr 464 :Password incorrect\r\n"
-# define ERR_NICKNAMEINUSE ":ircserv.42.fr 433 :Nickname is already in use\r\n"
-# define ERR_NONICKNAMEGIVEN ":ircserv.42.fr 431 :No nickname given\r\n"
-# define ERR_ERRONEUSNICKNAME(nickname) (":ircserv.42.fr 432 " + nickname + " :Erroneus nickname\r\n")
 # define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\n"
 
 # define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"

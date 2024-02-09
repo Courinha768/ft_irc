@@ -24,3 +24,23 @@ void Server::sendRPLwellcome(Client & client) {
 	sendRPL(client, RPL_MYINFO(client.getNickname()));
 
 }
+
+bool Server::isMsgEmpty(std::string msg) {
+	size_t pos = 0;
+	while (pos < msg.size()) {
+		if (!isspace(msg.at(pos))) {
+			return false;
+		}
+		pos++;
+	}
+	return true;
+}
+
+bool Server::hasInvalidChars(std::string msg) {
+
+	if (msg.find_first_of(INVALID_LEADING_CHARS) == 0 || msg.find_first_of(WHITESPACES) != EOS) {
+		return true;
+	}
+	return false;
+	
+}
