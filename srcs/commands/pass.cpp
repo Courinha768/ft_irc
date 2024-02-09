@@ -3,7 +3,7 @@
 void commandPASS(Client & client, Server & server)	{
 
 	if (client.isAuthenticated()) {
-		server.sendWarning(ALREADY_AUTHENTICATED, client);
+		server.sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
 	} else {
 		server.authenticate(client);
 	}

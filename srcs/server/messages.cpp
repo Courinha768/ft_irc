@@ -59,12 +59,13 @@ void Server::parseMessage(Client & client) {
 
 			if (!client.isRegistered()) {
 
-				sendWarning(ERR_NOTREGISTERED(client.getNickname()), client);
+				sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
 
 			} else {
 
 				for (int i = 0; i < 200; i++) {
 
+					// *Temporary
 					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
 
 						std::stringstream ss;

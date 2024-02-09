@@ -2,6 +2,8 @@
 
 void commandJOIN(Client & client, Server & server)	{
 
+	//! this is just tests
+
 	(void)server;
 	std::string hello = "hexchatClient!Hexchat@127.0.0.1 JOIN #hello\r\n";
 	send(client.getFd(), hello.c_str(), hello.size(), MSG_NOSIGNAL);

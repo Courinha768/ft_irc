@@ -45,7 +45,8 @@ class Server {
 		void sendWarning(std::string msg, Client & client);
 		void setClientUser(Client & client);
 		void setClientNick(Client & client);
-		void sendRPL(Client & client);
+		void sendRPLwellcome(Client & client);
+		void sendRPL(Client & client, std::string message);
 
 		template<typename T>
 		Server& operator<<(const T& data) {

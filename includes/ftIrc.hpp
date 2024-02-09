@@ -26,5 +26,7 @@
 # include "Client.hpp"
 # include "colors.hpp"
 # include "Password.hpp"
+# include "RPLerrors.hpp"
+# include "RPLreplies.hpp"
 
 #endif
