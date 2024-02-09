@@ -3,6 +3,7 @@
 
 //public libraries
 # include <iostream>
+# include <iomanip>
 # include <cstring>
 # include <sstream>
 # include <cstdlib> 

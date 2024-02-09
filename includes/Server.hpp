@@ -47,6 +47,9 @@ class Server {
 		void setClientNick(Client & client);
 		void sendRPLwellcome(Client & client);
 		void sendRPL(Client & client, std::string message);
+		bool isMsgEmpty(std::string msg);
+		bool hasInvalidChars(std::string msg);
+		void sendMessageToAllClients(std::string msg, int client_fd);
 
 		template<typename T>
 		Server& operator<<(const T& data) {
