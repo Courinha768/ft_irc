@@ -90,3 +90,11 @@ void Server::parseMessage(Client & client) {
 	}
 
 }
+
+void Server::sendMessageToAllClients(std::string msg, int client_fd) {
+	for (int i = 0; i < 200; i++) {
+		if (events[i].data.fd && events[i].data.fd != client_fd) {
+			send(events[i].data.fd, msg.c_str(), msg.size(), 0);
+		}
+	}
+}

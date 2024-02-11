@@ -39,6 +39,14 @@ std::string Client::getNickname() const {
 	return nickname;
 }
 
+bool Client::hasNick() const {
+	return !nickname.empty();
+}
+
+bool Client::hasUser() const {
+	return !username.empty();
+}
+
 int Client::getFd() const {
 	return fd;
 }
@@ -76,7 +84,7 @@ void Client::setUsername(std::string name) {
 }
 
 void Client::setNickname(std::string name) {
-	this->nickname = name;
+	this->nickname = name.substr(0,9);
 }
 
 void Client::setTextAddr(std::string addr) {

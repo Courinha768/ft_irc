@@ -26,6 +26,8 @@ class Client {
 
 		std::string			getUsername() const;
 		std::string			getNickname() const;
+		bool 				hasNick() const;
+		bool				hasUser() const;
 		int					getFd() const;
 		socklen_t			getSize() const;
 		bool				getStatus() const;

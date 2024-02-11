@@ -25,7 +25,7 @@ fclean:			clean
 
 re:				fclean $(NAME)
 
-lauch:			re
+launch:			re
 				@clear
 				@./$(NAME) 8000 1
 
