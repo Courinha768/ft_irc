@@ -27,6 +27,10 @@ Client & Client::operator=(Client const & rhs) {
 	return *this;
 }
 
+bool	Client::operator==(Client const & rhs) {
+	return (this->getFd() == rhs.getFd());
+}
+
 /* -------------------------------------------------------------------------- */
 /*                                   getters                                  */
 /* -------------------------------------------------------------------------- */

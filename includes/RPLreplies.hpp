@@ -1,14 +1,15 @@
 #ifndef RPLREPLIES_HPP
 # define RPLREPLIES_HPP
 
-#define RPL_WELCOME(nickname)								(":ircserv.42.fr 001 " + nickname + " :Welcome to the FT_IRC Network, " + nickname)			//001
-#define RPL_YOURHOST(nickname)								(":ircserv.42.fr 002 " + nickname + " :Your host is ircserv.42.fr running version 001.1")	//002
-#define RPL_CREATED(nickname)								(":ircserv.42.fr 003 " + nickname + " :This server was created on thu Feb 01 2024")			//003
-#define RPL_MYINFO(nickname)								(":ircserv.42.fr 004 " + nickname + " :ircserv.42.fr 001.1")								//004
+#define RPL_WELCOME(nick)								(":ircserv.42.fr 001 " + nick + " :Welcome to the FT_IRC Network, " + nick)				//001
+#define RPL_YOURHOST(nick)								(":ircserv.42.fr 002 " + nick + " :Your host is ircserv.42.fr running version 001.1")	//002
+#define RPL_CREATED(nick)								(":ircserv.42.fr 003 " + nick + " :This server was created on thu Feb 01 2024")			//003
+#define RPL_MYINFO(nick)								(":ircserv.42.fr 004 " + nick + " :ircserv.42.fr 001.1")								//004
 
-#define RPL_TOPIC(nickname, channel_name, channel_topic)	(":ircserv.42.fr 332 " + nickname + " "	+ channel_name " :" + channel_topic)
-#define RPL_NAMREPLY(nickname, channel_name)				(":ircserv.42.fr 353 " + nickname + " = " + channel_name ":@" + nickname)
-#define RPL_ENDOFNAMES(nickname, channel_name)				(":ircserv.42.fr 366 " + nickname + " "	+ channel_name " :End of /NAMES list.")
+#define RPL_TOPIC(nick, channel, topic)					(":ircserv.42.fr 332 " + nick + " "	+ channel " :" + topic)								//332
+#define RPL_TOPICWHOTIME(nick, channel, topic, setat)	(":ircserv.42.fr 333 " + nick + " "	+ channel " " + nick + " " + setat)					//333
+#define RPL_NAMREPLY(nick, channel)						(":ircserv.42.fr 353 " + nick + " = " + channel ":@" + nick)							//353
+#define RPL_ENDOFNAMES(nick, channel)					(":ircserv.42.fr 366 " + nick + " "	+ channel " :End of /NAMES list.")					//366
 
 
 #endif
