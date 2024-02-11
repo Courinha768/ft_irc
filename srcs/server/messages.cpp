@@ -55,7 +55,7 @@ void Server::parseMessage(Client & client) {
 			void	(Server::*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
 			(this->*functions[type])(client, *this);
 
-		} else {
+		} else { //! All this can go i think
 
 			if (!client.isRegistered()) {
 
