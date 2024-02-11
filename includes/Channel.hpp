@@ -26,9 +26,10 @@ class	Channel	{
 
 	public:
 
+		Channel();
 		Channel(std::string name);
 		Channel(std::string name, std::string password);
-		Channel(std::string name, std::string password, std::string modes);
+		// Channel(std::string name, std::string password, std::string modes);
 		~Channel();
 		Channel(Client const & src);
 
@@ -38,6 +39,9 @@ class	Channel	{
 		std::string			getPassword() const;
 		t_mode				getMode() const;
 		std::vector<Client>	getClients() const;
+
+		void	setName(std::string name);
+		void	setPassword(std::string password);
 
 		void				addClient(Client & client);
 		void				removeClient(Client & client);

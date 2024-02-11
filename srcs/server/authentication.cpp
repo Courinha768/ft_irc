@@ -1,5 +1,8 @@
 #include "../../includes/ftIrc.hpp"
 
+//!! MAYBE MOVE EVERYTHING IN THE FILE TO THE COMMAND FUNCTION
+//! like, move the autheticate to the pass command, the setClientUser to the user command, and setClientNick to the nick command
+
 //todo: fix problem where we can type anything in the space between the command and the input
 void Server::authenticate(Client & client) {
 	

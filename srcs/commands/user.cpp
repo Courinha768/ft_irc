@@ -1,6 +1,6 @@
 #include "../../includes/ftIrc.hpp"
 
-void commandUSER(Client & client, Server & server)	{
+void Server::commandUSER(Client & client, Server & server)	{
 
 	if (!client.isAuthenticated()) {
 		//todo: find RPL correct numeric to send

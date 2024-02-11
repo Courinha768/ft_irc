@@ -50,8 +50,10 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
-			functions[type](client, *this);
+			//todo: do the parsing before it sends
+			//! the normal msg is also a command ("PRIVMSG <channel> :msg")
+			void	(Server::*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
+			(this->*functions[type])(client, *this);
 
 		} else {
 

@@ -21,12 +21,12 @@
 	"QUIT", \
 }
 # define MP_COMMAND_FUNCTIONS { \
-	&commandCAP, \
-	&commandPASS, \
-	&commandNICK, \
-	&commandUSER, \
-	&commandJOIN, \
-	&commandQUIT, \
+	&Server::commandCAP, \
+	&Server::commandPASS, \
+	&Server::commandNICK, \
+	&Server::commandUSER, \
+	&Server::commandJOIN, \
+	&Server::commandQUIT, \
 }
 # define MP_NOT_A_COMMAND -1
 
