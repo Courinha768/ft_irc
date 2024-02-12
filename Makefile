@@ -29,7 +29,7 @@ launch:			re
 				@clear
 				@./$(NAME) 8000 1
 
-run:
+run:			$(NAME)
 				@./$(NAME) 8000 1
 
 .PHONY:			all clean fclean re

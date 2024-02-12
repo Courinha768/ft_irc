@@ -8,7 +8,7 @@ void Server::commandUSER(Client & client)	{
 	} else {
 
 		if (client.isRegistered()) {
-			server.sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
+			sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
 		} else {
 			setClientUser(client);
 		}
