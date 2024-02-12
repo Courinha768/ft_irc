@@ -52,6 +52,7 @@ void Server::parseMessage(Client & client) {
 
 			//todo: do the parsing before it sends
 			//! the normal msg is also a command ("PRIVMSG <channel> :msg")
+			std::cout << type<< std::endl;
 			void	(Server::*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
 			(this->*functions[type])(client, *this);
 

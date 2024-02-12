@@ -1,99 +1,112 @@
 #include "../../includes/ftIrc.hpp"
 
-typedef struct s_params {
-	std::string type;
-	std::string	name;
-	std::string password;
-	int			error;
-} t_params;
+typedef struct s_parsed_msg {
+	std::queue<std::string>	channels;
+	std::queue<std::string> passwords;
+} t_parsed_msg;
 
-enum {
-	OK,
-	NEED_MORE_PARAMS,
+static std::queue<std::pair<std::string, std::string> > parseJOINMessage(std::string message)	{
 
-
-};
-
-static std::string	removeCommand(std::string message)
-{
-	size_t end = message.find("\n", 0);
+	size_t end = message.find("\n");
 	if (message.at(end - 1) == '\r') {
 		end = end - 1;
 	}
-	return(message.substr(5, end));
-}
+	message = message.substr(5, end - 5);
 
-static t_params parseJOINMessage(std::string message)	{
+	std::string	channels_string;
+	std::string	passwords_string;
 
-	t_params	params;
-	params.error = OK;
+	end = message.find(" ");
+	channels_string = message.substr(0, end);
+	message = message.substr(end + 1);
 
-	std::string msg = removeCommand(message);
-	if (msg.empty()) {
-		params.error = NEED_MORE_PARAMS;
-		return params;
-	} else {
+	end = message.find(" ");
+	passwords_string = message.substr(0, end);
 
-		if (msg.at(0) != '#' && msg.at(0) != '&') {
-			// todo: error msg
-		}
-		
-		params.type = msg.at(0);
+	std::queue<std::pair<std::string, std::string> >	commands;
+	std::pair<std::string, std::string> 			pair;
 
-		size_t	pos = msg.find_first_of(" ", 0);
-		if (pos == EOS) {
+	size_t coma;
+	while (!channels_string.empty()) {
 
-			params.name = msg.substr(1);
-
+		coma = channels_string.find(",");
+		pair.first = channels_string.substr(0, coma);
+		if (coma != EOS) {
+			channels_string = channels_string.substr(coma + 1);
 		} else {
-
-			params.name = msg.substr(1, pos);
-			msg = msg.substr(pos + 1);
-			if (pos == EOS) {
-				params.password = msg;
-			}
+			channels_string = "";
 		}
+
+		coma = passwords_string.find(",");
+		pair.second = passwords_string.substr(0, coma);
+		if (coma != EOS) {
+			passwords_string = passwords_string.substr(coma + 1);
+		} else {
+			passwords_string = "";
+		}
+
+		commands.push(pair);
 	}
 
-	return params;
+	return commands;
 }
 
 //todo: enter the correct msgs to user (the first one is correct)
 //todo: redo everything... see exemples in https://modern.ircdocs.horse/#join-message
 void Server::commandJOIN(Client & client, Server & server)	{
 
+	(void)server;
+
+	Channel	channel;
+
 	if (client.isRegistered()) {
 
-		t_params	params = parseJOINMessage(message);
+		std::queue<std::pair<std::string, std::string> > commands = parseJOINMessage(message);
 
-		bool		created = false;
-		Channel		channel;
+		while (!commands.empty()) {
 
-		for (unsigned long i = 0; i < channels.size(); i++) {
+			bool	created = false;
+			bool	wrong_pass = false;
+			for (unsigned long i = 0; i < channels.size(); i++) {
 
-			if (channels.at(i).getName() == params.name) {
+				if (channels.at(i).getName() == commands.front().first) {
 
-				channel = channels.at(i);
-				channels.at(i).addClient(client);
+					channel = channels.at(i);
+					if (channel.getPassword() == commands.front().second) {
+
+						channels.at(i).addClient(client);
+						created = true;
+
+					} else {
+						//not sure this is the one
+						sendRPL(client, ERR_PASSWDMISMATCH(client.getNickname()));
+						wrong_pass = true;
+					}
+
+				}
+
+			}
+			if (!created && !wrong_pass) {
+
+				channel.setName(commands.front().first);
+				channel.setPassword(commands.front().second);
+				channel.addClient(client);
+				channels.push_back(channel);
 				created = true;
-				break ;
+				
+			}
+			if (!wrong_pass) {
+
+				server.sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
+				// server.sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), "Wellcome to our chat room"));
+				// server.sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName()));
+				// server.sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
 			}
 
-		}
-		if (!created) {
+			commands.pop();
 
-			channel.setName(params.name);
-			channel.setPassword(params.password);
-			channels.push_back(channel);
-			channels.at(channels.size() - 1).addClient(client);
-			
 		}
-
-		server.sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
-		// server.sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), "Wellcome to our chat room"));
-		// server.sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName()));
-		// server.sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
 	} else {
 
