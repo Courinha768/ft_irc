@@ -4,6 +4,7 @@
 # include "ftIrc.hpp"
 
 class Client;
+class Channel;
 class Password;
 
 class Server {
@@ -27,6 +28,8 @@ class Server {
 		int						status;
 		int						sockfd;
 		int						efd;
+
+		std::vector<Channel>	channels;
 		
 
 	public:
@@ -50,6 +53,15 @@ class Server {
 		bool isMsgEmpty(std::string msg);
 		bool hasInvalidChars(std::string msg);
 		void sendMessageToAllClients(std::string msg, int client_fd);
+
+		void commandCAP(Client & client);
+		void commandJOIN(Client & client);
+		void commandNICK(Client & client);
+		void commandPASS(Client & client);
+		void commandQUIT(Client & client);
+		void commandUSER(Client & client);
+		void commandPRIVMSG(Client & client);
+		
 
 		template<typename T>
 		Server& operator<<(const T& data) {

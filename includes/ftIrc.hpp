@@ -19,6 +19,7 @@
 # include <map>
 # include <arpa/inet.h>
 # include <vector>
+# include <cctype>
 
 //my include files
 # include "defines.hpp"
@@ -29,5 +30,6 @@
 # include "Password.hpp"
 # include "RPLerrors.hpp"
 # include "RPLreplies.hpp"
+# include "Channel.hpp"
 
 #endif
