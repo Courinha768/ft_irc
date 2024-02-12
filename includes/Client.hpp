@@ -11,6 +11,7 @@ class Client {
 		int						fd;
 		std::string				text_addr;
 		std::string				username;
+		std::string				realname;
 		std::string				nickname;
 		bool					registered;
 		bool					authenticated;
@@ -25,6 +26,7 @@ class Client {
 		Client & operator=(Client const & rhs);
 
 		std::string			getUsername() const;
+		std::string			getRealname() const;
 		std::string			getNickname() const;
 		bool 				hasNick() const;
 		bool				hasUser() const;
@@ -37,6 +39,7 @@ class Client {
 		bool				isRegistered() const;
 
 		void	setUsername(std::string name);
+		void	setRealname(std::string name);
 		void	setNickname(std::string name);
 		void	setTextAddr(std::string addr);
 		void	setAuthentication(bool status);

@@ -16,7 +16,7 @@
 # define ERR_ERRONEUSNICKNAME(client, nickname)	(client + " " + nickname + " :Erroneus nickname\r\n")					//432
 # define ERR_NICKNAMEINUSE(client, nickname)	(client + " " + nickname + " :Nickname is already in use\r\n")			//433
 # define ERR_NOTREGISTERED(nickname)			(nickname + " :You have not registered\r\n")							//451
-# define ERR_NEEDMOREPARAMS(client, command)	(client + " " + command + " :Not enough parameters\r\n")				//461
+# define ERR_NEEDMOREPARAMS(command)			(":ircserv.42.fr " + command + " :Not enough parameters\r\n")				//461
 # define ERR_ALREADYREGISTERED(client)			(client + " :You may not reregister\r\n")								//462
 # define ERR_PASSWDMISMATCH(client)				(client + " :Password incorrect\r\n")									//464
 

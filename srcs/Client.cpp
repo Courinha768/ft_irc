@@ -6,6 +6,7 @@ Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr
 	text_addr = "";
 	username = "";
 	nickname = "";
+	realname = "";
 }
 
 Client::~Client() {}
@@ -20,6 +21,7 @@ Client & Client::operator=(Client const & rhs) {
 	this->fd = rhs.getFd();
 	this->text_addr = rhs.getTextAddr();
 	this->username = rhs.getUsername();
+	this->realname = rhs.getRealname();
 	this->nickname = rhs.getNickname();
 	this->registered = rhs.isRegistered();
 	this->authenticated = rhs.isAuthenticated();
@@ -33,6 +35,10 @@ Client & Client::operator=(Client const & rhs) {
 
 std::string Client::getUsername() const {
 	return username;
+}
+
+std::string Client::getRealname() const {
+	return realname;
 }
 
 std::string Client::getNickname() const {
@@ -81,6 +87,10 @@ bool Client::isRegistered() const {
 
 void Client::setUsername(std::string name) {
 	this->username = name;
+}
+
+void Client::setRealname(std::string name) {
+	this->realname = name;
 }
 
 void Client::setNickname(std::string name) {

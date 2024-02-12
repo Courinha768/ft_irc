@@ -6,11 +6,13 @@ void commandUSER(Client & client, Server & server)	{
 		//todo: find RPL correct numeric to send
 		server.sendWarning(NEED_AUTHENTICATION, client);
 	} else {
-		if (!client.getUsername().empty()) {
+
+		if (client.isRegistered()) {
 			server.sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
 		} else {
 			server.setClientUser(client);
 		}
+
 	}
 
 }
