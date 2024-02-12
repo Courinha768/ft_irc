@@ -1,6 +1,6 @@
 #include "../../includes/ftIrc.hpp"
 
-void Server::commandCAP(Client & client)	{
+void Server::commandPRIVMSG(Client & client)	{
 
 	(void)client;
 

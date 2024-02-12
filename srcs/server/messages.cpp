@@ -50,13 +50,11 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			//todo: do the parsing before it sends
-			//! the normal msg is also a command ("PRIVMSG <channel> :msg")
 			std::cout << type<< std::endl;
-			void	(Server::*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
-			(this->*functions[type])(client, *this);
+			void	(Server::*functions[7])(Client & client) = MP_COMMAND_FUNCTIONS;
+			(this->*functions[type])(client);
 
-		} else { //! All this can go i think
+		} else {
 
 			if (!client.isRegistered()) {
 

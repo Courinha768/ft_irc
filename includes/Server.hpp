@@ -54,12 +54,13 @@ class Server {
 		bool hasInvalidChars(std::string msg);
 		void sendMessageToAllClients(std::string msg, int client_fd);
 
-		void commandCAP(Client & client, Server & server);
-		void commandJOIN(Client & client, Server & server);
-		void commandNICK(Client & client, Server & server);
-		void commandPASS(Client & client, Server & server);
-		void commandQUIT(Client & client, Server & server);
-		void commandUSER(Client & client, Server & server);
+		void commandCAP(Client & client);
+		void commandJOIN(Client & client);
+		void commandNICK(Client & client);
+		void commandPASS(Client & client);
+		void commandQUIT(Client & client);
+		void commandUSER(Client & client);
+		void commandPRIVMSG(Client & client);
 		
 
 		template<typename T>

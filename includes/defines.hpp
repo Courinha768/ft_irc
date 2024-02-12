@@ -19,6 +19,7 @@
 	"USER", \
 	"JOIN", \
 	"QUIT", \
+	"PRIVMSG", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -27,6 +28,7 @@
 	&Server::commandUSER, \
 	&Server::commandJOIN, \
 	&Server::commandQUIT, \
+	&Server::commandPRIVMSG, \
 }
 # define MP_NOT_A_COMMAND -1
 

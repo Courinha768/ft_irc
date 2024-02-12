@@ -51,11 +51,7 @@ static std::queue<std::pair<std::string, std::string> > parseJOINMessage(std::st
 	return commands;
 }
 
-//todo: enter the correct msgs to user (the first one is correct)
-//todo: redo everything... see exemples in https://modern.ircdocs.horse/#join-message
-void Server::commandJOIN(Client & client, Server & server)	{
-
-	(void)server;
+void Server::commandJOIN(Client & client)	{
 
 	Channel	channel;
 
@@ -78,7 +74,7 @@ void Server::commandJOIN(Client & client, Server & server)	{
 						created = true;
 
 					} else {
-						//not sure this is the one
+						//!not sure this is the one
 						sendRPL(client, ERR_PASSWDMISMATCH(client.getNickname()));
 						wrong_pass = true;
 					}
@@ -97,7 +93,7 @@ void Server::commandJOIN(Client & client, Server & server)	{
 			}
 			if (!wrong_pass) {
 
-				server.sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
+				sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
 				// server.sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), "Wellcome to our chat room"));
 				// server.sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName()));
 				// server.sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));

@@ -1,11 +1,11 @@
 #include "../../includes/ftIrc.hpp"
 
-void Server::commandPASS(Client & client, Server & server)	{
+void Server::commandPASS(Client & client)	{
 
 	if (client.isAuthenticated()) {
-		server.sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
+		sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
 	} else {
-		server.authenticate(client);
+		authenticate(client);
 	}
 
 }
