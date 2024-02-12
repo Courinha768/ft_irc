@@ -50,34 +50,34 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(*functions[6])(Client & client, Server & server) = MP_COMMAND_FUNCTIONS;
-			functions[type](client, *this);
+			void	(Server::*functions[7])(Client & client) = MP_COMMAND_FUNCTIONS;
+			(this->*functions[type])(client);
 
 		} else {
 
-			if (!client.isRegistered()) {
+			// if (!client.isRegistered()) {
 
-				sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
+			// 	sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
 
-			} else {
+			// } else {
 
-				Server::cout() << client.getNickname() << ": " << msg << "\r\n";
-				for (int i = 0; i < 200; i++) {
+			// 	Server::cout() << client.getNickname() << ": " << msg << "\r\n";
+			// 	for (int i = 0; i < 200; i++) {
 
-					// *Temporary
-					if (events[i].data.fd && events[i].data.fd != client.getFd()) {
+			// 		// *Temporary
+			// 		if (events[i].data.fd && events[i].data.fd != client.getFd()) {
 
-						std::stringstream ss;
-						ss << client.getNickname() << ": " << msg << "\r\n";
-						std::string message = ss.str();
+			// 			std::stringstream ss;
+			// 			ss << client.getNickname() << ": " << msg << "\r\n";
+			// 			std::string message = ss.str();
 
-						send(events[i].data.fd, message.c_str(), message.size(), 0);
+			// 			send(events[i].data.fd, message.c_str(), message.size(), 0);
 
-					}
+			// 		}
 
-				}
+			// 	}
 
-			}
+			// }
 		}
 
 		start = end + 1;

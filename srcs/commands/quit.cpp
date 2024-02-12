@@ -1,8 +1,8 @@
 #include "../../includes/ftIrc.hpp"
 
-void commandQUIT(Client & client, Server & server)	{
+void Server::commandQUIT(Client & client)	{
 
 	client.setStatus(false);
-	server.cout() << "connection lost with client " << client.getTextAddr() << "\n";
+	std::cout << "connection lost with client " << client.getTextAddr() << "\n";
 
 }

@@ -24,6 +24,7 @@ class Client {
 		Client(Client const & src);
 
 		Client & operator=(Client const & rhs);
+		bool	operator==(Client const & rhs);
 
 		std::string			getUsername() const;
 		std::string			getRealname() const;
