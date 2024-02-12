@@ -17,7 +17,8 @@ void Server::authenticate(Client & client) {
 		std::string pass = message.substr(start, end - start);
 
 		if (pass.empty()) {
-			sendRPL(client, ERR_NEEDMOREPARAMS(client.getUsername(), "PASS"));
+			std::string command = "PASS";
+			sendRPL(client, ERR_NEEDMOREPARAMS(command));
 		}
 
 		client.setAuthentication(password->validate(pass));
@@ -34,17 +35,28 @@ void Server::setClientUser(Client & client) {
 	size_t pos = message.find("USER");
 	if (pos != EOS) {
 
-		size_t start = pos + 4 + 1;
+		size_t start = pos + 5;
 		size_t end = message.find(" ", start);
-		if (end != EOS && message.at(end - 1) == '\r') {
-			end = end - 1;
+
+		std::string user = "~" + message.substr(start, end - start);
+
+		if (!isspace(message.at(start - 1))) return ;
+
+		if (start == EOS || end == EOS || (user.substr(1)).empty() || isMsgEmpty(user.substr(1))) {
+			std::string command = "USER";
+			sendRPL(client, ERR_NEEDMOREPARAMS(command));
+			return ;
 		}
 
-		std::string user = message.substr(start, end - start);
+		start = message.find(":");
+		end = message.find("\n", start);
+		if (start != EOS && end != EOS) {
+			if (message.at(end - 1) == '\r') end--;
+			start++;
+			std::string realname = message.substr(start, end - start);
+			client.setRealname(realname);
+		} else return ;
 
-		if (user.empty()) {
-			sendRPL(client, ERR_NEEDMOREPARAMS(client.getUsername(), "USER"));
-		}
 
 		client.setUsername(user);
 		if (!client.isRegistered() && !client.getNickname().empty()) {

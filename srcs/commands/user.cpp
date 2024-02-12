@@ -6,11 +6,13 @@ void Server::commandUSER(Client & client)	{
 		//todo: find RPL correct numeric to send
 		sendWarning(NEED_AUTHENTICATION, client);
 	} else {
-		if (!client.getUsername().empty()) {
+
+		if (client.isRegistered()) {
 			sendRPL(client, ERR_ALREADYREGISTERED(client.getUsername()));
 		} else {
 			setClientUser(client);
 		}
+
 	}
 
 }
