@@ -46,6 +46,9 @@ class	Channel	{
 		void				addClient(Client & client);
 		void				removeClient(Client & client);
 
+		void				addMode(char mode);
+		void				removeMode(char	mode);
+
 		std::vector<Client>::iterator	findClient(Client const & client);
 
 };

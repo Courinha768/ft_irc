@@ -2,9 +2,8 @@
 
 typedef struct s_command {
 	std::vector<std::string>	targets;
-	std::vector<std::string>	modes;
+	std::vector<char>			modes;
 	std::vector<std::string>	parameters;
-	bool						add;
 } t_command;
 
 static	t_command	parseMODEMessage(std::string message)	{
@@ -21,20 +20,29 @@ static	t_command	parseMODEMessage(std::string message)	{
 	std::string	modes;
 	std::string	parameters;
 
-	end = message.find(" ");
+	end = parsed_message.find(' ');
 	targets = parsed_message.substr(0, end);
-	parsed_message = parsed_message.substr(end + 1);
 
-	end = message.find(" ");
-	modes = parsed_message.substr(0, end);
-	parsed_message = parsed_message.substr(end + 1);
+	if (end != EOS)	{
+		
+		parsed_message = parsed_message.substr(end + 1);
 
-	parameters = parsed_message;
+		end = parsed_message.find(" ");
+		modes = parsed_message.substr(0, end);
+
+		if (end != EOS)	{
+
+			parsed_message = parsed_message.substr(end + 1);
+			parameters = parsed_message;
+
+		}
+
+	}
 
 	t_command	command;
-	
+
 	end = targets.find(",");
-	while (end != EOF)	{
+	while (end != EOS)	{
 
 		command.targets.push_back(targets.substr(0, end));
 		targets = targets.substr(end + 1);
@@ -43,44 +51,94 @@ static	t_command	parseMODEMessage(std::string message)	{
 	}
 	command.targets.push_back(targets.substr(0, end));
 
-	if (modes.at(0) == '+')
-		command.add = true;
-	else
-		command.add = false;
-	modes = modes.substr(1);
+	if (!modes.empty())	{
 
-	while (!modes.empty())	{
-
-		command.modes.push_back(modes.substr(0, 1));
-		targets = targets.substr(1);
+		while (!modes.empty())	{
+		
+			command.modes.push_back((modes.substr(0, 1).c_str())[0]);
+			modes = modes.substr(1);
+	
+		}
 
 	}
 
-	end = parameters.find(" ");
-	while (end != EOF)	{
+	if (!parameters.empty())	{
 
-		command.parameters.push_back(parameters.substr(0, end));
-		parameters = parameters.substr(end + 1);
 		end = parameters.find(" ");
+		while (end != EOS)	{
+
+			command.parameters.push_back(parameters.substr(0, end));
+			parameters = parameters.substr(end + 1);
+			end = parameters.find(" ");
+
+		}
+		command.parameters.push_back(parameters.substr(0, end));
 
 	}
-	command.parameters.push_back(parameters.substr(0, end));
 
 	return command;
 
 }
 
+//todo: end this
 void Server::commandMODE(Client & client)	{
 
-	t_command	command = parseMODEMessage(message);
+	if (!client.isRegistered())	{
 
-	for (unsigned long	i; i < command.targets.size(); i++)	{
+		//!ERROR
+		return ;
 
-		for (unsigned long	j; j < command.modes.size(); j++)	{
+	}
+	t_command		command = parseMODEMessage(message);
+	Channel			channel;
+	unsigned long	c;
 
-			for (unsigned long	k; k < command.parameters.size(); k++)	{
+	for (unsigned long	i = 0; i < command.targets.size(); i++)	{
 
-				
+		for (unsigned long	j = 1; j < command.modes.size(); j++)	{
+
+			for (unsigned long	k = 0; k < command.parameters.size(); k++)	{
+
+				bool created = false;
+
+				for (unsigned long l = 0; l < channels.size(); l++) {
+
+					if (channels.at(l).getName() == command.targets.at(i)) {
+
+						created = true;
+						c = l;
+
+					}
+
+				}
+				if (created)	{
+
+					if (command.modes.at(0) == '+')
+						channels.at(c).addMode(command.modes.at(j));
+					else
+						channels.at(c).removeMode(command.modes.at(j));
+
+				}	else	{
+
+					for (unsigned long l = 0; l < clients.size(); l++) {
+
+						//todo: find client correctly
+						if (clients.at(l)->getNickname() == command.targets.at(i)) {
+
+							if (clients.at(l)->getNickname() != client.getNickname()) {
+
+								//!ERROR msg
+								return ;
+
+							}
+							c = l;
+
+						}
+					
+
+					}
+
+				}
 
 			}
 
