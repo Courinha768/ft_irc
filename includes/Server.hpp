@@ -60,6 +60,7 @@ class Server {
 		void commandPASS(Client & client);
 		void commandQUIT(Client & client);
 		void commandUSER(Client & client);
+		void commandMODE(Client & client);
 		void commandPRIVMSG(Client & client);
 		
 

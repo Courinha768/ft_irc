@@ -19,6 +19,7 @@
 	"USER", \
 	"JOIN", \
 	"QUIT", \
+	"MODE", \
 	"PRIVMSG", \
 }
 # define MP_COMMAND_FUNCTIONS { \
@@ -28,6 +29,7 @@
 	&Server::commandUSER, \
 	&Server::commandJOIN, \
 	&Server::commandQUIT, \
+	&Server::commandMODE, \
 	&Server::commandPRIVMSG, \
 }
 # define MP_NOT_A_COMMAND -1

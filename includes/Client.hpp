@@ -3,6 +3,18 @@
 
 #include "ftIrc.hpp"
 
+typedef struct s_mode_client	{
+	bool	_ban;
+	bool	_exeption;
+	bool	_client_limit;
+	bool	_invite_only;
+	bool	_invite_exeption;
+	bool	_key;
+	bool	_moderated;
+	bool	_secret;
+	bool	_protected;
+	bool	_no_external_messages;
+} t_mode_client;
 class Client {
 
 	private:
@@ -16,6 +28,7 @@ class Client {
 		bool					registered;
 		bool					authenticated;
 		bool					status;
+
 
 	public:
 

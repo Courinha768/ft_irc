@@ -105,7 +105,7 @@ std::string Channel::getPassword() const	{
 	return _password;
 }
 
-t_mode Channel::getMode() const	{
+t_mode_channel Channel::getMode() const	{
 	return _mode;
 }
 
@@ -144,4 +144,86 @@ std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
 			return (_clients.begin() + i);
 	}
 	return (_clients.end());
+}
+
+void	Channel::addMode(char mode) {
+
+	switch (mode)	{
+
+		case 'b':
+			_mode._ban = true;
+			break;
+		case 'e':
+			_mode._exeption = true;
+			break;
+		case 'l':
+			_mode._client_limit = true;
+			break;
+		case 'i':
+			_mode._invite_only = true;
+			break;
+		case 'I':
+			_mode._invite_exeption = true;
+			break;
+		case 'k':
+			_mode._key = true;
+			break;
+		case 'm':
+			_mode._moderated = true;
+			break;
+		case 's':
+			_mode._secret = true;
+			break;
+		case 't':
+			_mode._protected = true;
+			break;
+		case 'n':
+			_mode._no_external_messages = true;
+			break;
+		default:
+			break;
+
+	}
+
+}
+
+void	Channel::removeMode(char mode) {
+
+	switch (mode)	{
+
+		case 'b':
+			_mode._ban = false;
+			break;
+		case 'e':
+			_mode._exeption = false;
+			break;
+		case 'l':
+			_mode._client_limit = false;
+			break;
+		case 'i':
+			_mode._invite_only = false;
+			break;
+		case 'I':
+			_mode._invite_exeption = false;
+			break;
+		case 'k':
+			_mode._key = false;
+			break;
+		case 'm':
+			_mode._moderated = false;
+			break;
+		case 's':
+			_mode._secret = false;
+			break;
+		case 't':
+			_mode._protected = false;
+			break;
+		case 'n':
+			_mode._no_external_messages = false;
+			break;
+		default:
+			break;
+
+	}
+
 }

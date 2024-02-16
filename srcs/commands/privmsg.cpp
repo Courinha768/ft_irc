@@ -2,8 +2,6 @@
 
 void Server::commandPRIVMSG(Client & client)	{
 
-	(void)client;
-
 	std::string trimmed_message;
 	std::string	channel_name;
 
@@ -19,21 +17,22 @@ void Server::commandPRIVMSG(Client & client)	{
 
 	for (unsigned long i = 0; i < channels.size(); i++) {
 
-			if (channels.at(i).getName() == channel_name) {
+		if (channels.at(i).getName() == channel_name) {
 
-				for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++) {
+			for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++) {
 
-					if (channels.at(i).getClients().at(j).getFd() != client.getFd()) {
+				if (channels.at(i).getClients().at(j).getFd() != client.getFd()) {
 
-						std::string test = ":" + client.getNickname() + " " + message;
-						sendMsg(channels.at(i).getClients().at(j), test);
-
-					}
+					std::string test = ":" + client.getNickname() + " " + message;
+					sendMsg(channels.at(i).getClients().at(j), test);
 
 				}
 
 			}
+			break ;
 
 		}
+
+	}
 	
 }

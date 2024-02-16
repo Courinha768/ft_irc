@@ -24,7 +24,7 @@ static std::queue<std::pair<std::string, std::string> > parseJOINMessage(std::st
 	passwords_string = message.substr(0, end);
 
 	std::queue<std::pair<std::string, std::string> >	commands;
-	std::pair<std::string, std::string> 			pair;
+	std::pair<std::string, std::string> 				pair;
 
 	size_t coma;
 	while (!channels_string.empty()) {
