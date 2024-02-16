@@ -83,6 +83,7 @@ static	t_command	parseMODEMessage(std::string message)	{
 //todo: end this
 void Server::commandMODE(Client & client)	{
 
+	//todo: add this to all commands
 	if (!client.isRegistered())	{
 
 		//!ERROR
@@ -111,31 +112,17 @@ void Server::commandMODE(Client & client)	{
 					}
 
 				}
+				//todo: make verifications such as: check if the Modes exist
+
 				if (created)	{
 
 					if (command.modes.at(0) == '+')
-						channels.at(c).addMode(command.modes.at(j));
+						channels.at(c).addMode(command.modes.at(j), command.parameters[k]);
 					else
-						channels.at(c).removeMode(command.modes.at(j));
+						channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
 
 				}	else	{
 
-					for (unsigned long l = 0; l < clients.size(); l++) {
-
-						if (clients.at(l)->getNickname() == command.targets.at(i)) {
-
-							if (clients.at(l)->getNickname() != client.getNickname()) {
-
-								//!ERROR msg
-								return ;
-
-							}
-							c = l;
-
-						}
-					
-
-					}
 
 				}
 

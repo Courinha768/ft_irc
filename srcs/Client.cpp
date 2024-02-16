@@ -2,7 +2,7 @@
 
 Client::Client(struct sockaddr_storage addr, socklen_t size, int fd) : addr(addr), size(size), fd(fd) {
 	authenticated = false;
-	registered = false;
+	modes._registered = false;
 	text_addr = "";
 	username = "";
 	nickname = "";
@@ -23,9 +23,9 @@ Client & Client::operator=(Client const & rhs) {
 	this->username = rhs.getUsername();
 	this->realname = rhs.getRealname();
 	this->nickname = rhs.getNickname();
-	this->registered = rhs.isRegistered();
 	this->authenticated = rhs.isAuthenticated();
 	this->status = rhs.getStatus();
+	this->modes._registered = rhs.isRegistered();
 	return *this;
 }
 
@@ -82,7 +82,11 @@ bool Client::isAuthenticated() const {
 }
 
 bool Client::isRegistered() const {
-	return (registered);
+	return (modes._registered);
+}
+
+bool	Client::isOperator(Channel channel)	const {
+	return (channel.getClients().at(0).getFd() == this->getFd());
 }
 
 /* -------------------------------------------------------------------------- */
@@ -113,9 +117,10 @@ void Client::setStatus(bool status) {
 	this->status = status;
 }
 
-void Client::setisRegistered(bool status) {
-	this->registered = status;
+void	Client::setisRegistered(bool status) {
+	this->modes._registered = status;
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                                   others                                   */

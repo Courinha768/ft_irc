@@ -4,16 +4,7 @@
 #include "ftIrc.hpp"
 
 typedef struct s_mode_client	{
-	bool	_ban;
-	bool	_exeption;
-	bool	_client_limit;
-	bool	_invite_only;
-	bool	_invite_exeption;
-	bool	_key;
-	bool	_moderated;
-	bool	_secret;
-	bool	_protected;
-	bool	_no_external_messages;
+	bool	_registered;
 } t_mode_client;
 class Client {
 
@@ -25,9 +16,9 @@ class Client {
 		std::string				username;
 		std::string				realname;
 		std::string				nickname;
-		bool					registered;
 		bool					authenticated;
 		bool					status;
+		t_mode_client			modes;
 
 
 	public:
@@ -51,6 +42,7 @@ class Client {
 		std::string			getTextAddr() const;
 		bool				isAuthenticated() const;
 		bool				isRegistered() const;
+		bool				isOperator(Channel channel) const;
 
 		void	setUsername(std::string name);
 		void	setRealname(std::string name);
