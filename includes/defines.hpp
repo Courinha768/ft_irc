@@ -21,6 +21,7 @@
 	"QUIT", \
 	"MODE", \
 	"PRIVMSG", \
+	"KICK", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -31,6 +32,7 @@
 	&Server::commandQUIT, \
 	&Server::commandMODE, \
 	&Server::commandPRIVMSG, \
+	&Server::commandKICK, \
 }
 # define MP_NOT_A_COMMAND -1
 
