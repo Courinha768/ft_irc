@@ -20,6 +20,7 @@
 # include <arpa/inet.h>
 # include <vector>
 # include <cctype>
+# include <stdexcept>
 
 //my include files
 # include "defines.hpp"
