@@ -80,7 +80,12 @@ static	t_command	parseMODEMessage(std::string message)	{
 
 }
 
-//todo: end this
+//todo:finish this
+static std::string getModes(std::string target)	{
+	(void)target;
+	return target;
+}
+
 void Server::commandMODE(Client & client)	{
 
 	//todo: add this to all commands
@@ -94,8 +99,20 @@ void Server::commandMODE(Client & client)	{
 	Channel			channel;
 	unsigned long	c;
 
+	for (unsigned long	i = 1; i < command.modes.size(); i++)	{
+		if (command.modes.at(i) != 'i' && command.modes.at(i) != 'k'
+				&& command.modes.at(i) != 't' && command.modes.at(i) != 'n'
+				&& command.modes.at(i) != 'o')	{
+			sendRPL(client, ERR_UMODEUNKNOWNFLAG(client.getNickname()));
+		}
+	}
+
 	for (unsigned long	i = 0; i < command.targets.size(); i++)	{
 
+		// TODO: finish this one
+		if (command.modes.size() < 1)	{
+			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i))));
+		}
 		for (unsigned long	j = 1; j < command.modes.size(); j++)	{
 
 			for (unsigned long	k = 0; k < command.parameters.size(); k++)	{
@@ -112,7 +129,6 @@ void Server::commandMODE(Client & client)	{
 					}
 
 				}
-				//todo: make verifications such as: check if the Modes exist
 
 				if (created)	{
 
@@ -123,6 +139,7 @@ void Server::commandMODE(Client & client)	{
 
 				}	else	{
 
+					sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), command.targets.at(i)));
 
 				}
 

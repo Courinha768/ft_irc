@@ -11,6 +11,8 @@
 #define RPL_NAMREPLY(nick, channel)						":ircserv.42.fr 353 " + nick + " = " + channel + ":@" + nick							//353
 #define RPL_ENDOFNAMES(nick, channel)					":ircserv.42.fr 366 " + nick + " "	+ channel + ":End of /NAMES list."					//366
 
+#define RPL_CHANNELMODEIS(nick, channel, modes)				":ircserv.42.fr 366 " + nick + " "	+ channel + " " + modes								//324
+
 #define JOIN_REPLY(nick, channel)						":" + nick + "!" + nick + "@ircserv.42.fr JOIN " + channel
 
 #endif

@@ -20,5 +20,6 @@
 # define ERR_ALREADYREGISTERED(client)			(":ircserv.42.fr 462 " + client + " :You may not reregister\r\n")								//462
 # define ERR_PASSWDMISMATCH(client)				(":ircserv.42.fr 464 " + client + " :Password incorrect\r\n")									//464
 # define ERR_BADCHANNELKEY(client, channel)		(":ircserv.42.fr 475 " + client + " " + channel + " :Password incorrect\r\n")					//475
+# define ERR_UMODEUNKNOWNFLAG(client)		(":ircserv.42.fr 475 " + client + " :Unknown MODE flag\r\n")									//501
 
 #endif
