@@ -122,7 +122,6 @@ void Server::commandMODE(Client & client)	{
 
 					for (unsigned long l = 0; l < clients.size(); l++) {
 
-						//todo: find client correctly
 						if (clients.at(l)->getNickname() == command.targets.at(i)) {
 
 							if (clients.at(l)->getNickname() != client.getNickname()) {

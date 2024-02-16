@@ -105,7 +105,7 @@ std::string Channel::getPassword() const	{
 	return _password;
 }
 
-t_mode Channel::getMode() const	{
+t_mode_channel Channel::getMode() const	{
 	return _mode;
 }
 

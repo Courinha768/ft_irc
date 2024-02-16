@@ -43,6 +43,7 @@ void Server::parseMessage(Client & client) {
 	size_t end = message.find("\n");
 	size_t start = 0;
 
+	Server::cout() << message << "\r\n";
 	while (end != EOS) {
 
 		std::string msg = message.substr(start, end);
