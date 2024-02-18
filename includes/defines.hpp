@@ -51,6 +51,7 @@
 # define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
 # define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
 # define NEED_REGISTRATION		"FT_IRC Network: You need to register before sending mensages\n"
+# define NEED_CHANOPRIVS   		"FT_IRC Network: You're not channel operator\n"
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 

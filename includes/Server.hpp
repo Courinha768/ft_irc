@@ -53,6 +53,7 @@ class Server {
 		bool isMsgEmpty(std::string msg);
 		bool hasInvalidChars(std::string msg);
 		void sendMessageToAllClients(std::string msg, int client_fd);
+		void sendMessageToClient(std::string msg, int client_fd);
 
 		void commandCAP(Client & client);
 		void commandJOIN(Client & client);

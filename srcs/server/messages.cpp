@@ -99,3 +99,12 @@ void Server::sendMessageToAllClients(std::string msg, int client_fd) {
 		}
 	}
 }
+
+void Server::sendMessageToClient(std::string msg, int client_fd) {
+    for (int i = 0; i < 200; i++) {
+        if (events[i].data.fd == client_fd) {
+            send(client_fd, msg.c_str(), msg.size(), 0);
+            break;
+        }
+    }
+}
