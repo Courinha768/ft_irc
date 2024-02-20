@@ -2,6 +2,7 @@
 
 void Server::commandKICK(Client &client)
 {
+    //We have to change by the true confirmation that the customer is an operator
     bool isOperator = true;
 
     if (!isOperator)
@@ -26,7 +27,7 @@ void Server::commandKICK(Client &client)
     std::string user_to_kick;
     std::string comment;
 
-    size_t end = message.find("/n");
+    size_t end = message.find("\n");
     if (end == std::string::npos)
     {
         sendWarning(NEED_MOREPARAMS, client);

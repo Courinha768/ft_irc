@@ -22,6 +22,7 @@
 	"MODE", \
 	"PRIVMSG", \
 	"KICK", \
+	"INVITE", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -33,6 +34,7 @@
 	&Server::commandMODE, \
 	&Server::commandPRIVMSG, \
 	&Server::commandKICK, \
+	&Server::commandINVITE, \
 }
 # define MP_NOT_A_COMMAND -1
 
@@ -51,10 +53,13 @@
 # define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
 # define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
 # define NEED_REGISTRATION		"FT_IRC Network: You need to register before sending mensages\n"
-# define NEED_CHANOPRIVS   		"FT_IRC Network: KICK: You're not channel operator\n"
-# define NEED_MOREPARAMS		"FT_IRC Network: KICK: Not enough parameters\n"
-# define NOSUCHCHANNEL			"FT_IRC Network: KICK: No such channel\n"
-# define USERNOTINCHANNEL		"FT_IRC Network: KICK: That user is not on that channel\n"
+# define NEED_CHANOPRIVS   		"FT_IRC Network: You're not channel operator\n"
+# define NEED_MOREPARAMS		"FT_IRC Network: Not enough parameters\n"
+# define NOSUCHCHANNEL			"FT_IRC Network: No such channel\n"
+# define USERNOTINCHANNEL		"FT_IRC Network: That user is not on that channel\n"
+# define NOTMEMBER				"FT_IRC Network: You are not on that channel\n"
+# define ALREADYMEMBER			"FT_IRC Network: That user is already on that channel\n"
+# define NOUSER					"FT_IRC Network: That user doesn't exist\n"
 
 # define COMMAND_NF	"FT_IRC Network: Command not found\n"
 
