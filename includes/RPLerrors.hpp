@@ -16,6 +16,8 @@
 # define ERR_ERRONEUSNICKNAME(client, nickname)	(":ircserv.42.fr 432 " + client + " " + nickname + " :Erroneus nickname\r\n")					//432
 # define ERR_NICKNAMEINUSE(client, nickname)	(":ircserv.42.fr 433 " + client + " " + nickname + " :Nickname is already in use\r\n")			//433
 # define ERR_USERNOTINCHANNEL(client, nickname, channel) (":ircserv.42.fr 441 " + client + " " + nickname + " " + channel + " :That user is not on that channel\r\n")	//441
+# define ERR_NOTONCHANNEL(client, channel)		(":ircserv.42.fr 442 " + client + " " + channel + " :You're not on that channel\r\n")			//442
+# define ERR_USERONCHANNEL(client, nickname, channel)	(":ircserv.42.fr 443 " + client + " " + nickname + " " + channel + " :is already on channel\r\n")	//443
 # define ERR_NOTREGISTERED(nickname)			(":ircserv.42.fr 451 " + nickname + " :You have not registered\r\n")							//451
 # define ERR_NEEDMOREPARAMS(command)			(":ircserv.42.fr 461 " + command + " :Not enough parameters\r\n")								//461
 # define ERR_ALREADYREGISTERED(client)			(":ircserv.42.fr 462 " + client + " :You may not reregister\r\n")								//462

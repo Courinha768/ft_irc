@@ -66,7 +66,7 @@ void Server::commandINVITE(Client & client)
 
     if (!isMember)
     {
-        sendWarning(NOTMEMBER, client);
+        sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return;
     }
 
@@ -82,7 +82,7 @@ void Server::commandINVITE(Client & client)
 
     if (isAlreadyInChannel)
     {
-        sendWarning(ALREADYMEMBER, client);
+        sendWarning(ERR_USERONCHANNEL(client.getNickname(), nickname_to_invite, channel_name), client);
         return;
     }
 
