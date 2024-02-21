@@ -10,5 +10,4 @@ size_t	stringVectorLenght(std::string vector[]);
 void sendMsg(Client & client, std::string message);
 
 
-
 #endif

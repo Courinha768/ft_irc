@@ -4,16 +4,10 @@
 #include "ftIrc.hpp"
 
 typedef struct s_mode_channel	{
-	bool	_ban;
-	bool	_exeption;
-	bool	_client_limit;
 	bool	_invite_only;
-	bool	_invite_exeption;
 	bool	_key;
-	bool	_moderated;
-	bool	_secret;
-	bool	_protected;
-	bool	_no_external_messages;
+	bool	_protected_topic;
+	bool	_user_limit;
 } t_mode_channel;
 
 class	Channel	{
@@ -21,15 +15,16 @@ class	Channel	{
 	private:
 		std::string			_name;
 		std::string 		_password;
-		t_mode_channel				_mode;
+		t_mode_channel		_mode;
 		std::vector<Client>	_clients;
+		std::vector<Client>	_operators;
+		long unsigned int	_user_limit;
 
 	public:
 
 		Channel();
 		Channel(std::string name);
 		Channel(std::string name, std::string password);
-		// Channel(std::string name, std::string password, std::string modes);
 		~Channel();
 		Channel(Client const & src);
 
@@ -37,8 +32,9 @@ class	Channel	{
 
 		std::string			getName() const;
 		std::string			getPassword() const;
-		t_mode_channel				getMode() const;
+		t_mode_channel		getMode() const;
 		std::vector<Client>	getClients() const;
+		long unsigned int	getUserLimit() const;
 
 		void	setName(std::string name);
 		void	setPassword(std::string password);
@@ -46,8 +42,8 @@ class	Channel	{
 		void				addClient(Client & client);
 		void				removeClient(Client & client);
 
-		void				addMode(char mode);
-		void				removeMode(char	mode);
+		void				addMode(char mode, std::string parameters);
+		void				removeMode(char mode, std::string parameters);
 
 		std::vector<Client>::iterator	findClient(Client const & client);
 

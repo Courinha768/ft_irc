@@ -58,29 +58,8 @@ void Server::parseMessage(Client & client) {
 
 		} else {
 
-			// if (!client.isRegistered()) {
+			Server::cout() << client.getNickname() << ": " << msg << "\r\n";
 
-			// 	sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
-
-			// } else {
-
-				Server::cout() << client.getNickname() << ": " << msg << "\r\n";
-			// 	for (int i = 0; i < 200; i++) {
-
-			// 		// *Temporary
-			// 		if (events[i].data.fd && events[i].data.fd != client.getFd()) {
-
-			// 			std::stringstream ss;
-			// 			ss << client.getNickname() << ": " << msg << "\r\n";
-			// 			std::string message = ss.str();
-
-			// 			send(events[i].data.fd, message.c_str(), message.size(), 0);
-
-			// 		}
-
-			// 	}
-
-			// }
 		}
 
 		start = end + 1;

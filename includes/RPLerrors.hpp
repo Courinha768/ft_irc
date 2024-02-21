@@ -24,5 +24,6 @@
 # define ERR_PASSWDMISMATCH(client)				(":ircserv.42.fr 464 " + client + " :Password incorrect\r\n")									//464
 # define ERR_BADCHANNELKEY(client, channel)		(":ircserv.42.fr 475 " + client + " " + channel + " :Password incorrect\r\n")					//475
 # define ERR_CHANOPRIVSNEEDED(client, channel)   (":ircserv.42.fr 482 " + client + " " + channel + " :You're not channel operator\r\n")			//482
+# define ERR_UMODEUNKNOWNFLAG(client)		(":ircserv.42.fr 475 " + client + " :Unknown MODE flag\r\n")									//501
 
 #endif

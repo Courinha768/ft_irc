@@ -80,9 +80,15 @@ static	t_command	parseMODEMessage(std::string message)	{
 
 }
 
-//todo: end this
+//todo:finish this
+static std::string getModes(std::string target)	{
+	(void)target;
+	return target;
+}
+
 void Server::commandMODE(Client & client)	{
 
+	//todo: add this to all commands
 	if (!client.isRegistered())	{
 
 		//!ERROR
@@ -93,8 +99,22 @@ void Server::commandMODE(Client & client)	{
 	Channel			channel;
 	unsigned long	c;
 
+	for (unsigned long	i = 1; i < command.modes.size(); i++)	{
+		if (command.modes.at(i) != 'i' && command.modes.at(i) != 'k'
+				&& command.modes.at(i) != 't' && command.modes.at(i) != 'n'
+				&& command.modes.at(i) != 'o')	{
+			sendRPL(client, ERR_UMODEUNKNOWNFLAG(client.getNickname()));
+			return ;
+		}
+	}
+
+	if (command.parameters.size() == 0)
+		command.parameters.push_back("");
 	for (unsigned long	i = 0; i < command.targets.size(); i++)	{
 
+		if (command.modes.size() < 1)	{
+			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i))));
+		}
 		for (unsigned long	j = 1; j < command.modes.size(); j++)	{
 
 			for (unsigned long	k = 0; k < command.parameters.size(); k++)	{
@@ -111,31 +131,18 @@ void Server::commandMODE(Client & client)	{
 					}
 
 				}
+
 				if (created)	{
 
 					if (command.modes.at(0) == '+')
-						channels.at(c).addMode(command.modes.at(j));
+						channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
 					else
-						channels.at(c).removeMode(command.modes.at(j));
+						channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
+
 
 				}	else	{
 
-					for (unsigned long l = 0; l < clients.size(); l++) {
-
-						if (clients.at(l)->getNickname() == command.targets.at(i)) {
-
-							if (clients.at(l)->getNickname() != client.getNickname()) {
-
-								//!ERROR msg
-								return ;
-
-							}
-							c = l;
-
-						}
-					
-
-					}
+					sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), command.targets.at(i)));
 
 				}
 

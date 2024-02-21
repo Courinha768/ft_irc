@@ -36,7 +36,7 @@
 	&Server::commandKICK, \
 	&Server::commandINVITE, \
 }
-# define MP_NOT_A_COMMAND -1
+# define	MP_NOT_A_COMMAND -1
 
 
 // End Of String

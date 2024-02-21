@@ -6,75 +6,31 @@ Channel::Channel()	{
 	_name = "";
 	_password = "";
 
-	_mode._ban = false;
-	_mode._exeption = false;
-	_mode._client_limit = false;
 	_mode._invite_only = false;
-	_mode._invite_exeption = false;
 	_mode._key = false;
-	_mode._moderated = false;
-	_mode._secret = false;
-	_mode._protected = false;
-	_mode._no_external_messages = false;
+	_mode._protected_topic = false;
+	_mode._user_limit = false;
 }
 
 Channel::Channel(std::string name)	{
 	_name = name;
 	_password = "";
 
-	_mode._ban = false;
-	_mode._exeption = false;
-	_mode._client_limit = false;
 	_mode._invite_only = false;
-	_mode._invite_exeption = false;
 	_mode._key = false;
-	_mode._moderated = false;
-	_mode._secret = false;
-	_mode._protected = false;
-	_mode._no_external_messages = false;
+	_mode._protected_topic = false;
+	_mode._user_limit = false;
 }
 
 Channel::Channel(std::string name, std::string password)	{
 	_name = name;
 	_password = password;
 
-	_mode._ban = false;
-	_mode._exeption = false;
-	_mode._client_limit = false;
 	_mode._invite_only = false;
-	_mode._invite_exeption = false;
 	_mode._key = false;
-	_mode._moderated = false;
-	_mode._secret = false;
-	_mode._protected = false;
-	_mode._no_external_messages = false;
+	_mode._protected_topic = false;
+	_mode._user_limit = false;
 }
-
-// Channel::Channel(std::string name, std::string password, std::string modes)	{
-// 	_name = name;
-// 	_password = password;
-
-// 	if (modes.find("+b") != EOS)
-// 		_mode._ban = true;
-// 	if (modes.find("+e") != EOS)
-// 		_mode._exeption = true;
-// 	if (modes.find("+l") != EOS)
-// 		_mode._client_limit = true;
-// 	if (modes.find("+i") != EOS)
-// 		_mode._invite_only = true;
-// 	if (modes.find("+I") != EOS)
-// 		_mode._invite_exeption = true;
-// 	if (modes.find("+k") != EOS)
-// 		_mode._key = true;
-// 	if (modes.find("+m") != EOS)
-// 		_mode._moderated = true;
-// 	if (modes.find("+s") != EOS)
-// 		_mode._secret = true;
-// 	if (modes.find("+t") != EOS)
-// 		_mode._protected = true;
-// 	if (modes.find("+n") != EOS)
-// 		_mode._no_external_messages = true;
-// }
 
 Channel::~Channel()	{
 	
@@ -113,6 +69,10 @@ std::vector<Client> Channel::getClients() const	{
 	return _clients;
 }
 
+long unsigned int	Channel::getUserLimit() const	{
+	return _user_limit;
+}
+
 /* --------------------------------- setters -------------------------------- */
 
 void	Channel::setName(std::string name){
@@ -146,84 +106,82 @@ std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
 	return (_clients.end());
 }
 
-void	Channel::addMode(char mode) {
+void	Channel::addMode(char mode, std::string parameters) {
 
 	switch (mode)	{
 
-		case 'b':
-			_mode._ban = true;
-			break;
-		case 'e':
-			_mode._exeption = true;
-			break;
-		case 'l':
-			_mode._client_limit = true;
-			break;
 		case 'i':
 			_mode._invite_only = true;
-			break;
-		case 'I':
-			_mode._invite_exeption = true;
-			break;
+			return ;
 		case 'k':
 			_mode._key = true;
-			break;
-		case 'm':
-			_mode._moderated = true;
-			break;
-		case 's':
-			_mode._secret = true;
-			break;
+			_password = parameters;
+			return ;
 		case 't':
-			_mode._protected = true;
-			break;
+			_mode._protected_topic = true;
+			return ;
 		case 'n':
-			_mode._no_external_messages = true;
-			break;
-		default:
-			break;
+			_mode._user_limit = true;
+			_user_limit = atoi(parameters.c_str());
+			return ;
+		case 'o':
+
+			int c = -1;
+			for (unsigned long i = 0; i < _clients.size(); i++) {
+
+				if (_clients.at(i).getNickname() == parameters) {
+					c = i;
+				}
+					
+			}
+			if (c != -1)	{
+				_operators.push_back(_clients.at(c));
+			}	else	{
+				//!ERROR
+			}
+
+			return ;
 
 	}
+	//!error msg, mode not found
 
 }
 
-void	Channel::removeMode(char mode) {
+void	Channel::removeMode(char mode, std::string parameters) {
 
 	switch (mode)	{
 
-		case 'b':
-			_mode._ban = false;
-			break;
-		case 'e':
-			_mode._exeption = false;
-			break;
-		case 'l':
-			_mode._client_limit = false;
-			break;
 		case 'i':
 			_mode._invite_only = false;
-			break;
-		case 'I':
-			_mode._invite_exeption = false;
-			break;
+			return ;
 		case 'k':
 			_mode._key = false;
-			break;
-		case 'm':
-			_mode._moderated = false;
-			break;
-		case 's':
-			_mode._secret = false;
-			break;
+			return ;
 		case 't':
-			_mode._protected = false;
-			break;
+			_mode._protected_topic = false;
+			return ;
 		case 'n':
-			_mode._no_external_messages = false;
-			break;
-		default:
-			break;
+			_mode._user_limit = false;
+			return ;
+		case 'o':
+
+			int c = -1;
+			for (unsigned long i = 0; i < _clients.size(); i++) {
+
+				if (_operators.at(i).getNickname() == parameters) {
+					c = i;
+				}
+					
+			}
+			if (c != -1)	{
+				_operators.erase(_operators.begin() + c);
+			}	else	{
+				//!ERROR
+			}
+
+			return ;
 
 	}
+	//!error msg, mode not found
 
 }

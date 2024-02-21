@@ -63,15 +63,24 @@ void Server::commandJOIN(Client & client)	{
 
 			bool	created = false;
 			bool	wrong_pass = false;
+			bool	invite_only = false;
+			bool	user_limit = false;
 			for (unsigned long i = 0; i < channels.size(); i++) {
 
 				if (channels.at(i).getName() == commands.front().first) {
 
 					channel = channels.at(i);
-					if (channel.getPassword() == commands.front().second) {
+					if (!channels.at(i).getMode()._key || channels.at(i).getPassword() == commands.front().second) {
 
 						channels.at(i).addClient(client);
 						created = true;
+						if (channels.at(i).getMode()._invite_only)	{
+							invite_only = true;
+						}
+						if (channels.at(i).getMode()._user_limit
+								&& channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
+							user_limit = true;
+						}
 
 					} else {
 						//!not sure this is the one
@@ -91,13 +100,18 @@ void Server::commandJOIN(Client & client)	{
 				created = true;
 				
 			}
-			if (!wrong_pass) {
+			if (!wrong_pass && !invite_only && !user_limit) {
 
 				sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
 				// server.sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), "Wellcome to our chat room"));
 				// server.sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName()));
 				// server.sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
+			}
+			if (invite_only) {
+				//!Error msg
+			}	else if (user_limit)	{
+				//!Error msg
 			}
 
 			commands.pop();
