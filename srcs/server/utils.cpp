@@ -51,7 +51,8 @@ Channel* Server::findChannelByName(const std::string& name)
     {
         if (channels[i].getName() == name)
         {
-            return &channels[i];
+			Channel * channel = new Channel(channels[i]);
+			return channel;
         }
     }
     return NULL;

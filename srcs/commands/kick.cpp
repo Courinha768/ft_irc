@@ -3,8 +3,6 @@
 void Server::commandKICK(Client &client)
 {
     //We have to change by the true confirmation that the customer is an operator
-    // we also have to check if the client that is sending this command is on the channel. If not, send ERR_NOTONCHANNEL.
-
     
     bool isOperator = true;
 

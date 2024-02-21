@@ -2,12 +2,14 @@
 
 void Server::commandINVITE(Client & client)
 {
+    //Again. Don't know if this is necassary. Don't believe this kind of user would get this point.
     if (!client.isAuthenticated())
     {
         sendWarning(NEED_AUTHENTICATION, client);
         return;
     }
 
+    //Same here!
     if (!client.isRegistered())
     {
         sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
@@ -18,18 +20,17 @@ void Server::commandINVITE(Client & client)
     std::string channel_name;
 
     size_t end = message.find("\n");
-    if (end == std::string::npos)
+    if (end == EOS)
     {
         sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
         return;
     }
 
-    if (message.at(end - 1) == '\r')
-        end = end - 1;
+    if (message.at(end - 1) == '\r') end = end - 1;
 
-    std::string to_cut = message.substr(8, end - 8);
+    std::string to_cut = message.substr(7, end - 7);
     end = to_cut.find(" ");
-    if (end == std::string::npos)
+    if (end == EOS)
     {
         sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
         return;
@@ -38,16 +39,14 @@ void Server::commandINVITE(Client & client)
     to_cut = to_cut.substr(end + 1);
 
     end = to_cut.find(" ");
-    if (end == std::string::npos)
-    {
+    if (end == EOS)
         channel_name = to_cut;
-    }
     else
-    {
         channel_name = to_cut.substr(0, end);
-    }
+
 
     Channel* target_channel = findChannelByName(channel_name);
+
     if (target_channel == NULL)
     {
         sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
@@ -67,6 +66,7 @@ void Server::commandINVITE(Client & client)
     if (!isMember)
     {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
+        delete target_channel;
         return;
     }
 
@@ -83,6 +83,7 @@ void Server::commandINVITE(Client & client)
     if (isAlreadyInChannel)
     {
         sendWarning(ERR_USERONCHANNEL(client.getNickname(), nickname_to_invite, channel_name), client);
+        delete target_channel;
         return;
     }
 
@@ -93,9 +94,11 @@ void Server::commandINVITE(Client & client)
             std::string invite_notification = "Invite " + nickname_to_invite + " to " + channel_name + "\r\n";
             sendMessageToClient(invite_notification, clients[i]->getFd());
             RPL_INVITING(client.getNickname(), client.getFd(), nickname_to_invite, channel_name);
+            delete target_channel;
             return;
         }
     }
 
     sendWarning(NOUSER, client);
+    delete target_channel;
 }
