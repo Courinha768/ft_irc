@@ -19,8 +19,10 @@ void Server::receiveMessage(Client & client) {
 	} else {
 
 		message.append(recv_buffer);
-		parseMessage(client);
-		message.erase();
+		if (message.find("\n") != EOS) {
+			parseMessage(client);
+			message.erase();
+		}
 
 	}
 }
