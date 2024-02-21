@@ -69,6 +69,10 @@ std::vector<Client> Channel::getClients() const	{
 	return _clients;
 }
 
+long unsigned int	Channel::getUserLimit() const	{
+	return _user_limit;
+}
+
 /* --------------------------------- setters -------------------------------- */
 
 void	Channel::setName(std::string name){
@@ -108,19 +112,18 @@ void	Channel::addMode(char mode, std::string parameters) {
 
 		case 'i':
 			_mode._invite_only = true;
-			break;
+			return ;
 		case 'k':
 			_mode._key = true;
 			_password = parameters;
-			break;
+			return ;
 		case 't':
 			_mode._protected_topic = true;
-			break;
+			return ;
 		case 'n':
 			_mode._user_limit = true;
-			//todo: make verifications
 			_user_limit = atoi(parameters.c_str());
-			break;
+			return ;
 		case 'o':
 
 			int c = -1;
@@ -131,15 +134,16 @@ void	Channel::addMode(char mode, std::string parameters) {
 				}
 					
 			}
-			if (c == -1)	{
-				//!ERROR
-			}	else	{
+			if (c != -1)	{
 				_operators.push_back(_clients.at(c));
+			}	else	{
+				//!ERROR
 			}
 
-			break;
+			return ;
 
 	}
+	//!error msg, mode not found
 
 }
 
@@ -149,16 +153,16 @@ void	Channel::removeMode(char mode, std::string parameters) {
 
 		case 'i':
 			_mode._invite_only = false;
-			break;
+			return ;
 		case 'k':
 			_mode._key = false;
-			break;
+			return ;
 		case 't':
 			_mode._protected_topic = false;
-			break;
+			return ;
 		case 'n':
 			_mode._user_limit = false;
-			break;
+			return ;
 		case 'o':
 
 			int c = -1;
@@ -169,14 +173,15 @@ void	Channel::removeMode(char mode, std::string parameters) {
 				}
 					
 			}
-			if (c == -1)	{
-				//!ERROR
-			}	else	{
+			if (c != -1)	{
 				_operators.erase(_operators.begin() + c);
+			}	else	{
+				//!ERROR
 			}
 
-			break;
+			return ;
 
 	}
+	//!error msg, mode not found
 
 }

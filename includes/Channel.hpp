@@ -18,7 +18,7 @@ class	Channel	{
 		t_mode_channel		_mode;
 		std::vector<Client>	_clients;
 		std::vector<Client>	_operators;
-		int					_user_limit;
+		long unsigned int	_user_limit;
 
 	public:
 
@@ -32,8 +32,9 @@ class	Channel	{
 
 		std::string			getName() const;
 		std::string			getPassword() const;
-		t_mode_channel				getMode() const;
+		t_mode_channel		getMode() const;
 		std::vector<Client>	getClients() const;
+		long unsigned int	getUserLimit() const;
 
 		void	setName(std::string name);
 		void	setPassword(std::string password);

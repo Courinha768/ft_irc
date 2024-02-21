@@ -104,12 +104,14 @@ void Server::commandMODE(Client & client)	{
 				&& command.modes.at(i) != 't' && command.modes.at(i) != 'n'
 				&& command.modes.at(i) != 'o')	{
 			sendRPL(client, ERR_UMODEUNKNOWNFLAG(client.getNickname()));
+			return ;
 		}
 	}
 
+	if (command.parameters.size() == 0)
+		command.parameters.push_back("");
 	for (unsigned long	i = 0; i < command.targets.size(); i++)	{
 
-		// TODO: finish this one
 		if (command.modes.size() < 1)	{
 			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i))));
 		}
@@ -133,9 +135,10 @@ void Server::commandMODE(Client & client)	{
 				if (created)	{
 
 					if (command.modes.at(0) == '+')
-						channels.at(c).addMode(command.modes.at(j), command.parameters[k]);
+						channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
 					else
 						channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
+
 
 				}	else	{
 
