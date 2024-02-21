@@ -3,52 +3,63 @@
 void Server::commandKICK(Client &client)
 {
     //We have to change by the true confirmation that the customer is an operator
+    // we also have to check if the client that is sending this command is on the channel. If not, send ERR_NOTONCHANNEL.
     bool isOperator = true;
 
-    if (!isOperator)
+    std::string channel_name;
+    std::string user_to_kick;
+    std::string comment = "";
+
+
+    size_t end = message.find("\n");
+    // don't think we need this check. All the messages get this point with a \n in the end
+    if (end == std::string::npos)
     {
-        sendWarning(NEED_CHANOPRIVS, client);
+        sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
         return;
     }
 
+    if (message.at(end - 1) == '\r') end = end - 1;
+
+    std::string to_cut = message.substr(5, end - 5);
+
+    end = to_cut.find(" ");
+    if (end == EOS)
+    {
+        sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+        return;
+    }
+
+    channel_name = to_cut.substr(0, end);
+    if (channel_name.empty()) {
+        sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+        return ;
+    }
+
+    if (!isOperator)
+    {
+        sendWarning(ERR_CHANOPRIVSNEEDED(client.getNickname(), channel_name), client);
+        return;
+    }
+
+    // I don't know if we need this check here. Because this is checked in earlier steps. 
+    // I think a not authenticated client would never get this point. Not sure!
     if (!client.isAuthenticated())
     {
         sendWarning(NEED_AUTHENTICATION, client);
         return;
     }
-
+    //Same here!
     if (!client.isRegistered())
     {
         sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
         return;
     }
 
-    std::string channel_name;
-    std::string user_to_kick;
-    std::string comment;
-
-    size_t end = message.find("\n");
-    if (end == std::string::npos)
-    {
-        sendWarning(NEED_MOREPARAMS, client);
-        return;
-    }
-
-    if (message.at(end - 1) == '\r')
-        end = end - 1;
-
-    std::string to_cut = message.substr(5, end - 5);
-    end = to_cut.find(" ");
-    if (end == std::string::npos)
-    {
-        sendWarning(NEED_MOREPARAMS, client);
-        return;
-    }
-    channel_name = to_cut.substr(0, end);
     to_cut = to_cut.substr(end + 1);
 
     end = to_cut.find(" ");
-    if (end != std::string::npos)
+    if (end != EOS)
     {
         user_to_kick = to_cut.substr(0, end);
         comment = to_cut.substr(end + 1);
@@ -69,12 +80,13 @@ void Server::commandKICK(Client &client)
                 if (channels.at(i).getClients().at(j).getNickname() == user_to_kick)
                 {
                     userFound = true;
-                    std::string channel_notification = "Command to kick " + user_to_kick + " from " + channel_name;
-                    if (!comment.empty()) {
-                        channel_notification += " using \"" + comment + "\" as the reason (comment).";
-                    }
-                    channel_notification += "\r\n";
-                    sendMessageToAllClients(channel_notification, client.getFd());
+                    // I think that this part is not necessary. 
+                    // std::string channel_notification = "Command to kick " + user_to_kick + " from " + channel_name;
+                    // if (!comment.empty()) {
+                    //     channel_notification += " using \"" + comment + "\" as the reason (comment).";
+                    // }
+                    // channel_notification += "\r\n";
+                    // sendMessageToAllClients(channel_notification, client.getFd());
 
                     std::string client_notification = ":" + client.getNickname() + " kicked you from " + channel_name;
                     if (!comment.empty()) {
@@ -92,13 +104,13 @@ void Server::commandKICK(Client &client)
 
     if (!channelFound)
     {
-        sendWarning(NOSUCHCHANNEL, client);
+        sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
         return;
     }
 
     if (!userFound)
     {
-        sendWarning(USERNOTINCHANNEL, client);
+        sendWarning(ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name), client);
         return;
     }
 }

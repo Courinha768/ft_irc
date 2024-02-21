@@ -20,7 +20,7 @@ void Server::commandINVITE(Client & client)
     size_t end = message.find("\n");
     if (end == std::string::npos)
     {
-        sendWarning(NEED_MOREPARAMS, client);
+        sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
         return;
     }
 
@@ -31,7 +31,7 @@ void Server::commandINVITE(Client & client)
     end = to_cut.find(" ");
     if (end == std::string::npos)
     {
-        sendWarning(NEED_MOREPARAMS, client);
+        sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
         return;
     }
     nickname_to_invite = to_cut.substr(0, end);
@@ -50,7 +50,7 @@ void Server::commandINVITE(Client & client)
     Channel* target_channel = findChannelByName(channel_name);
     if (target_channel == NULL)
     {
-        sendWarning(NOSUCHCHANNEL, client);
+        sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
         return;
     }
 
