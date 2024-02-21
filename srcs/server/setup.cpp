@@ -1,8 +1,7 @@
 #include "../../includes/ftIrc.hpp"
 
 void Server::setup() {
-
-	//todo: take care of errors
+	
 	memset(&serv, 0, sizeof(serv));
 
 	serv.ai_family		= AF_INET;
@@ -12,16 +11,34 @@ void Server::setup() {
 	int option_value = 1;
 
 	status = getaddrinfo("0.0.0.0", port.c_str(), &serv, &servinfo);
+	if (status != 0) {
+		throw std::runtime_error("Error initializing addrinfo structures.");
+	}
 	sockfd = socket(servinfo->ai_family, servinfo->ai_socktype, servinfo->ai_protocol);
-	setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
-	bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
-	listen(sockfd, 5);
+	if (sockfd == -1) {
+		throw std::runtime_error("Error creating endpoint for communication.");
+	}
+	status = setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &option_value, sizeof(int));
+	if (status == -1) {
+		throw std::runtime_error("Error setting socket options.");
+	}
+	status = bind(sockfd, servinfo->ai_addr, servinfo->ai_addrlen);
+	if (status == -1) {
+		throw std::runtime_error("Error binding socket.");
+	}
+	status = listen(sockfd, 5);
+	if (status == -1) {
+		throw std::runtime_error("Error listening on socket.");
+	}
 
 	event.events = EPOLLIN | EPOLLOUT;
 	event.data.fd = sockfd;
 	events[0].data.fd = sockfd;
 
 	efd = epoll_create1(0);
+	if (efd == -1) {
+		throw std::runtime_error("Error opening epoll file descriptor.");
+	}
 	epoll_ctl(efd, EPOLL_CTL_ADD, sockfd, &event);
 
 	memset(&events, 0, sizeof(events));

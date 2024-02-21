@@ -21,6 +21,8 @@
 	"QUIT", \
 	"MODE", \
 	"PRIVMSG", \
+	"KICK", \
+	"INVITE", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -31,6 +33,8 @@
 	&Server::commandQUIT, \
 	&Server::commandMODE, \
 	&Server::commandPRIVMSG, \
+	&Server::commandKICK, \
+	&Server::commandINVITE, \
 }
 # define	MP_NOT_A_COMMAND -1
 
@@ -46,16 +50,14 @@
 # define USER_COMMAND "USER"
 # define NICK_COMMAND "NICK"
 
-# define NEED_AUTHENTICATION	"FT_IRC Network: Type PASS to enter the servers password\n"
-# define NEED_USER				"FT_IRC Network: Type USER to assign yourself a username\n"
-# define NEED_REGISTRATION		"FT_IRC Network: You need to register before sending mensages\n"
+# define NOUSER	"FT_IRC Network: That user doesn't exist\r\n"
 
-# define COMMAND_NF	"FT_IRC Network: Command not found\n"
+# define COMMAND_NF	"FT_IRC Network: Command not found\r\n"
 
-# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\n"
+# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\r\n"
 
-# define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\n"
-# define ALREADY_USER "FT_IRC Network: You already have a username\n"
+# define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\r\n"
+# define ALREADY_USER "FT_IRC Network: You already have a username\r\n"
 
 # define NL "\n"
 

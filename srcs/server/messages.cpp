@@ -19,8 +19,10 @@ void Server::receiveMessage(Client & client) {
 	} else {
 
 		message.append(recv_buffer);
-		parseMessage(client);
-		message.erase();
+		if (message.find("\n") != EOS) {
+			parseMessage(client);
+			message.erase();
+		}
 
 	}
 }
@@ -51,7 +53,7 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(Server::*functions[8])(Client & client) = MP_COMMAND_FUNCTIONS;
+			void	(Server::*functions[10])(Client & client) = MP_COMMAND_FUNCTIONS;
 			(this->*functions[type])(client);
 
 		} else {
@@ -77,4 +79,18 @@ void Server::sendMessageToAllClients(std::string msg, int client_fd) {
 			send(events[i].data.fd, msg.c_str(), msg.size(), 0);
 		}
 	}
+}
+
+void Server::sendMessageToClient(std::string msg, int client_fd) {
+    for (int i = 0; i < 200; i++) {
+        if (events[i].data.fd == client_fd) {
+            send(client_fd, msg.c_str(), msg.size(), 0);
+            break;
+        }
+    }
+}
+
+void Server::RPL_INVITING(const std::string& senderNickname, int senderFd, const std::string& inviteeNickname, const std::string& channelName) {
+    std::string message = ":localhost 341 " + senderNickname + " " + inviteeNickname + " " + channelName + " :Invitation sent successfully\r\n";
+    sendMessageToClient(message, senderFd);
 }

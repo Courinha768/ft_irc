@@ -53,6 +53,11 @@ class Server {
 		bool isMsgEmpty(std::string msg);
 		bool hasInvalidChars(std::string msg);
 		void sendMessageToAllClients(std::string msg, int client_fd);
+		void sendMessageToClient(std::string msg, int client_fd);
+		Channel* findChannelByName(const std::string& name);
+		Client* findClientByNickname(const std::string& nickname);
+		void RPL_INVITING(const std::string& senderNickname, int senderFd, const std::string& inviteeNickname, const std::string& channelName);
+		bool isClientOnChannel(Client client, std::string channel_name);
 
 		void commandCAP(Client & client);
 		void commandJOIN(Client & client);
@@ -62,6 +67,8 @@ class Server {
 		void commandUSER(Client & client);
 		void commandMODE(Client & client);
 		void commandPRIVMSG(Client & client);
+		void commandKICK(Client & client);
+		void commandINVITE(Client & client);
 		
 
 		template<typename T>
