@@ -68,3 +68,4 @@ Client* Server::findClientByNickname(const std::string& nickname)
     }
     return NULL;
 }
+

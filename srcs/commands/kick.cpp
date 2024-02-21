@@ -4,6 +4,8 @@ void Server::commandKICK(Client &client)
 {
     //We have to change by the true confirmation that the customer is an operator
     // we also have to check if the client that is sending this command is on the channel. If not, send ERR_NOTONCHANNEL.
+
+    
     bool isOperator = true;
 
     std::string channel_name;
@@ -33,6 +35,11 @@ void Server::commandKICK(Client &client)
     channel_name = to_cut.substr(0, end);
     if (channel_name.empty()) {
         sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+        return ;
+    }
+
+    if (!isClientOnChannel(client, channel_name)) {
+        sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return ;
     }
 
@@ -113,4 +120,21 @@ void Server::commandKICK(Client &client)
         sendWarning(ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name), client);
         return;
     }
+}
+
+bool Server::isClientOnChannel(Client client, std::string channel_name) {
+
+
+    for (size_t i = 0; i < channels.size(); i++) {
+        if (channels.at(i).getName() == channel_name) {
+            for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
+                if (channels.at(i).getClients().at(j).getNickname() == client.getNickname()) {
+                    return true;
+                }
+            }
+        }
+    }
+
+    return false;
+   
 }

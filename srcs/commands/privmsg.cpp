@@ -15,6 +15,11 @@ void Server::commandPRIVMSG(Client & client)	{
 	channel_name = trimmed_message.substr(0, end);
 	trimmed_message = trimmed_message.substr(end + 2);
 
+	if (!isClientOnChannel(client, channel_name)) {
+        sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
+        return ;
+    }
+
 	for (unsigned long i = 0; i < channels.size(); i++) {
 
 		if (channels.at(i).getName() == channel_name) {

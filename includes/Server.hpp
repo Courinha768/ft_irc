@@ -57,6 +57,7 @@ class Server {
 		Channel* findChannelByName(const std::string& name);
 		Client* findClientByNickname(const std::string& nickname);
 		void RPL_INVITING(const std::string& senderNickname, int senderFd, const std::string& inviteeNickname, const std::string& channelName);
+		bool isClientOnChannel(Client client, std::string channel_name);
 
 		void commandCAP(Client & client);
 		void commandJOIN(Client & client);
