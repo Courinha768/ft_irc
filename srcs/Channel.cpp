@@ -68,6 +68,10 @@ std::vector<Client> Channel::getClients() const	{
 	return _clients;
 }
 
+std::vector<Client> Channel::getOperators() const	{
+	return _clients;
+}
+
 long unsigned int	Channel::getUserLimit() const	{
 	return _user_limit;
 }

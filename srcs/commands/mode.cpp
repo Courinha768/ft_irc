@@ -134,11 +134,23 @@ void Server::commandMODE(Client & client)	{
 
 				if (created)	{
 
-					if (command.modes.at(0) == '+')
-						channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
-					else
-						channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
+					bool _operator = false;
+					for (unsigned long l = 0; l < channels.size(); l++) {
 
+						if (client.getFd() == channels.at(c).getOperators().at(l).getFd())	{
+
+							if (command.modes.at(0) == '+')
+								channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
+							else
+								channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
+							_operator = true;
+
+						}
+
+					}
+					if (!_operator)	{
+						//!Error msg
+					}
 
 				}	else	{
 
