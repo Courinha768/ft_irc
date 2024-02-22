@@ -80,18 +80,44 @@ static	t_command	parseMODEMessage(std::string message)	{
 
 }
 
-//todo:finish this
-static std::string getModes(std::string target)	{
-	(void)target;
+static std::string getModes(std::string target, std::vector<Channel> channels)	{
+	
+	std::string	modes = "+";
+	
+	for (unsigned long l = 0; l < channels.size(); l++) {
+
+		if (channels.at(l).getName() == target)	{
+
+			if (channels.at(l).getMode()._invite_only)
+
+				modes += "i";
+
+			else if (channels.at(l).getMode()._key)
+
+				modes += "k";
+
+			else if (channels.at(l).getMode()._protected_topic)
+
+				modes += "t";
+
+			else if (channels.at(l).getMode()._user_limit)
+
+				modes += "l";
+
+			break ;
+
+		}			
+	
+	}
+
 	return target;
 }
 
 void Server::commandMODE(Client & client)	{
 
-	//todo: add this to all commands
 	if (!client.isRegistered())	{
 
-		//!ERROR
+		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
 		return ;
 
 	}
@@ -113,7 +139,7 @@ void Server::commandMODE(Client & client)	{
 	for (unsigned long	i = 0; i < command.targets.size(); i++)	{
 
 		if (command.modes.size() < 1)	{
-			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i))));
+			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i), channels)));
 		}
 		for (unsigned long	j = 1; j < command.modes.size(); j++)	{
 
@@ -149,7 +175,7 @@ void Server::commandMODE(Client & client)	{
 
 					}
 					if (!_operator)	{
-						//!Error msg
+						sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), channels.at(c).getName()));
 					}
 
 				}	else	{
