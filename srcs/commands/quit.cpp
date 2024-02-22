@@ -8,6 +8,10 @@ void Server::commandQUIT(Client & client)	{
 	}
 	client.setStatus(false);
 
+	for (size_t i = 0; i < channels.size(); i++) {
+		channels.at(i).removeClient(client);
+	}
+
 	// this print on server side can be ommited when project is ready
 	std::cout << "connection lost with client " << client.getTextAddr() << "\n";
 

@@ -45,24 +45,23 @@ bool Server::hasInvalidChars(std::string msg) {
 	
 }
 
-Channel* Server::findChannelByName(const std::string& name)
+Channel & Server::findChannelByName(const std::string& name)
 {
     for (size_t i = 0; i < channels.size(); ++i)
     {
         if (channels[i].getName() == name)
         {
-			Channel * channel = new Channel(channels[i]);
-			return channel;
+			return channels[i];
         }
     }
-    return NULL;
+    throw ChannelNotFoundException();
 }
 
 Client* Server::findClientByNickname(const std::string& nickname)
 {
-    for (size_t i = 0; i < clients.size(); ++i)
+    for (size_t i = 0; i < clients.size(); i++)
     {
-        if (clients[i]->getNickname() == nickname)
+        if (clients[i] != NULL && clients[i]->getNickname() == nickname)
         {
             return clients[i];
         }

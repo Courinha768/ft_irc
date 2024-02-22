@@ -45,60 +45,43 @@ void Server::commandINVITE(Client & client)
         channel_name = to_cut.substr(0, end);
 
 
-    Channel* target_channel = findChannelByName(channel_name);
+    Channel target_channel;
 
-    if (target_channel == NULL)
-    {
+    try {
+        target_channel = findChannelByName(channel_name);
+    } catch (const ChannelNotFoundException& e) {
+        (void)e;
         sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
         return;
     }
 
-    bool isMember = false;
-    for (size_t i = 0; i < target_channel->getClients().size(); ++i)
-    {
-        if (target_channel->getClients()[i].getNickname() == client.getNickname())
-        {
-            isMember = true;
-            break;
-        }
-    }
-
-    if (!isMember)
+    if (!isClientOnChannel(client.getNickname(), target_channel.getName()))
     {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
-        delete target_channel;
         return;
     }
 
-    bool isAlreadyInChannel = false;
-    for (size_t i = 0; i < target_channel->getClients().size(); ++i)
-    {
-        if (target_channel->getClients()[i].getNickname() == nickname_to_invite)
-        {
-            isAlreadyInChannel = true;
-            break;
-        }
+    Client * client_to_invite = findClientByNickname(nickname_to_invite);
+
+
+    if (client_to_invite == NULL) {
+        sendWarning(NOUSER, client);
+        return ;
     }
 
-    if (isAlreadyInChannel)
+
+    if (isClientOnChannel(client_to_invite->getNickname(), target_channel.getName()))
     {
         sendWarning(ERR_USERONCHANNEL(client.getNickname(), nickname_to_invite, channel_name), client);
-        delete target_channel;
         return;
     }
 
-   for (size_t i = 0; i < clients.size(); ++i)
-    {
-        if (clients[i]->getNickname() == nickname_to_invite)
-        {
-            std::string invite_notification = "Invite " + nickname_to_invite + " to " + channel_name + "\r\n";
-            sendMessageToClient(invite_notification, clients[i]->getFd());
-            RPL_INVITING(client.getNickname(), client.getFd(), nickname_to_invite, channel_name);
-            delete target_channel;
-            return;
+    for (size_t i = 0; i < channels.size(); i++) {
+        if (channels.at(i).getName().compare(channel_name) == 0) {
+            channels.at(i).addClient(*client_to_invite);
         }
     }
 
-    sendWarning(NOUSER, client);
-    delete target_channel;
+    sendMessageToClient(RPL_INVITING(nickname_to_invite, channel_name), client_to_invite->getFd());
+
 }

@@ -45,7 +45,7 @@ void Server::parseMessage(Client & client) {
 	size_t end = message.find("\n");
 	size_t start = 0;
 
-	Server::cout() << message << "\r\n";
+	// Server::cout() << message << "\r\n";
 	while (end != EOS) {
 
 		std::string msg = message.substr(start, end);
@@ -57,7 +57,7 @@ void Server::parseMessage(Client & client) {
 			(this->*functions[type])(client);
 
 		} else {
-
+			//Why print this?
 			Server::cout() << client.getNickname() << ": " << msg << "\r\n";
 
 		}
@@ -88,9 +88,4 @@ void Server::sendMessageToClient(std::string msg, int client_fd) {
             break;
         }
     }
-}
-
-void Server::RPL_INVITING(const std::string& senderNickname, int senderFd, const std::string& inviteeNickname, const std::string& channelName) {
-    std::string message = ":localhost 341 " + senderNickname + " " + inviteeNickname + " " + channelName + " :Invitation sent successfully\r\n";
-    sendMessageToClient(message, senderFd);
 }

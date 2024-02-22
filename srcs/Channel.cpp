@@ -33,7 +33,6 @@ Channel::Channel(std::string name, std::string password)	{
 }
 
 Channel::~Channel()	{
-	
 }
 
 Channel::Channel(Client const & src)	{
@@ -104,8 +103,9 @@ void	Channel::removeClient(Client & client) {
 
 std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
 	for (unsigned long i = 0; i < _clients.size(); i++)	{
-		if (client.getFd() == _clients.at(i).getFd())
+		if (client.getFd() == _clients.at(i).getFd()) {
 			return (_clients.begin() + i);
+		}
 	}
 	return (_clients.end());
 }

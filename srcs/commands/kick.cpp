@@ -31,12 +31,22 @@ void Server::commandKICK(Client &client)
     }
 
     channel_name = to_cut.substr(0, end);
+
+    try {
+        Channel target_channel = findChannelByName(channel_name);
+    } catch (const ChannelNotFoundException& e) {
+        (void)e;
+        sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
+        return;
+    }
+
+
     if (channel_name.empty()) {
         sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
         return ;
     }
 
-    if (!isClientOnChannel(client, channel_name)) {
+    if (!isClientOnChannel(client.getNickname(), channel_name)) {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return ;
     }
@@ -72,19 +82,21 @@ void Server::commandKICK(Client &client)
     else
         user_to_kick = to_cut;
 
-    bool channelFound = false;
-    bool userFound = false;
 
-    for (unsigned long i = 0; i < channels.size(); i++)
+    if (!isClientOnChannel(user_to_kick, channel_name))
     {
-        if (channels.at(i).getName() == channel_name)
+        sendWarning(ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name), client);
+        return;
+    }
+
+    for (size_t i = 0; i < channels.size(); i++)
+    {
+        if (channels.at(i).getName().compare(channel_name) == 0)
         {
-            channelFound = true;
-            for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++)
+            for (size_t j = 0; j < channels.at(i).getClients().size(); j++)
             {
-                if (channels.at(i).getClients().at(j).getNickname() == user_to_kick)
+                if (channels.at(i).getClients().at(j).getNickname().compare(user_to_kick) == 0)
                 {
-                    userFound = true;
                     // I think that this part is not necessary. 
                     // std::string channel_notification = "Command to kick " + user_to_kick + " from " + channel_name;
                     // if (!comment.empty()) {
@@ -107,26 +119,15 @@ void Server::commandKICK(Client &client)
         }
     }
 
-    if (!channelFound)
-    {
-        sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
-        return;
-    }
-
-    if (!userFound)
-    {
-        sendWarning(ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name), client);
-        return;
-    }
 }
 
-bool Server::isClientOnChannel(Client client, std::string channel_name) {
+bool Server::isClientOnChannel(std::string client_nickname, std::string channel_name) {
 
 
     for (size_t i = 0; i < channels.size(); i++) {
-        if (channels.at(i).getName() == channel_name) {
+        if (channels.at(i).getName().compare(channel_name) == 0) {
             for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
-                if (channels.at(i).getClients().at(j).getNickname() == client.getNickname()) {
+                if (channels.at(i).getClients().at(j).getNickname().compare(client_nickname) == 0) {
                     return true;
                 }
             }
