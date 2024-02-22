@@ -97,8 +97,6 @@ void	Channel::removeClient(Client & client) {
 
 	if (pos != _clients.end())
 		_clients.erase(findClient(client));
-	// todo: error msg
-	// else
 }
 
 std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
@@ -140,14 +138,11 @@ void	Channel::addMode(char mode, std::string parameters) {
 			}
 			if (c != -1)	{
 				_operators.push_back(_clients.at(c));
-			}	else	{
-				//!ERROR
 			}
 
 			return ;
 
 	}
-	//!error msg, mode not found
 
 }
 
@@ -179,13 +174,10 @@ void	Channel::removeMode(char mode, std::string parameters) {
 			}
 			if (c != -1)	{
 				_operators.erase(_operators.begin() + c);
-			}	else	{
-				//!ERROR
 			}
 
 			return ;
 
 	}
-	//!error msg, mode not found
 
 }

@@ -82,7 +82,7 @@ class Server {
 		class ChannelNotFoundException : public std::exception {
 
 			public:
-				const char * what() {
+				virtual const char * what() const throw() {
 					return "Channel not found!";
 				}
 		};

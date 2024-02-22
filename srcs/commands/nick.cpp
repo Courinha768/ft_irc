@@ -3,8 +3,9 @@
 void Server::commandNICK(Client & client)	{
 
 	if (!client.isAuthenticated()) {
-		//todo: find RPL correct numeric to send
-		sendWarning(NEED_AUTHENTICATION, client);
+
+		sendRPL(client, ERR_PASSWDMISMATCH(client.getNickname()));
+
 	} else {
 
 		size_t pos = message.find(NICK_COMMAND);
@@ -43,9 +44,12 @@ void Server::commandNICK(Client & client)	{
 			if (client.hasNick()) oldNick = client.getNickname();
 			client.setNickname(newNick);
 			if (!client.isRegistered() && client.hasUser()) {
+
 				client.setisRegistered(true);
 				sendRPLwellcome(client);
+				
 			} else if (client.isRegistered()) {
+
 				std::string acknowledge = ":" + oldNick + " NICK " + client.getNickname() + "\r\n";
 				sendWarning(acknowledge, client);
 				std::stringstream ss;
