@@ -36,7 +36,7 @@ void Server::commandKICK(Client &client)
         return ;
     }
 
-    if (!isClientOnChannel(client, channel_name)) {
+    if (!isClientOnChannel(client.getNickname(), channel_name)) {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return ;
     }
@@ -77,12 +77,12 @@ void Server::commandKICK(Client &client)
 
     for (unsigned long i = 0; i < channels.size(); i++)
     {
-        if (channels.at(i).getName() == channel_name)
+        if (channels.at(i).getName().compare(channel_name) == 0)
         {
             channelFound = true;
             for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++)
             {
-                if (channels.at(i).getClients().at(j).getNickname() == user_to_kick)
+                if (channels.at(i).getClients().at(j).getNickname().compare(user_to_kick) == 0)
                 {
                     userFound = true;
                     // I think that this part is not necessary. 
@@ -120,13 +120,13 @@ void Server::commandKICK(Client &client)
     }
 }
 
-bool Server::isClientOnChannel(Client client, std::string channel_name) {
+bool Server::isClientOnChannel(std::string client_nickname, std::string channel_name) {
 
 
     for (size_t i = 0; i < channels.size(); i++) {
-        if (channels.at(i).getName() == channel_name) {
+        if (channels.at(i).getName().compare(channel_name) == 0) {
             for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
-                if (channels.at(i).getClients().at(j).getNickname() == client.getNickname()) {
+                if (channels.at(i).getClients().at(j).getNickname().compare(client_nickname) == 0) {
                     return true;
                 }
             }
