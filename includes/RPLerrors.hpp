@@ -27,6 +27,5 @@
 # define ERR_UMODEUNKNOWNFLAG(client)						(":ircserv.42.fr 501 " + client + " :Unknown MODE flag\r\n")													//501
 # define ERR_INVITEONLYCHAN(client, channel) 				(":ircserv.42.fr 473 " + client + " " + channel + " :Cannot join channel (+i)")									//473
 # define ERR_CHANNELISFULL(client, channel) 				(":ircserv.42.fr 471 " + client + " " + channel + " :Cannot join channel (+l)")									//471
-# define ERR_CHANOPRIVSNEEDED(client, channel) 				(":ircserv.42.fr 482 " + client + " " + channel + " :You're not channel operator")								//482
 
 #endif

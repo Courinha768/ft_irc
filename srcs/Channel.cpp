@@ -60,6 +60,10 @@ std::string Channel::getPassword() const	{
 	return _password;
 }
 
+std::string Channel::getTopic() const	{
+	return _topic;
+}
+
 t_mode_channel Channel::getMode() const	{
 	return _mode;
 }
@@ -84,6 +88,10 @@ void	Channel::setName(std::string name){
 
 void	Channel::setPassword(std::string password){
 	_password = password;
+}
+
+void	Channel::setTopic(std::string topic){
+	_topic = topic;
 }
 
 /* --------------------------------- Methods -------------------------------- */

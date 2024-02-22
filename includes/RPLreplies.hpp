@@ -6,6 +6,7 @@
 #define RPL_CREATED(nick)								":ircserv.42.fr 003 " + nick + " :This server was created on thu Feb 01 2024"			//003
 #define RPL_MYINFO(nick)								":ircserv.42.fr 004 " + nick + " :ircserv.42.fr 001.1"									//004
 
+#define RPL_NOTOPIC(nick, channel)						":ircserv.42.fr 332 " + nick + " "	+ channel + " :No topic is set"						//331
 #define RPL_TOPIC(nick, channel, topic)					":ircserv.42.fr 332 " + nick + " "	+ channel + " :" + topic							//332
 #define RPL_TOPICWHOTIME(nick, channel, topic, setat)	":ircserv.42.fr 333 " + nick + " "	+ channel + " " + nick + " " + setat				//333
 #define RPL_INVITING(nick, channel)						":ircserv.42.fr 341 " + nick + " " + channel + "\r\n"									//341

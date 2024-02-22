@@ -68,6 +68,7 @@ class Server {
 		void commandPRIVMSG(Client & client);
 		void commandKICK(Client & client);
 		void commandINVITE(Client & client);
+		void commandTOPIC(Client & client);
 		
 
 		template<typename T>

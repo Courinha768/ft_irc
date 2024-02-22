@@ -99,6 +99,7 @@ void Server::commandJOIN(Client & client)	{
 				channel.setName(commands.front().first);
 				channel.setPassword(commands.front().second);
 				channel.addClient(client);
+				channel.setTopic("");
 				channels.push_back(channel);
 				created = true;
 				
@@ -107,6 +108,10 @@ void Server::commandJOIN(Client & client)	{
 			if (!wrong_pass && !invite_only && !user_limit) {
 
 				sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
+				if (!channel.getTopic().empty())
+					sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
+				else
+					sendRPL(client, RPL_NOTOPIC(client.getNickname(), channel.getName()));
 
 			}	else if (invite_only) {
 

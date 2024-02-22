@@ -15,6 +15,7 @@ class	Channel	{
 	private:
 		std::string			_name;
 		std::string 		_password;
+		std::string			_topic;
 		t_mode_channel		_mode;
 		std::vector<Client>	_clients;
 		std::vector<Client>	_operators;
@@ -31,14 +32,17 @@ class	Channel	{
 		Channel & operator=(Channel const & rhs);
 
 		std::string			getName() const;
+		std::string			getTopic() const;
 		std::string			getPassword() const;
 		t_mode_channel		getMode() const;
 		std::vector<Client>	getClients() const;
 		std::vector<Client>	getOperators() const;
 		long unsigned int	getUserLimit() const;
 
-		void	setName(std::string name);
-		void	setPassword(std::string password);
+
+		void				setName(std::string name);
+		void				setPassword(std::string password);
+		void				setTopic(std::string topic);
 
 		void				addClient(Client & client);
 		void				removeClient(Client & client);
