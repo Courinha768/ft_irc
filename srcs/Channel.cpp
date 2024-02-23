@@ -116,7 +116,19 @@ void	Channel::removeClient(Client & client) {
 	std::vector<Client>::iterator	pos = findClient(client);
 
 	if (pos != _clients.end())
-		_clients.erase(findClient(client));
+		_clients.erase(pos);
+
+	pos = findOperators(client);
+
+	if (pos != _operators.end())
+		_operators.erase(pos);
+}
+
+void	Channel::removeInvited(Client & client) {
+	std::vector<Client>::iterator	pos = findInvited(client);
+
+	if (pos != _invited.end())
+		_invited.erase(pos);
 }
 
 std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
@@ -126,6 +138,24 @@ std::vector<Client>::iterator	Channel::findClient(Client const & client)	{
 		}
 	}
 	return (_clients.end());
+}
+
+std::vector<Client>::iterator	Channel::findOperators(Client const & client)	{
+	for (unsigned long i = 0; i < _operators.size(); i++)	{
+		if (client.getFd() == _operators.at(i).getFd()) {
+			return (_operators.begin() + i);
+		}
+	}
+	return (_operators.end());
+}
+
+std::vector<Client>::iterator	Channel::findInvited(Client const & client)	{
+	for (unsigned long i = 0; i < _invited.size(); i++)	{
+		if (client.getFd() == _invited.at(i).getFd()) {
+			return (_invited.begin() + i);
+		}
+	}
+	return (_invited.end());
 }
 
 void	Channel::addMode(char mode, std::string parameters) {
@@ -142,7 +172,7 @@ void	Channel::addMode(char mode, std::string parameters) {
 		case 't':
 			_mode._protected_topic = true;
 			return ;
-		case 'n':
+		case 'l':
 			_mode._user_limit = true;
 			_user_limit = atoi(parameters.c_str());
 			return ;
@@ -179,7 +209,7 @@ void	Channel::removeMode(char mode, std::string parameters) {
 		case 't':
 			_mode._protected_topic = false;
 			return ;
-		case 'n':
+		case 'l':
 			_mode._user_limit = false;
 			return ;
 		case 'o':

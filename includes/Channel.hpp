@@ -50,11 +50,14 @@ class	Channel	{
 		void				addInvited(Client & client);
 		void				addOperator(Client & client);
 		void				removeClient(Client & client);
+		void				removeInvited(Client & client);
 
 		void				addMode(char mode, std::string parameters);
 		void				removeMode(char mode, std::string parameters);
 
 		std::vector<Client>::iterator	findClient(Client const & client);
+		std::vector<Client>::iterator	findOperators(Client const & client);
+		std::vector<Client>::iterator	findInvited(Client const & client);
 
 };
 

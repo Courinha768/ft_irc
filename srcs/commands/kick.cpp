@@ -2,9 +2,11 @@
 
 void Server::commandKICK(Client &client)
 {
-	//We have to change by the true confirmation that the customer is an operator
-	
-	bool isOperator = true;
+	if (!client.isRegistered())
+	{
+		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
+		return;
+	}
 
 	std::string channel_name;
 	std::string user_to_kick;
@@ -12,13 +14,6 @@ void Server::commandKICK(Client &client)
 
 
 	size_t end = message.find("\n");
-	// don't think we need this check. All the messages get this point with a \n in the end
-	if (end == std::string::npos)
-	{
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
-		return;
-	}
-
 	if (message.at(end - 1) == '\r') end = end - 1;
 
 	std::string to_cut = message.substr(5, end - 5);
@@ -32,14 +27,25 @@ void Server::commandKICK(Client &client)
 
 	channel_name = to_cut.substr(0, end);
 
+	Channel target_channel;
+
 	try {
-		Channel target_channel = findChannelByName(channel_name);
+		target_channel = findChannelByName(channel_name);
 	} catch (const ChannelNotFoundException& e) {
 		(void)e;
 		sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
 		return;
 	}
 
+	bool isOperator = false;
+	for (unsigned long i = 0; i < target_channel.getOperators().size(); i++)	{
+		if (!client.getNickname().compare(target_channel.getOperators().at(i).getNickname()))
+			isOperator = true;
+	}
+	if (!isOperator)	{
+		sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target_channel.getName()));
+		return ;
+	}
 
 	if (channel_name.empty()) {
 		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
@@ -49,26 +55,6 @@ void Server::commandKICK(Client &client)
 	if (!isClientOnChannel(client.getNickname(), channel_name)) {
 		sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
 		return ;
-	}
-
-	if (!isOperator)
-	{
-		sendWarning(ERR_CHANOPRIVSNEEDED(client.getNickname(), channel_name), client);
-		return;
-	}
-
-	// I don't know if we need this check here. Because this is checked in earlier steps. 
-	// I think a not authenticated client would never get this point. Not sure!
-	if (!client.isAuthenticated())
-	{
-		sendWarning(NEED_AUTHENTICATION, client);
-		return;
-	}
-	//Same here!
-	if (!client.isRegistered())
-	{
-		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
-		return;
 	}
 
 	to_cut = to_cut.substr(end + 1);
@@ -97,22 +83,29 @@ void Server::commandKICK(Client &client)
 			{
 				if (channels.at(i).getClients().at(j).getNickname().compare(user_to_kick) == 0)
 				{
-					// I think that this part is not necessary. 
-					// std::string channel_notification = "Command to kick " + user_to_kick + " from " + channel_name;
-					// if (!comment.empty()) {
-					//     channel_notification += " using \"" + comment + "\" as the reason (comment).";
-					// }
-					// channel_notification += "\r\n";
-					// sendMessageToAllClients(channel_notification, client.getFd());
-
-					std::string client_notification = ":" + client.getNickname() + " kicked you from " + channel_name;
+					std::string client_notification = ":" + client.getNickname() + " KICK " + channel_name + " " + user_to_kick;
 					if (!comment.empty()) {
-						client_notification += " using \"" + comment + "\" as the reason (comment).";
+						client_notification += " " + comment;
 					}
 					client_notification += "\r\n";
 					sendMessageToClient(client_notification, channels.at(i).getClients().at(j).getFd());
 
+
 					channels.at(i).removeClient(channels.at(i).getClients().at(j));
+
+
+					if (channels.at(i).getClients().size() == 0)	{
+
+						std::vector<Channel>::iterator it = channels.begin();
+						while(it != channels.end()) {
+							if ((*it).getName().compare(channel_name) == 0) {
+								break;
+							}
+							it++;
+						}
+						channels.erase(it);
+
+					}
 					break;
 				}
 			}

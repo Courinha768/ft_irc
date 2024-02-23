@@ -127,12 +127,13 @@ void Server::commandMODE(Client & client)	{
 
 	for (unsigned long	i = 1; i < command.modes.size(); i++)	{
 		if (command.modes.at(i) != 'i' && command.modes.at(i) != 'k'
-				&& command.modes.at(i) != 't' && command.modes.at(i) != 'n'
+				&& command.modes.at(i) != 't' && command.modes.at(i) != 'l'
 				&& command.modes.at(i) != 'o')	{
 			sendRPL(client, ERR_UMODEUNKNOWNFLAG(client.getNickname()));
 			return ;
 		}
 	}
+
 
 	if (command.parameters.size() == 0)
 		command.parameters.push_back("");
