@@ -121,6 +121,20 @@ void Server::commandKICK(Client &client)
 
 }
 
+bool Server::isClientOnServer(std::string client_nickname) {
+
+	std::map<int, Client*>::iterator it = clients.begin();
+	while (it != clients.end()) {
+		if (it->second->getNickname().compare(client_nickname) == 0) {
+			return true;
+		}
+		it++;
+	}
+
+	return false;
+   
+}
+
 bool Server::isClientOnChannel(std::string client_nickname, std::string channel_name) {
 
 

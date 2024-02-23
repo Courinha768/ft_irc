@@ -57,6 +57,7 @@ class Server {
 		Channel & findChannelByName(const std::string& name);
 		Client* findClientByNickname(const std::string& nickname);
 		bool isClientOnChannel(std::string client_nickname, std::string channel_name);
+		bool isClientOnServer(std::string client_nickname);
 
 		void commandCAP(Client & client);
 		void commandJOIN(Client & client);
@@ -68,6 +69,7 @@ class Server {
 		void commandPRIVMSG(Client & client);
 		void commandKICK(Client & client);
 		void commandINVITE(Client & client);
+		void commandTOPIC(Client & client);
 		
 
 		template<typename T>

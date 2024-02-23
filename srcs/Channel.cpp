@@ -60,12 +60,20 @@ std::string Channel::getPassword() const	{
 	return _password;
 }
 
+std::string Channel::getTopic() const	{
+	return _topic;
+}
+
 t_mode_channel Channel::getMode() const	{
 	return _mode;
 }
 
 std::vector<Client> Channel::getClients() const	{
 	return _clients;
+}
+
+std::vector<Client>	 Channel::getInviteds() const {
+	return _invited;
 }
 
 std::vector<Client> Channel::getOperators() const	{
@@ -86,10 +94,22 @@ void	Channel::setPassword(std::string password){
 	_password = password;
 }
 
+void	Channel::setTopic(std::string topic){
+	_topic = topic;
+}
+
 /* --------------------------------- Methods -------------------------------- */
 
 void	Channel::addClient(Client & client)	{
 	_clients.push_back(client);
+}
+
+void	Channel::addInvited(Client & client) {
+	_invited.push_back(client);
+}
+
+void	Channel::addOperator(Client & client)	{
+	_operators.push_back(client);
 }
 
 void	Channel::removeClient(Client & client) {

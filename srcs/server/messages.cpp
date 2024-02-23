@@ -45,7 +45,7 @@ void Server::parseMessage(Client & client) {
 	size_t end = message.find("\n");
 	size_t start = 0;
 
-	// Server::cout() << message << "\r\n";
+	Server::cout() << message << "\r\n";
 	while (end != EOS) {
 
 		std::string msg = message.substr(start, end);
@@ -53,13 +53,9 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(Server::*functions[10])(Client & client) = MP_COMMAND_FUNCTIONS;
+			void	(Server::*functions[11])(Client & client) = MP_COMMAND_FUNCTIONS;
 			(this->*functions[type])(client);
-
-		} else {
-			//Why print this?
-			Server::cout() << client.getNickname() << ": " << msg << "\r\n";
-
+			
 		}
 
 		start = end + 1;

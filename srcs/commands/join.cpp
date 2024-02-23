@@ -75,7 +75,13 @@ void Server::commandJOIN(Client & client)	{
 						channels.at(i).addClient(client);
 						if (channels.at(i).getMode()._invite_only)	{
 							invite_only = true;
+							for (unsigned long j = 0; j < channels.at(i).getInviteds().size(); j++) {
+								if (channels.at(i).getInviteds().at(j).getNickname() == client.getNickname())
+									invite_only = false;
+							}
 						}
+						if (channels.at(i).getMode()._user_limit &&
+								channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
 						if (channels.at(i).getMode()._user_limit &&
 								channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
 							user_limit = true;
@@ -83,10 +89,14 @@ void Server::commandJOIN(Client & client)	{
 
 					} else {
 
+
 						sendRPL(client, ERR_PASSWDMISMATCH(client.getNickname()));
 						wrong_pass = true;
 
+
 					}
+					created = true;
+					break ;
 					created = true;
 					break ;
 
@@ -96,17 +106,26 @@ void Server::commandJOIN(Client & client)	{
 
 			if (!created) {
 
+			if (!created) {
+
 				channel.setName(commands.front().first);
 				channel.setPassword(commands.front().second);
 				channel.addClient(client);
+				channel.addOperator(client);
+				channel.setTopic("");
 				channels.push_back(channel);
 				created = true;
 				
 			}
 
+
 			if (!wrong_pass && !invite_only && !user_limit) {
 
 				sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
+				if (!channel.getTopic().empty())
+					sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
+				else
+					sendRPL(client, RPL_NOTOPIC(client.getNickname(), channel.getName()));
 
 			}	else if (invite_only) {
 

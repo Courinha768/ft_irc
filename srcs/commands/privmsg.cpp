@@ -15,29 +15,43 @@ void Server::commandPRIVMSG(Client & client)	{
 	channel_name = trimmed_message.substr(0, end);
 	trimmed_message = trimmed_message.substr(end + 2);
 
-	if (!isClientOnChannel(client.getNickname(), channel_name)) {
+	if (!isClientOnChannel(client.getNickname(), channel_name) && !isClientOnServer(channel_name)) {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return ;
     }
 
-	for (unsigned long i = 0; i < channels.size(); i++) {
+	if (isClientOnChannel(client.getNickname(), channel_name))	{
 
-		if (channels.at(i).getName() == channel_name) {
+		for (unsigned long i = 0; i < channels.size(); i++) {
 
-			for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++) {
+			if (channels.at(i).getName() == channel_name) {
 
-				if (channels.at(i).getClients().at(j).getFd() != client.getFd()) {
+				for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++) {
 
-					std::string test = ":" + client.getNickname() + " " + message;
-					sendMsg(channels.at(i).getClients().at(j), test);
+					if (channels.at(i).getClients().at(j).getFd() != client.getFd()) {
+
+						std::string test = ":" + client.getNickname() + " " + message;
+						sendMsg(channels.at(i).getClients().at(j), test);
+
+					}
 
 				}
+				break ;
 
 			}
-			break ;
 
 		}
 
+	}	else if (isClientOnServer(channel_name))	{
+
+		std::map<int, Client*>::iterator it = clients.begin();
+		while (it != clients.end()) {
+			if (it->second->getNickname().compare(channel_name) == 0) {
+				std::string test = ":" + client.getNickname() + " " + message;
+				sendMsg(*it->second, test);
+			}
+			it++;
+		}
 	}
 	
 }

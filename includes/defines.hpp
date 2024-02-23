@@ -23,6 +23,7 @@
 	"PRIVMSG", \
 	"KICK", \
 	"INVITE", \
+	"TOPIC", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -35,6 +36,7 @@
 	&Server::commandPRIVMSG, \
 	&Server::commandKICK, \
 	&Server::commandINVITE, \
+	&Server::commandTOPIC, \
 }
 # define	MP_NOT_A_COMMAND -1
 
