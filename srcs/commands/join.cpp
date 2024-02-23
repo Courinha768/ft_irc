@@ -99,6 +99,7 @@ void Server::commandJOIN(Client & client)	{
 				channel.setName(commands.front().first);
 				channel.setPassword(commands.front().second);
 				channel.addClient(client);
+				channel.addOperator(client);
 				channel.setTopic("");
 				channels.push_back(channel);
 				created = true;

@@ -48,20 +48,16 @@ void Server::parseMessage(Client & client) {
 	Server::cout() << message << "\r\n";
 	while (end != EOS) {
 
-		std::cout << BLUB << "+" << CRESET << std::endl;
 		std::string msg = message.substr(start, end);
 
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
 			void	(Server::*functions[11])(Client & client) = MP_COMMAND_FUNCTIONS;
-			std::cout << WHTB << "+" << CRESET << std::endl;
 			(this->*functions[type])(client);
-			std::cout << GRNB << "+" << CRESET << std::endl;
-
+			
 		}
 
-		std::cout << REDB << "+" << CRESET << std::endl;
 		start = end + 1;
 		if (start != EOS) {
 			end = message.find("\n", start);

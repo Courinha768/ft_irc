@@ -45,6 +45,7 @@ class	Channel	{
 		void				setTopic(std::string topic);
 
 		void				addClient(Client & client);
+		void				addOperator(Client & client);
 		void				removeClient(Client & client);
 
 		void				addMode(char mode, std::string parameters);

@@ -100,6 +100,10 @@ void	Channel::addClient(Client & client)	{
 	_clients.push_back(client);
 }
 
+void	Channel::addOperator(Client & client)	{
+	_operators.push_back(client);
+}
+
 void	Channel::removeClient(Client & client) {
 	std::vector<Client>::iterator	pos = findClient(client);
 

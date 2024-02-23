@@ -121,6 +121,21 @@ void Server::commandKICK(Client &client)
 
 }
 
+bool Server::isClientOnServer(std::string client_nickname) {
+
+	std::cout << clients.at(0)->getFd() << std::endl;
+	std::cout << clients.size() << std::endl;
+	for (size_t j = 0; j < clients.size(); j++) {
+		if (clients.at(j)->getNickname().compare(client_nickname) == 0) {
+			return true;
+		}
+	}
+	std::cout << "9" << std::endl;
+
+	return false;
+   
+}
+
 bool Server::isClientOnChannel(std::string client_nickname, std::string channel_name) {
 
 

@@ -3,7 +3,6 @@
 typedef struct s_command {
 	std::string	target;
 	std::string	parameters;
-	bool		empty;
 } t_command;
 
 static	t_command	parseTOPICMessage(std::string message)	{
@@ -17,8 +16,6 @@ static	t_command	parseTOPICMessage(std::string message)	{
 	parsed_message = message.substr(6, end - 6);
 
 	t_command	command;
-
-	command.empty = false;
 
 	end = parsed_message.find(' ');
 	command.target = parsed_message.substr(0, end);
@@ -34,10 +31,6 @@ static	t_command	parseTOPICMessage(std::string message)	{
 			command.parameters = parsed_message;
 
 		}
-
-	}	else	{
-
-		command.empty = true;
 
 	}
 
@@ -57,61 +50,71 @@ void Server::commandTOPIC(Client & client)	{
 	t_command		command = parseTOPICMessage(message);
 	Channel			channel;
 
+	std::cout << "|" << command.target << "|" << std::endl;
+	std::cout << "|" << command.parameters << "|" << std::endl;
+
+
+	int	channel_id = -1;
+	int	client_id = -1;
+	int operator_id = -1;
+	(void)client_id;
+	(void)operator_id;
+
+	std::cout << HRED << "+" << CRESET << std::endl;
 	for (unsigned long i = 0; i < channels.size(); i++) {
-
 		if (channels.at(i).getName() == command.target) {
-			channel = channels.at(i);
+			channel_id = i;
+		}
+	}	if (channel_id < 0)	{
+		//!Error msg
+		std::cout << "Error 1" << std::endl;
+		return ;
+	}
 
-			for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++) {
+	std::cout << HBLU << "+" << CRESET << std::endl;
+	for (unsigned long i = 0; i < channels.at(channel_id).getClients().size(); i++) {
+		if (client.getFd() == channels.at(channel_id).getClients().at(i).getFd())	{
+			client_id = i;
+		}
+	}	if (channel_id < 0)	{
+		//!Error msg
+		std::cout << "Error 2" << std::endl;
+	}
 
-				if (client.getFd() == channels.at(i).getClients().at(j).getFd())	{
+	std::cout << HGRN << "+" << CRESET << std::endl;
+	if (command.parameters.empty())	{
 
-					if (command.empty)	{
+		std::cout << REDB << "+" << CRESET << std::endl;
+		if (!channels.at(channel_id).getTopic().empty())
+			sendRPL(client, RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
+		else
+			sendRPL(client, RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
 
-						if (!channels.at(i).getTopic().empty())
-							sendRPL(client, RPL_TOPIC(client.getNickname(), channels.at(i).getName(), channels.at(i).getTopic()));
-						else
-							sendRPL(client, RPL_NOTOPIC(client.getNickname(), channels.at(i).getName()));
+		return ;
 
-						//!This doesnt make sense, why is it segfaulting in the return????
-						std::cout << HBLU << "+" << CRESET << std::endl;
-						return ;
+	}	else	{
 
+		std::cout << GRNB << "+" << CRESET << std::endl;
+		for (unsigned long i = 0; i < channels.at(channel_id).getOperators().size(); i++) {
+			if (client.getFd() == channels.at(channel_id).getOperators().at(i).getFd())	{
+				operator_id = i;
+			}
+		}	if (channel_id < 0)	{
+			//!Error msg
+			std::cout << "Error 3" << std::endl;
+			return ;
+		}
+		channels.at(channel_id).setTopic(command.parameters);
+		for (unsigned long l = 0; l < channels.at(channel_id).getOperators().size(); l++)	{
 
-					}	else	{
-			
-						for (unsigned long k = 0; k < channels.at(i).getOperators().size(); k++) {
+			if (channels.at(channel_id).getClients().at(l).getFd() != client.getFd())	{
 
-							if (client.getFd() == channels.at(i).getOperators().at(k).getFd())	{
-
-								channels.at(i).setTopic(command.parameters);
-								for (unsigned long l = 0; l < channels.at(i).getOperators().size(); l++)	{
-
-									if (channels.at(i).getClients().at(l).getFd() != client.getFd())	{
-
-										if (!channels.at(i).getTopic().empty())
-											sendRPL(channels.at(i).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(i).getName(), channels.at(i).getTopic()));
-										else
-											sendRPL(channels.at(i).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(i).getName()));
-
-									}
-
-								}
-								return ;
-
-							}
-
-						}
-						sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), channels.at(i).getName()));
-
-					}
-					return ;
-
-				}
+				if (!channels.at(channel_id).getTopic().empty())
+					sendRPL(channels.at(channel_id).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
+				else
+					sendRPL(channels.at(channel_id).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
 
 			}
-			sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), channel.getName()));
-			return ;
 
 		}
 
