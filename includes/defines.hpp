@@ -24,6 +24,7 @@
 	"KICK", \
 	"INVITE", \
 	"TOPIC", \
+	"PART", \
 }
 # define MP_COMMAND_FUNCTIONS { \
 	&Server::commandCAP, \
@@ -37,6 +38,7 @@
 	&Server::commandKICK, \
 	&Server::commandINVITE, \
 	&Server::commandTOPIC, \
+	&Server::commandPART, \
 }
 # define	MP_NOT_A_COMMAND -1
 

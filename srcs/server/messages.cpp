@@ -53,7 +53,7 @@ void Server::parseMessage(Client & client) {
 		int	type = findCommand(msg);
 		if (type != MP_NOT_A_COMMAND) {
 
-			void	(Server::*functions[11])(Client & client) = MP_COMMAND_FUNCTIONS;
+			void	(Server::*functions[12])(Client & client) = MP_COMMAND_FUNCTIONS;
 			(this->*functions[type])(client);
 			
 		}
