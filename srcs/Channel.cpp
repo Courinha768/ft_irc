@@ -72,6 +72,10 @@ std::vector<Client> Channel::getClients() const	{
 	return _clients;
 }
 
+std::vector<Client>	 Channel::getInviteds() const {
+	return _invited;
+}
+
 std::vector<Client> Channel::getOperators() const	{
 	return _clients;
 }
@@ -98,6 +102,10 @@ void	Channel::setTopic(std::string topic){
 
 void	Channel::addClient(Client & client)	{
 	_clients.push_back(client);
+}
+
+void	Channel::addInvited(Client & client) {
+	_invited.push_back(client);
 }
 
 void	Channel::addOperator(Client & client)	{

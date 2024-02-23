@@ -75,6 +75,10 @@ void Server::commandJOIN(Client & client)	{
 						channels.at(i).addClient(client);
 						if (channels.at(i).getMode()._invite_only)	{
 							invite_only = true;
+							for (unsigned long j = 0; j < channels.at(i).getInviteds().size(); j++) {
+								if (channels.at(i).getInviteds().at(j).getNickname() == client.getNickname())
+									invite_only = false;
+							}
 						}
 						if (channels.at(i).getMode()._user_limit &&
 								channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{

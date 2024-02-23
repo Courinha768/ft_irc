@@ -18,6 +18,7 @@ class	Channel	{
 		std::string			_topic;
 		t_mode_channel		_mode;
 		std::vector<Client>	_clients;
+		std::vector<Client>	_invited;
 		std::vector<Client>	_operators;
 		long unsigned int	_user_limit;
 
@@ -36,6 +37,7 @@ class	Channel	{
 		std::string			getPassword() const;
 		t_mode_channel		getMode() const;
 		std::vector<Client>	getClients() const;
+		std::vector<Client>	getInviteds() const;
 		std::vector<Client>	getOperators() const;
 		long unsigned int	getUserLimit() const;
 
@@ -45,6 +47,7 @@ class	Channel	{
 		void				setTopic(std::string topic);
 
 		void				addClient(Client & client);
+		void				addInvited(Client & client);
 		void				addOperator(Client & client);
 		void				removeClient(Client & client);
 

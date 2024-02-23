@@ -1,43 +1,5 @@
 #include "../../includes/ftIrc.hpp"
 
-typedef struct s_command {
-	std::string	target;
-	std::string	parameters;
-} t_command;
-
-static	t_command	parseTOPICMessage(std::string message)	{
-
-	std::string parsed_message;
-
-	size_t end = message.find("\n");
-	if (message.at(end - 1) == '\r') {
-		end = end - 1;
-	}
-	parsed_message = message.substr(6, end - 6);
-
-	t_command	command;
-
-	end = parsed_message.find(' ');
-	command.target = parsed_message.substr(0, end);
-
-
-	if (end != EOS)	{
-		
-		parsed_message = parsed_message.substr(end + 2);
-		end = parsed_message.find(" ");
-
-		if (end != EOS)	{
-			
-			command.parameters = parsed_message;
-
-		}
-
-	}
-
-	return command;
-
-}
-
 void Server::commandTOPIC(Client & client)	{
 
 	if (!client.isRegistered())	{
@@ -47,12 +9,31 @@ void Server::commandTOPIC(Client & client)	{
 
 	}
 
-	t_command		command = parseTOPICMessage(message);
+	std::string	target;
+	std::string	parameters;
+
+	std::string parsed_message;
+
+	size_t end = message.find("\n");
+	if (message.at(end - 1) == '\r') {
+		end = end - 1;
+	}
+	parsed_message = message.substr(6, end - 6);
+
+	end = parsed_message.find(' ');
+
+	target = parsed_message.substr(0, end);
+
+
+	if (end != EOS)	{
+		
+		parsed_message = parsed_message.substr(end + 2);
+		end = parsed_message.find(" ");
+		parameters = parsed_message;
+
+	}
+
 	Channel			channel;
-
-	std::cout << "|" << command.target << "|" << std::endl;
-	std::cout << "|" << command.parameters << "|" << std::endl;
-
 
 	int	channel_id = -1;
 	int	client_id = -1;
@@ -60,9 +41,8 @@ void Server::commandTOPIC(Client & client)	{
 	(void)client_id;
 	(void)operator_id;
 
-	std::cout << HRED << "+" << CRESET << std::endl;
 	for (unsigned long i = 0; i < channels.size(); i++) {
-		if (channels.at(i).getName() == command.target) {
+		if (channels.at(i).getName() == target) {
 			channel_id = i;
 		}
 	}	if (channel_id < 0)	{
@@ -71,7 +51,6 @@ void Server::commandTOPIC(Client & client)	{
 		return ;
 	}
 
-	std::cout << HBLU << "+" << CRESET << std::endl;
 	for (unsigned long i = 0; i < channels.at(channel_id).getClients().size(); i++) {
 		if (client.getFd() == channels.at(channel_id).getClients().at(i).getFd())	{
 			client_id = i;
@@ -81,20 +60,18 @@ void Server::commandTOPIC(Client & client)	{
 		std::cout << "Error 2" << std::endl;
 	}
 
-	std::cout << HGRN << "+" << CRESET << std::endl;
-	if (command.parameters.empty())	{
+	if (parameters.empty())	{
 
-		std::cout << REDB << "+" << CRESET << std::endl;
 		if (!channels.at(channel_id).getTopic().empty())
 			sendRPL(client, RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
 		else
 			sendRPL(client, RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
 
+		parameters = " ";
 		return ;
 
 	}	else	{
 
-		std::cout << GRNB << "+" << CRESET << std::endl;
 		for (unsigned long i = 0; i < channels.at(channel_id).getOperators().size(); i++) {
 			if (client.getFd() == channels.at(channel_id).getOperators().at(i).getFd())	{
 				operator_id = i;
@@ -104,7 +81,7 @@ void Server::commandTOPIC(Client & client)	{
 			std::cout << "Error 3" << std::endl;
 			return ;
 		}
-		channels.at(channel_id).setTopic(command.parameters);
+		channels.at(channel_id).setTopic(parameters);
 		for (unsigned long l = 0; l < channels.at(channel_id).getOperators().size(); l++)	{
 
 			if (channels.at(channel_id).getClients().at(l).getFd() != client.getFd())	{

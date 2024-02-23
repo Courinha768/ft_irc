@@ -15,13 +15,11 @@ void Server::commandPRIVMSG(Client & client)	{
 	channel_name = trimmed_message.substr(0, end);
 	trimmed_message = trimmed_message.substr(end + 2);
 
-	std::cout << HGRN << "+" << CRESET << std::endl;
 	if (!isClientOnChannel(client.getNickname(), channel_name) && !isClientOnServer(channel_name)) {
         sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
         return ;
     }
 
-	std::cout << HRED << "+" << CRESET << std::endl;
 	if (isClientOnChannel(client.getNickname(), channel_name))	{
 
 		for (unsigned long i = 0; i < channels.size(); i++) {
@@ -46,18 +44,14 @@ void Server::commandPRIVMSG(Client & client)	{
 
 	}	else if (isClientOnServer(channel_name))	{
 
-		std::cout << HBLU << "+" << CRESET << std::endl;
-		for (unsigned long i = 0; i < clients.size(); i++) {
-
-			if (clients.at(i)->getNickname() == channel_name) {
-
+		std::map<int, Client*>::iterator it = clients.begin();
+		while (it != clients.end()) {
+			if (it->second->getNickname().compare(channel_name) == 0) {
 				std::string test = ":" + client.getNickname() + " " + message;
-				sendMsg(*clients.at(i), test);
-
+				sendMsg(*it->second, test);
 			}
-
+			it++;
 		}
-
 	}
 	
 }
