@@ -21,7 +21,7 @@
 # define ERR_NOTREGISTERED(nickname)						(":ircserv.42.fr 451 " + nickname + " :You have not registered\r\n")											//451
 # define ERR_NEEDMOREPARAMS(command)						(":ircserv.42.fr 461 " + command + " :Not enough parameters\r\n")												//461
 # define ERR_ALREADYREGISTERED(client)						(":ircserv.42.fr 462 " + client + " :You may not reregister\r\n")												//462
-# define ERR_PASSWDMISMATCH(client)							(":ircserv.42.fr 464 " + client + " :Password incorrect\r\n")													//464
+# define ERR_PASSWDMISMATCH(client)							(":ircserv.42.fr 464 " + client + " :Password incorrect")													//464
 # define ERR_BADCHANNELKEY(client, channel)					(":ircserv.42.fr 475 " + client + " " + channel + " :Password incorrect\r\n")									//475
 # define ERR_CHANOPRIVSNEEDED(client, channel)				(":ircserv.42.fr 482 " + client + " " + channel + " :You're not channel operator\r\n")							//482
 # define ERR_UMODEUNKNOWNFLAG(client)						(":ircserv.42.fr 501 " + client + " :Unknown MODE flag\r\n")													//501

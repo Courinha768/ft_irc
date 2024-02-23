@@ -151,7 +151,8 @@ std::vector<Client>::iterator	Channel::findOperators(Client const & client)	{
 
 std::vector<Client>::iterator	Channel::findInvited(Client const & client)	{
 	for (unsigned long i = 0; i < _invited.size(); i++)	{
-		if (client.getFd() == _invited.at(i).getFd()) {
+		std::cout << _invited.at(i).getNickname() << std::endl;
+		if (client.getNickname() == _invited.at(i).getNickname()) {
 			return (_invited.begin() + i);
 		}
 	}

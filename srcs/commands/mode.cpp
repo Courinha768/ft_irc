@@ -82,7 +82,7 @@ static	t_command	parseMODEMessage(std::string message)	{
 
 static std::string getModes(std::string target, std::vector<Channel> channels)	{
 	
-	std::string	modes = "+";
+	std::string	modes = "";
 	
 	for (unsigned long l = 0; l < channels.size(); l++) {
 
@@ -92,15 +92,15 @@ static std::string getModes(std::string target, std::vector<Channel> channels)	{
 
 				modes += "i";
 
-			else if (channels.at(l).getMode()._key)
+			if (channels.at(l).getMode()._key)
 
 				modes += "k";
 
-			else if (channels.at(l).getMode()._protected_topic)
+			if (channels.at(l).getMode()._protected_topic)
 
 				modes += "t";
 
-			else if (channels.at(l).getMode()._user_limit)
+			if (channels.at(l).getMode()._user_limit)
 
 				modes += "l";
 
@@ -110,7 +110,10 @@ static std::string getModes(std::string target, std::vector<Channel> channels)	{
 	
 	}
 
-	return target;
+	if (!modes.empty())
+		modes = "+" + modes;
+
+	return modes;
 }
 
 void Server::commandMODE(Client & client)	{

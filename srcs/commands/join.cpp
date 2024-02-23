@@ -76,21 +76,19 @@ void Server::commandJOIN(Client & client)	{
 					return ;
 
 				}
-				if (channels.at(i).getMode()._invite_only)	{
 
-					std::vector<Client>::iterator pos = channels.at(i).findInvited(client);
-					if (pos != channels.at(i).getInviteds().end())	{
+				std::vector<Client>::iterator pos = channels.at(i).findInvited(client);
+				if (pos != channels.at(i).getInviteds().end())	{
 
-						channels.at(i).removeInvited(client);
+					channels.at(i).removeInvited(client);
 
-					}	else	{
+				}	else if (channels.at(i).getMode()._invite_only)	{
 
-						sendRPL(client, ERR_INVITEONLYCHAN(client.getNickname(), channel.getName()));
-						return ;
-
-					}
+					sendRPL(client, ERR_INVITEONLYCHAN(client.getNickname(), channel.getName()));
+					return ;
 
 				}
+
 				if (channels.at(i).getMode()._user_limit &&
 							channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
 
@@ -121,94 +119,5 @@ void Server::commandJOIN(Client & client)	{
 			
 		commands.pop();
 	}
-
-
-
-	// if (client.isRegistered()) {
-
-	// 	std::queue<std::pair<std::string, std::string> > commands = parseJOINMessage(message);
-
-	// 	while (!commands.empty()) {
-
-	// 		bool	created = false;
-	// 		bool	wrong_pass = false;
-	// 		bool	invite_only = false;
-	// 		bool	user_limit = false;
-	// 		for (unsigned long i = 0; i < channels.size(); i++) {
-
-	// 			if (channels.at(i).getName() == commands.front().first) {
-
-	// 				channel = channels.at(i);
-	// 				if (!channels.at(i).getMode()._key || channels.at(i).getPassword() == commands.front().second) {
-
-	// 					channels.at(i).addClient(client);
-	// 					if (channels.at(i).getMode()._invite_only)	{
-							
-	// 						invite_only = true;
-	// 						std::vector<Client>::iterator pos = channels.at(i).findInvited(client);
-	// 						if (pos != channels.at(i).getInviteds().end())	{
-	// 							invite_only = false;
-	// 							channels.at(i).removeInvited(client);
-	// 						}
-							
-	// 					}
-	// 					if (channels.at(i).getMode()._user_limit &&
-	// 							channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
-	// 						user_limit = true;
-	// 					}
-
-	// 				} else {
-
-	// 					sendRPL(client, ERR_PASSWDMISMATCH(client.getNickname()));
-	// 					wrong_pass = true;
-
-	// 				}
-	// 				created = true;
-	// 				break ;
-
-	// 			}
-
-	// 		}
-
-	// 		if (!created) {
-
-	// 			channel.setName(commands.front().first);
-	// 			channel.setPassword(commands.front().second);
-	// 			channel.addClient(client);
-	// 			channel.addOperator(client);
-	// 			channel.setTopic("");
-	// 			channels.push_back(channel);
-	// 			created = true;
-				
-	// 		}
-
-	// 		if (!wrong_pass && !invite_only && !user_limit) {
-
-	// 			sendRPL(client, JOIN_REPLY(client.getNickname(), channel.getName()));
-	// 			if (!channel.getTopic().empty())
-	// 				sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
-	// 			else
-	// 				sendRPL(client, RPL_NOTOPIC(client.getNickname(), channel.getName()));
-				
-
-	// 		}	else if (invite_only) {
-
-	// 			sendRPL(client, ERR_INVITEONLYCHAN(client.getNickname(), channel.getName()));
-
-	// 		}	else if (user_limit)	{
-
-	// 			sendRPL(client, ERR_CHANNELISFULL(client.getNickname(), channel.getName()));
-				
-	// 		}
-
-	// 		commands.pop();
-
-	// 	}
-
-	// } else {
-
-	// 	sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
-
-	// }
 
 }

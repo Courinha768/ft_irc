@@ -2,14 +2,6 @@
 
 void Server::commandINVITE(Client & client)
 {
-	//Again. Don't know if this is necassary. Don't believe this kind of user would get this point.
-	if (!client.isAuthenticated())
-	{
-		sendWarning(NEED_AUTHENTICATION, client);
-		return;
-	}
-
-	//Same here!
 	if (!client.isRegistered())
 	{
 		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
@@ -76,12 +68,14 @@ void Server::commandINVITE(Client & client)
 		return;
 	}
 
+
 	for (size_t i = 0; i < channels.size(); i++) {
 		if (channels.at(i).getName().compare(channel_name) == 0) {
 			channels.at(i).addInvited(*client_to_invite);
 		}
 	}
 
-	sendMessageToClient(RPL_INVITING(client_to_invite->getNickname(), channel_name), client_to_invite->getFd());
+
+	sendMessageToClient(RPL_INVITING(client.getNickname(), client_to_invite->getNickname(), channel_name), client_to_invite->getFd());
 
 }
