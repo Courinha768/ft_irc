@@ -82,9 +82,10 @@ void Server::commandJOIN(Client & client)	{
 						}
 						if (channels.at(i).getMode()._user_limit &&
 								channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
-						if (channels.at(i).getMode()._user_limit &&
-								channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
-							user_limit = true;
+							if (channels.at(i).getMode()._user_limit &&
+									channels.at(i).getClients().size() >= channels.at(i).getUserLimit())	{
+								user_limit = true;
+							}
 						}
 
 					} else {
@@ -103,8 +104,6 @@ void Server::commandJOIN(Client & client)	{
 				}
 
 			}
-
-			if (!created) {
 
 			if (!created) {
 
@@ -146,6 +145,4 @@ void Server::commandJOIN(Client & client)	{
 		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
 
 	}
-
-
 }
