@@ -52,6 +52,8 @@ class	Channel	{
 		void				removeClient(Client & client);
 		void				removeInvited(Client & client);
 
+		bool				isInvitedEnd(std::vector<Client>::iterator pos);
+
 		void				addMode(char mode, std::string parameters);
 		void				removeMode(char mode, std::string parameters);
 

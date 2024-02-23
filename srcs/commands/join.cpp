@@ -78,7 +78,7 @@ void Server::commandJOIN(Client & client)	{
 				}
 
 				std::vector<Client>::iterator pos = channels.at(i).findInvited(client);
-				if (pos != channels.at(i).getInviteds().end())	{
+				if (!channels.at(i).isInvitedEnd(pos))	{
 
 					channels.at(i).removeInvited(client);
 
@@ -99,6 +99,7 @@ void Server::commandJOIN(Client & client)	{
 				channels.at(i).addClient(client);
 
 			}
+			break ;
 
 		}
 		if (!created)	{

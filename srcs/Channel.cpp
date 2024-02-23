@@ -149,9 +149,12 @@ std::vector<Client>::iterator	Channel::findOperators(Client const & client)	{
 	return (_operators.end());
 }
 
+bool	Channel::isInvitedEnd(std::vector<Client>::iterator pos)	{
+	return (pos == _invited.end());
+}
+
 std::vector<Client>::iterator	Channel::findInvited(Client const & client)	{
 	for (unsigned long i = 0; i < _invited.size(); i++)	{
-		std::cout << _invited.at(i).getNickname() << std::endl;
 		if (client.getNickname() == _invited.at(i).getNickname()) {
 			return (_invited.begin() + i);
 		}
