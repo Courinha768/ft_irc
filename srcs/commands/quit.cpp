@@ -8,8 +8,19 @@ void Server::commandQUIT(Client & client)	{
 	}
 	client.setStatus(false);
 
-	for (size_t i = 0; i < channels.size(); i++) {
-		channels.at(i).removeClient(client);
+	std::string msg = ":" + client.getNickname() + " " + message; 
+	std::vector<Channel>::iterator it = channels.begin();
+	while (it != channels.end()) {
+		(*it).removeClient(client);
+		if ((*it).getClients().empty()) {
+			channels.erase(it);
+		} else {
+			for (size_t j = 0; j < (*it).getClients().size(); j++) {
+				sendMessageToClient(msg, (*it).getClients().at(j).getFd());
+			}
+		}
+		
+		it++;
 	}
 
 	// this print on server side can be ommited when project is ready
