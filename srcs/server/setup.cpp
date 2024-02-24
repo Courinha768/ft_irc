@@ -69,7 +69,7 @@ void Server::setupPoll() {
 				int									client_fd = events[i].data.fd;
 				std::map<int, Client*>::iterator	client_it = clients.find(client_fd);
 
-				if (client_it != clients.end()) {
+				if (client_it->second && client_it != clients.end()) {
 					(*client_it->second).setStatus(true);
 					
 					receiveMessage((*client_it->second));

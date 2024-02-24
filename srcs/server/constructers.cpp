@@ -31,7 +31,8 @@ Server::~Server() {
 
 	std::map<int, Client *>::iterator it = clients.begin();
 	while (it != clients.end()) {
-		delete it->second;
+		if (it->second)
+			delete it->second;
 		it++;
 	}
 	clients.clear();

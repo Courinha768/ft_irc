@@ -111,7 +111,7 @@ bool Server::isClientOnServer(std::string client_nickname) {
 
 	std::map<int, Client*>::iterator it = clients.begin();
 	while (it != clients.end()) {
-		if (it->second->getNickname().compare(client_nickname) == 0) {
+		if (it->second && it->second->getNickname().compare(client_nickname) == 0) {
 			return true;
 		}
 		it++;

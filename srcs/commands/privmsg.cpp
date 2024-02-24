@@ -53,7 +53,7 @@ void Server::commandPRIVMSG(Client & client)	{
 
 		std::map<int, Client*>::iterator it = clients.begin();
 		while (it != clients.end()) {
-			if (it->second->getNickname().compare(channel_name) == 0) {
+			if (it->second && it->second->getNickname().compare(channel_name) == 0) {
 				std::string test = ":" + client.getNickname() + " " + message;
 				sendMsg(*it->second, test);
 			}
