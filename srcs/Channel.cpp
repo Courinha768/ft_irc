@@ -128,6 +128,10 @@ void	Channel::removeClient(Client & client) {
 		_operators.erase(pos);
 		if (_operators.empty() && !_clients.empty()) {
 			addOperator(_clients.at(0));
+			std::string	msg = ":" + client.getNickname() + " MODE " + _name + " +o " + _clients.at(0).getNickname();
+			for (unsigned long i = 0; i < _clients.size(); i++)	{
+				sendMsg(_clients.at(i), msg);
+			}
 		}
 	}
 	
