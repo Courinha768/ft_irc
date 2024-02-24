@@ -29,6 +29,8 @@ static std::queue<std::pair<std::string, std::string> > parseJOINMessage(std::st
 
 		coma = channels_string.find(",");
 		pair.first = channels_string.substr(0, coma);
+		if (pair.first.at(0) != '#' && pair.first.at(0) != '&') 
+			pair.first = "#" + pair.first;
 		if (coma != EOS) {
 			channels_string = channels_string.substr(coma + 1);
 		} else {
@@ -97,7 +99,22 @@ void Server::commandJOIN(Client & client)	{
 
 				}
 				channels.at(i).addClient(client);
+				// std::cout << "2:" << std::endl;
+				// for (unsigned long j = 0; j < channels.at(i).getOperators().size(); j++)	{
+
+				// 	std::cout << "++ " << channels.at(i).getOperators().at(j).getNickname() << std::endl;
+
+				// }
+				// std::cout << std::endl;
 				channel = channels.at(i);
+				// std::cout << "2:" << std::endl;
+				// for (unsigned long j = 0; j < channel.getClients().size(); j++)	{
+
+				// 	std::cout << "-- " << channel.getOperators().at(j).getNickname() << std::endl;
+				// 	std::cout << "++ " << channels.at(i).getOperators().at(j).getNickname() << std::endl;
+
+				// }
+				// std::cout << std::endl;
 				break ;
 			}
 
@@ -107,12 +124,12 @@ void Server::commandJOIN(Client & client)	{
 			channel.setName(commands.front().first);
 			channel.setPassword(commands.front().second);
 			channel.addClient(client);
+			std::cout << "!created" << std::endl;
 			channel.addOperator(client);
 			channel.setTopic("");
 			channels.push_back(channel);
 
 		}
-
 		for (unsigned long i = 0; i < channel.getClients().size(); i++)	{
 
 			sendRPL(channel.getClients().at(i), JOIN_REPLY(client.getNickname(), channel.getName()));
@@ -135,6 +152,13 @@ void Server::commandJOIN(Client & client)	{
 			}
 			sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
 			sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
+
+		}
+
+		std::cout << std::endl;
+		for (unsigned long i = 0; i < channel.getOperators().size(); i++)	{
+
+			std::cout << ":: " << channel.getOperators().at(i).getNickname() << std::endl;
 
 		}
 

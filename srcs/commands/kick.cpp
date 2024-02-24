@@ -37,12 +37,7 @@ void Server::commandKICK(Client &client)
 		return;
 	}
 
-	bool isOperator = false;
-	for (unsigned long i = 0; i < target_channel.getOperators().size(); i++)	{
-		if (!client.getNickname().compare(target_channel.getOperators().at(i).getNickname()))
-			isOperator = true;
-	}
-	if (!isOperator)	{
+	if (!client.isOperator(target_channel))	{
 		sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target_channel.getName()));
 		return ;
 	}
