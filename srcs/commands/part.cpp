@@ -47,7 +47,17 @@ void Server::commandPART(Client & client)	{
 	if (end != EOS)
 		comment = to_cut.substr(end + 1);
 
-	//todo: send msg to everyone on the channel including client the msg :<prefix> PART <channel> [:<reason>]
+	std::string msg = ":ircserv.42.fr " + message; 
+
+	for (size_t i = 0; i < channels.size(); i++) {
+		if (channels.at(i).getName().compare(channel_name) == 0) {
+			channels.at(i).removeClient(client);
+			sendMessageToClient(msg, client.getFd());
+			for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
+				sendMessageToClient(msg, channels.at(i).getClients().at(j).getFd());
+			}
+		}
+	}
 
 	
 
