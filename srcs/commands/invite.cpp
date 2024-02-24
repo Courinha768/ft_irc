@@ -14,7 +14,7 @@ void Server::commandINVITE(Client & client)
 	size_t end = message.find("\n");
 	if (end == EOS)
 	{
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
+		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 6)));
 		return;
 	}
 
@@ -24,7 +24,7 @@ void Server::commandINVITE(Client & client)
 	end = to_cut.find(" ");
 	if (end == EOS)
 	{
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 6)), client);
+		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 6)));
 		return;
 	}
 	nickname_to_invite = to_cut.substr(0, end);
@@ -43,13 +43,13 @@ void Server::commandINVITE(Client & client)
 		target_channel = findChannelByName(channel_name);
 	} catch (const ChannelNotFoundException& e) {
 		(void)e;
-		sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), channel_name));
 		return;
 	}
 
 	if (!isClientOnChannel(client.getNickname(), target_channel.getName()))
 	{
-		sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), channel_name));
 		return;
 	}
 
@@ -57,14 +57,14 @@ void Server::commandINVITE(Client & client)
 
 
 	if (client_to_invite == NULL) {
-		sendWarning(NOUSER, client);
+		sendRPL(client, NOUSER);
 		return ;
 	}
 
 
 	if (isClientOnChannel(client_to_invite->getNickname(), target_channel.getName()))
 	{
-		sendWarning(ERR_USERONCHANNEL(client.getNickname(), nickname_to_invite, channel_name), client);
+		sendRPL(client, ERR_USERONCHANNEL(client.getNickname(), nickname_to_invite, channel_name));
 		return;
 	}
 
@@ -76,6 +76,6 @@ void Server::commandINVITE(Client & client)
 	}
 
 
-	sendMessageToClient(RPL_INVITING(client.getNickname(), client_to_invite->getNickname(), channel_name), client_to_invite->getFd());
+	sendRPL(*client_to_invite, RPL_INVITING(client.getNickname(), client_to_invite->getNickname(), channel_name));
 
 }

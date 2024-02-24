@@ -14,7 +14,7 @@ void Server::commandNICK(Client & client)	{
 
 			start = pos + 5;
 			if (start >= message.size()) {
-				sendWarning(ERR_NONICKNAMEGIVEN(client.getUsername()), client);
+				sendRPL(client, ERR_NONICKNAMEGIVEN(client.getUsername()));
 				return;
 			}
 			if (!isspace(message.at(start - 1))) return;
@@ -24,13 +24,13 @@ void Server::commandNICK(Client & client)	{
 			
 			std::string newNick = message.substr(start, end - start);
 			if (isMsgEmpty(newNick)) {
-				sendWarning(ERR_NONICKNAMEGIVEN(client.getUsername()), client);
+				sendRPL(client, ERR_NONICKNAMEGIVEN(client.getUsername()));
 				return;
 			}
 
 			if (hasInvalidChars(newNick)) {
 				std::string invalid_nickname = ERR_ERRONEUSNICKNAME(client.getUsername(), newNick);
-				sendWarning(invalid_nickname, client);
+				sendRPL(client, invalid_nickname);
 				return;
 			}
 
@@ -38,7 +38,7 @@ void Server::commandNICK(Client & client)	{
 			while (it != clients.end()) {
 
 				if (!client.getNickname().empty() && it->second->getFd() != client.getFd() && it->second->getNickname() == newNick) {
-					sendWarning(ERR_NICKNAMEINUSE(client.getUsername(), newNick), client);
+					sendRPL(client, ERR_NICKNAMEINUSE(client.getUsername(), newNick));
 					return ;
 				}
 				it++;
