@@ -126,6 +126,7 @@ void Server::commandMODE(Client & client)	{
 		return ;
 
 	}
+
 	t_command		command = parseMODEMessage(message);
 	Channel			channel;
 	unsigned long	c;
@@ -182,6 +183,28 @@ void Server::commandMODE(Client & client)	{
 					}
 					if (!_operator)	{
 						sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), channels.at(c).getName()));
+					} else {
+
+						if (success) {
+							char	symbol;
+							if (command.modes.at(0) == '+')
+								symbol = '+';
+							else
+								symbol = '-';
+							std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
+							for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
+
+								sendRPL(channels.at(c).getClients().at(l), msg);
+
+							}
+						} else if (!success && command.modes.at(j) == 'o') {
+							if (isClientOnServer(command.parameters.at(k))) {
+								sendRPL(client, ERR_USERNOTINCHANNEL(client.getNickname(), command.parameters.at(k), channels.at(c).getName()));
+							} else {
+								sendRPL(client, NOUSER);
+							}
+						}
+
 					}
 
 				}	else	{
@@ -190,25 +213,6 @@ void Server::commandMODE(Client & client)	{
 
 				}
 
-				if (success) {
-					char	symbol;
-					if (command.modes.at(0) == '+')
-						symbol = '+';
-					else
-						symbol = '-';
-					std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
-					for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
-
-						sendRPL(channels.at(c).getClients().at(l), msg);
-
-					}
-				} else if (!success && command.modes.at(j) == 'o') {
-					if (isClientOnServer(command.parameters.at(k))) {
-						sendRPL(client, ERR_USERNOTINCHANNEL(client.getNickname(), command.parameters.at(k), channels.at(c).getName()));
-					} else {
-						sendRPL(client, NOUSER);
-					}
-				}
 
 
 			}
