@@ -118,9 +118,9 @@ void Server::commandJOIN(Client & client)	{
 
 			sendRPL(channel.getClients().at(i), JOIN_REPLY(client.getNickname(), channel.getName()));
 			if (!channel.getTopic().empty())
-				sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
+				sendRPL(channel.getClients().at(i), RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
 			else
-				sendRPL(client, RPL_NOTOPIC(client.getNickname(), channel.getName()));
+				sendRPL(channel.getClients().at(i), RPL_NOTOPIC(client.getNickname(), channel.getName()));
 
 			std::string	client_list = "";
 			for (unsigned long i = 0; i < channel.getClients().size(); i++)	{
@@ -134,8 +134,8 @@ void Server::commandJOIN(Client & client)	{
 				}
 
 			}
-			sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
-			sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
+			sendRPL(channel.getClients().at(i), RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
+			sendRPL(channel.getClients().at(i), RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
 		}
 			
