@@ -34,9 +34,15 @@ void Server::commandNICK(Client & client)	{
 				return;
 			}
 
-			if (client.hasNick() && client.getNickname().compare(newNick) == 0) {
-				sendWarning(ERR_NICKNAMEINUSE(client.getUsername(), newNick), client);
-				return ;
+			std::map<int, Client*>::iterator it = clients.begin();
+			while (it != clients.end()) {
+
+				if (!client.getNickname().empty() && it->second->getFd() != client.getFd() && it->second->getNickname() == newNick) {
+					sendWarning(ERR_NICKNAMEINUSE(client.getUsername(), newNick), client);
+					return ;
+				}
+				it++;
+
 			}
 			
 			// maybe we will need a list of nicknames to store this history
@@ -50,13 +56,15 @@ void Server::commandNICK(Client & client)	{
 				
 			} else if (client.isRegistered()) {
 
-				std::string acknowledge = ":" + oldNick + " NICK " + client.getNickname() + "\r\n";
-				sendWarning(acknowledge, client);
-				std::stringstream ss;
-				ss << ":" << oldNick << " NICK " << client.getNickname() << "\r\n";
-				std::string message = ss.str();
+				std::string acknowledge = ":" + oldNick + " NICK " + client.getNickname();
 
-				sendMessageToAllClients(message, client.getFd());
+				std::map<int, Client*>::iterator it = clients.begin();
+				while (it != clients.end()) {
+
+					sendRPL(*it->second, acknowledge);
+					it++;
+
+				}
 
 			}
 		}
