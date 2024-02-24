@@ -53,6 +53,11 @@ void Server::commandINVITE(Client & client)
 		return;
 	}
 
+	if (!client.isOperator(target_channel))	{
+		sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target_channel.getName()));
+		return ;
+	}
+
 	Client * client_to_invite = findClientByNickname(nickname_to_invite);
 
 
