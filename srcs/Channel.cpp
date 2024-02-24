@@ -45,6 +45,10 @@ Channel & Channel::operator=(Channel const & rhs) {
 	_password = rhs.getPassword();
 	_mode = rhs.getMode();
 	_clients = rhs.getClients();
+	_operators = rhs.getOperators();
+	_topic = rhs.getTopic();
+	_invited = rhs.getInviteds();
+	_user_limit = rhs.getUserLimit();
 
 	return *this;
 
@@ -77,7 +81,7 @@ std::vector<Client>	 Channel::getInviteds() const {
 }
 
 std::vector<Client> Channel::getOperators() const	{
-	return _clients;
+	return _operators;
 }
 
 long unsigned int	Channel::getUserLimit() const	{

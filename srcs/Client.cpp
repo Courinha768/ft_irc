@@ -86,7 +86,14 @@ bool Client::isRegistered() const {
 }
 
 bool	Client::isOperator(Channel channel)	const {
-	return (channel.getClients().at(0).getFd() == this->getFd());
+	
+	for (unsigned int i = 0; i < channel.getOperators().size(); i++)	{
+		if (channel.getOperators().at(i).getNickname() == nickname)	{
+			return true;
+		}
+	}
+	return false;
+	
 }
 
 /* -------------------------------------------------------------------------- */
