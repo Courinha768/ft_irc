@@ -82,14 +82,11 @@ void Server::commandTOPIC(Client & client)	{
 		channels.at(channel_id).setTopic(parameters);
 		for (unsigned long l = 0; l < channels.at(channel_id).getOperators().size(); l++)	{
 
-			if (channels.at(channel_id).getClients().at(l).getFd() != client.getFd())	{
+			if (!channels.at(channel_id).getTopic().empty())
+				sendRPL(channels.at(channel_id).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
+			else
+				sendRPL(channels.at(channel_id).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
 
-				if (!channels.at(channel_id).getTopic().empty())
-					sendRPL(channels.at(channel_id).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
-				else
-					sendRPL(channels.at(channel_id).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
-
-			}
 
 		}
 

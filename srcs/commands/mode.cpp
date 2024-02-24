@@ -166,25 +166,14 @@ void Server::commandMODE(Client & client)	{
 				}
 
 				if (created)	{
-
-					bool _operator = false;
-					for (unsigned long l = 0; l < channels.size(); l++) {
-
-						if (client.getFd() == channels.at(c).getOperators().at(l).getFd())	{
-
-							if (command.modes.at(0) == '+')
-								success =  channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
-							else
-								success = channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
-							_operator = true;
-
-						}
-
-					}
-					if (!_operator)	{
+					if (!client.isOperator(channels.at(c)))	{
 						sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), channels.at(c).getName()));
 					} else {
 
+						if (command.modes.at(0) == '+')
+							success =  channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
+						else
+							success = channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
 						if (success) {
 							char	symbol;
 							if (command.modes.at(0) == '+')
