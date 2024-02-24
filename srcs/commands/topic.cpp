@@ -75,7 +75,7 @@ void Server::commandTOPIC(Client & client)	{
 			if (client.getFd() == channels.at(channel_id).getOperators().at(i).getFd())	{
 				operator_id = i;
 			}
-		}	if (channel_id < 0)	{
+		}	if (channel_id < 0 && channel.getMode()._protected_topic)	{
 			sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target));
 			return ;
 		}
