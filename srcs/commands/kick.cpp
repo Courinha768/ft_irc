@@ -21,7 +21,7 @@ void Server::commandKICK(Client &client)
 	end = to_cut.find(" ");
 	if (end == EOS)
 	{
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
 		return;
 	}
 
@@ -33,7 +33,7 @@ void Server::commandKICK(Client &client)
 		target_channel = findChannelByName(channel_name);
 	} catch (const ChannelNotFoundException& e) {
 		(void)e;
-		sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), channel_name));
 		return;
 	}
 
@@ -43,12 +43,12 @@ void Server::commandKICK(Client &client)
 	}
 
 	if (channel_name.empty()) {
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
 		return ;
 	}
 
 	if (!isClientOnChannel(client.getNickname(), channel_name)) {
-		sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), channel_name));
 		return ;
 	}
 
@@ -66,7 +66,7 @@ void Server::commandKICK(Client &client)
 
 	if (!isClientOnChannel(user_to_kick, channel_name))
 	{
-		sendWarning(ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name), client);
+		sendRPL(client, ERR_USERNOTINCHANNEL(client.getNickname(), user_to_kick, channel_name));
 		return;
 	}
 

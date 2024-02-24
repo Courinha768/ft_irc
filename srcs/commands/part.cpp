@@ -27,17 +27,17 @@ void Server::commandPART(Client & client)	{
 		target_channel = findChannelByName(channel_name);
 	} catch (const ChannelNotFoundException& e) {
 		(void)e;
-		sendWarning(ERR_NOSUCHCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), channel_name));
 		return;
 	}
 
 	if (channel_name.empty()) {
-		sendWarning(ERR_NEEDMOREPARAMS(message.substr(0, 4)), client);
+		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
 		return ;
 	}
 
 	if (!isClientOnChannel(client.getNickname(), channel_name)) {
-		sendWarning(ERR_NOTONCHANNEL(client.getNickname(), channel_name), client);
+		sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), channel_name));
 		return ;
 	}
 

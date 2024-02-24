@@ -44,7 +44,6 @@ class Server {
 		void setupPoll();
 		void receiveMessage(Client & client);
 		void parseMessage(Client & client);
-		void sendWarning(std::string msg, Client & client);
 		void sendRPLwellcome(Client & client);
 		void sendRPL(Client & client, std::string message);
 		bool isMsgEmpty(std::string msg);
