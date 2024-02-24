@@ -46,8 +46,7 @@ void Server::commandTOPIC(Client & client)	{
 			channel_id = i;
 		}
 	}	if (channel_id < 0)	{
-		//!Error msg
-		std::cout << "Error 1" << std::endl;
+		sendRPL(client, ERR_NOSUCHCHANNEL(client.getNickname(), target));
 		return ;
 	}
 
@@ -56,8 +55,8 @@ void Server::commandTOPIC(Client & client)	{
 			client_id = i;
 		}
 	}	if (channel_id < 0)	{
-		//!Error msg
-		std::cout << "Error 2" << std::endl;
+		sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), target));
+		return ;
 	}
 
 	if (parameters.empty())	{
@@ -77,8 +76,7 @@ void Server::commandTOPIC(Client & client)	{
 				operator_id = i;
 			}
 		}	if (channel_id < 0)	{
-			//!Error msg
-			std::cout << "Error 3" << std::endl;
+			sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target));
 			return ;
 		}
 		channels.at(channel_id).setTopic(parameters);
