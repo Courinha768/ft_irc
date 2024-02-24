@@ -99,22 +99,7 @@ void Server::commandJOIN(Client & client)	{
 
 				}
 				channels.at(i).addClient(client);
-				// std::cout << "2:" << std::endl;
-				// for (unsigned long j = 0; j < channels.at(i).getOperators().size(); j++)	{
-
-				// 	std::cout << "++ " << channels.at(i).getOperators().at(j).getNickname() << std::endl;
-
-				// }
-				// std::cout << std::endl;
 				channel = channels.at(i);
-				// std::cout << "2:" << std::endl;
-				// for (unsigned long j = 0; j < channel.getClients().size(); j++)	{
-
-				// 	std::cout << "-- " << channel.getOperators().at(j).getNickname() << std::endl;
-				// 	std::cout << "++ " << channels.at(i).getOperators().at(j).getNickname() << std::endl;
-
-				// }
-				// std::cout << std::endl;
 				break ;
 			}
 
@@ -124,7 +109,6 @@ void Server::commandJOIN(Client & client)	{
 			channel.setName(commands.front().first);
 			channel.setPassword(commands.front().second);
 			channel.addClient(client);
-			std::cout << "!created" << std::endl;
 			channel.addOperator(client);
 			channel.setTopic("");
 			channels.push_back(channel);
@@ -154,14 +138,6 @@ void Server::commandJOIN(Client & client)	{
 			sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
 		}
-
-		std::cout << std::endl;
-		for (unsigned long i = 0; i < channel.getOperators().size(); i++)	{
-
-			std::cout << ":: " << channel.getOperators().at(i).getNickname() << std::endl;
-
-		}
-
 			
 		commands.pop();
 	}

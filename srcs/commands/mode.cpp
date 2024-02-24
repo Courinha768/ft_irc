@@ -188,6 +188,18 @@ void Server::commandMODE(Client & client)	{
 
 				}
 
+				char	symbol;
+				if (command.modes.at(0) == '+')
+					symbol = '+';
+				else
+					symbol = '-';
+				std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
+				for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
+
+					sendRPL(channels.at(c).getClients().at(l), msg);
+
+				}
+
 			}
 
 		}
