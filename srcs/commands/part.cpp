@@ -32,7 +32,8 @@ void Server::commandPART(Client & client)	{
 	}
 
 	if (channel_name.empty()) {
-		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
+		std::string empty = "";
+		sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), message.substr(0, 4)));
 		return ;
 	}
 

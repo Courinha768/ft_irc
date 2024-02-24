@@ -8,8 +8,6 @@ void Server::receiveMessage(Client & client) {
 	if (bytes_recv == 0) {
 
 		client.setStatus(false);
-		
-
 		message = "QUIT\r\n";
 		commandQUIT(client);
 

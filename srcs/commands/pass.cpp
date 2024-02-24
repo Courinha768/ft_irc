@@ -18,7 +18,8 @@ void Server::commandPASS(Client & client)	{
 
 			if (pass.empty()) {
 				std::string command = "PASS";
-				sendRPL(client, ERR_NEEDMOREPARAMS(command));
+				std::string empty = "";
+				sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), command));
 			}
 
 			client.setAuthentication(password->validate(pass));

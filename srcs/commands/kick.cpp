@@ -21,7 +21,8 @@ void Server::commandKICK(Client &client)
 	end = to_cut.find(" ");
 	if (end == EOS)
 	{
-		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
+		std::string empty = "";
+		sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), message.substr(0, 4)));
 		return;
 	}
 
@@ -43,7 +44,8 @@ void Server::commandKICK(Client &client)
 	}
 
 	if (channel_name.empty()) {
-		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 4)));
+		std::string empty = "";
+		sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), message.substr(0, 4)));
 		return ;
 	}
 

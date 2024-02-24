@@ -192,11 +192,21 @@ bool	Channel::addMode(char mode, std::string parameters) {
 			_mode._protected_topic = true;
 			return true;
 		case 'l':
-			_mode._user_limit = true;
-			_user_limit = atoi(parameters.c_str());
+			if (parameters.find_first_not_of(NUMERALS) != EOS) {
+				return false;
+			}
+			if (parameters.empty())	{
+				_user_limit = -1;
+				_mode._user_limit = false;
+			}	else	{
+				_user_limit = atoi(parameters.c_str());
+				_mode._user_limit = true;
+			}
 			return true;
 		case 'o':
-
+			if (parameters.find_first_not_of(NUMERALS) != EOS) {
+				return false;
+			}
 			int c = -1;
 			for (unsigned long i = 0; i < _clients.size(); i++) {
 

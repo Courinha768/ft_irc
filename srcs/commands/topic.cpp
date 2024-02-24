@@ -71,23 +71,21 @@ void Server::commandTOPIC(Client & client)	{
 
 	}	else	{
 
-		for (unsigned long i = 0; i < channels.at(channel_id).getOperators().size(); i++) {
-			if (client.getFd() == channels.at(channel_id).getOperators().at(i).getFd())	{
-				operator_id = i;
+		if (!channels.at(channel_id).getMode()._protected_topic || client.isOperator(channels.at(channel_id)))	{
+
+			channels.at(channel_id).setTopic(parameters);
+			for (unsigned long l = 0; l < channels.at(channel_id).getClients().size(); l++)	{
+
+				if (!channels.at(channel_id).getTopic().empty())
+					sendRPL(channels.at(channel_id).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
+				else
+					sendRPL(channels.at(channel_id).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
+
 			}
-		}	if (channel_id < 0 && channel.getMode()._protected_topic)	{
+
+		}	else	{
 			sendRPL(client, ERR_CHANOPRIVSNEEDED(client.getNickname(), target));
-			return ;
-		}
-		channels.at(channel_id).setTopic(parameters);
-		for (unsigned long l = 0; l < channels.at(channel_id).getOperators().size(); l++)	{
-
-			if (!channels.at(channel_id).getTopic().empty())
-				sendRPL(channels.at(channel_id).getClients().at(l), RPL_TOPIC(client.getNickname(), channels.at(channel_id).getName(), channels.at(channel_id).getTopic()));
-			else
-				sendRPL(channels.at(channel_id).getClients().at(l), RPL_NOTOPIC(client.getNickname(), channels.at(channel_id).getName()));
-
-
+				return ;
 		}
 
 	}		

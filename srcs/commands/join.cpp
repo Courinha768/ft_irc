@@ -63,7 +63,16 @@ void Server::commandJOIN(Client & client)	{
 	}
 
 	std::queue<std::pair<std::string, std::string> > commands = parseJOINMessage(message);
+	if (commands.empty())	{
+		std::string join = "JOIN";
+		std::string empty = "";
+		sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), join));
+		return ;
+	}
+
+
 	while (!commands.empty()) {
+
 
 		bool	created = false;
 		for (unsigned long i = 0; i < channels.size(); i++) {
@@ -114,6 +123,7 @@ void Server::commandJOIN(Client & client)	{
 			channels.push_back(channel);
 
 		}
+
 		std::string	client_list = "";
 		for (unsigned long j = 0; j < channel.getClients().size(); j++)	{
 
@@ -136,7 +146,7 @@ void Server::commandJOIN(Client & client)	{
 
 		sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
 		sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
-			
+
 		commands.pop();
 	}
 

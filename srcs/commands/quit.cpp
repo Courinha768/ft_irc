@@ -19,7 +19,7 @@ void Server::commandQUIT(Client & client)	{
 
 	std::vector<std::vector<Channel>::iterator> list_of_empty_channels;
 
-	std::string msg = ":" + client.getNickname() + " " + message; 
+	std::string msg = ":" + client.getNickname() + " ERROR :" + reason + "\r\n"; 
 	std::vector<Channel>::iterator it = channels.begin();
 	while (it != channels.end()) {
 		sendMessageToClient(msg, client.getFd());

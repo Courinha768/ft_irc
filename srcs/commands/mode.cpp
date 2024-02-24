@@ -131,6 +131,7 @@ void Server::commandMODE(Client & client)	{
 	Channel			channel;
 	unsigned long	c;
 
+
 	for (unsigned long	i = 1; i < command.modes.size(); i++)	{
 		if (command.modes.at(i) != 'i' && command.modes.at(i) != 'k'
 				&& command.modes.at(i) != 't' && command.modes.at(i) != 'l'
@@ -147,6 +148,12 @@ void Server::commandMODE(Client & client)	{
 
 		if (command.modes.size() < 1)	{
 			sendRPL(client, RPL_CHANNELMODEIS(client.getNickname(), command.targets.at(i), getModes(command.targets.at(i), channels)));
+		} else {
+			if (command.modes.at(0) != '+' && command.modes.at(0) != '-')	{
+				std::string mmm = "MODE";
+				std::cout << command.targets.at(i) << std::endl;
+				sendRPL(client, ERR_NEEDMOREPARAMS(command.targets.at(i), client.getNickname(), mmm));
+			}
 		}
 		for (unsigned long	j = 1; j < command.modes.size(); j++)	{
 
@@ -180,18 +187,26 @@ void Server::commandMODE(Client & client)	{
 								symbol = '+';
 							else
 								symbol = '-';
+							if (command.parameters.at(k).empty())
+								symbol = '-';
 							std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
 							for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
 
 								sendRPL(channels.at(c).getClients().at(l), msg);
 
 							}
-						} else if (!success && command.modes.at(j) == 'o') {
-							if (isClientOnServer(command.parameters.at(k))) {
+						} else if (!success && command.modes.at(j) == 'o')	{
+							if (command.parameters.at(k).empty()) {
+								std::string mmm = "MODE";
+								sendRPL(client, ERR_NEEDMOREPARAMS(command.targets.at(i), client.getNickname(), mmm));
+							}	else if (isClientOnServer(command.parameters.at(k)))	{
 								sendRPL(client, ERR_USERNOTINCHANNEL(client.getNickname(), command.parameters.at(k), channels.at(c).getName()));
-							} else {
+							}	else	{
 								sendRPL(client, NOUSER);
 							}
+						} else if (!success && command.modes.at(j) == 'l')	{
+							std::string mmm = "MODE";
+							sendRPL(client, ERR_NEEDMOREPARAMS(command.targets.at(i), client.getNickname(), mmm));;
 						}
 
 					}

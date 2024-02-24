@@ -20,7 +20,8 @@ void Server::commandPRIVMSG(Client & client)	{
 
 	if (trimmed_message.empty())	{
 		std::string command = "PRIVMSG";
-		sendRPL(client, ERR_NEEDMOREPARAMS(command));
+		std::string empty = "";
+		sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), command));
 		return ;
 	}
 
@@ -30,7 +31,7 @@ void Server::commandPRIVMSG(Client & client)	{
 
 	if (trimmed_message.empty())	{
 		std::string command = "PRIVMSG";
-		sendRPL(client, ERR_NEEDMOREPARAMS(command));
+		sendRPL(client, ERR_NEEDMOREPARAMS(channel_name, client.getNickname(), command));
 		return ;
 	}
 

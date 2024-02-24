@@ -24,7 +24,8 @@ void Server::commandUSER(Client & client)	{
 
 				if (start == EOS || end == EOS || (user.substr(1)).empty() || isMsgEmpty(user.substr(1))) {
 					std::string command = "USER";
-					sendRPL(client, ERR_NEEDMOREPARAMS(command));
+					std::string empty = "";
+					sendRPL(client, ERR_NEEDMOREPARAMS(empty, client.getNickname(), command));
 					return ;
 				}
 

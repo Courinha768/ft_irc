@@ -8,14 +8,15 @@ void Server::commandINVITE(Client & client)
 		return;
 	}
 
+	bool not_enough_param = false;
+
 	std::string nickname_to_invite;
 	std::string channel_name;
 
 	size_t end = message.find("\n");
 	if (end == EOS)
 	{
-		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 6)));
-		return;
+		not_enough_param = true;
 	}
 
 	if (message.at(end - 1) == '\r') end = end - 1;
@@ -24,8 +25,7 @@ void Server::commandINVITE(Client & client)
 	end = to_cut.find(" ");
 	if (end == EOS)
 	{
-		sendRPL(client, ERR_NEEDMOREPARAMS(message.substr(0, 6)));
-		return;
+		not_enough_param = true;
 	}
 	nickname_to_invite = to_cut.substr(0, end);
 	to_cut = to_cut.substr(end + 1);
@@ -35,6 +35,11 @@ void Server::commandINVITE(Client & client)
 		channel_name = to_cut;
 	else
 		channel_name = to_cut.substr(0, end);
+
+	if (not_enough_param)	{
+		sendRPL(client, ERR_NEEDMOREPARAMS(channel_name, client.getNickname(), message.substr(0, 6)));
+		return ;
+	}
 
 
 	Channel target_channel;
