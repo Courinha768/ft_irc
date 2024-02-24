@@ -114,30 +114,28 @@ void Server::commandJOIN(Client & client)	{
 			channels.push_back(channel);
 
 		}
-		for (unsigned long i = 0; i < channel.getClients().size(); i++)	{
+		std::string	client_list = "";
+		for (unsigned long j = 0; j < channel.getClients().size(); j++)	{
 
-			sendRPL(channel.getClients().at(i), JOIN_REPLY(client.getNickname(), channel.getName()));
-			if (!channel.getTopic().empty())
-				sendRPL(channel.getClients().at(i), RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
-			else
-				sendRPL(channel.getClients().at(i), RPL_NOTOPIC(client.getNickname(), channel.getName()));
-
-			std::string	client_list = "";
-			for (unsigned long i = 0; i < channel.getClients().size(); i++)	{
-
-				if (i != 0)
-					client_list += " ";
-				if (channel.getClients().at(i).isOperator(channel))	{
-					client_list += "@" + channel.getClients().at(i).getNickname();
-				}	else	{
-					client_list += channel.getClients().at(i).getNickname();
-				}
-
+			if (j != 0)
+				client_list += " ";
+			if (channel.getClients().at(j).isOperator(channel))	{
+				client_list += "@" + channel.getClients().at(j).getNickname();
+			}	else	{
+				client_list += channel.getClients().at(j).getNickname();
 			}
-			sendRPL(channel.getClients().at(i), RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
-			sendRPL(channel.getClients().at(i), RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 
 		}
+		for (unsigned long i = 0; i < channel.getClients().size(); i++)	{
+			sendRPL(channel.getClients().at(i), JOIN_REPLY(client.getNickname(), channel.getName()));
+		}
+		if (!channel.getTopic().empty())
+			sendRPL(client, RPL_TOPIC(client.getNickname(), channel.getName(), channel.getTopic()));
+		else
+			sendRPL(client, RPL_NOTOPIC(client.getNickname(), channel.getName()));
+
+		sendRPL(client, RPL_NAMREPLY(client.getNickname(), channel.getName(), client_list));
+		sendRPL(client, RPL_ENDOFNAMES(client.getNickname(), channel.getName()));
 			
 		commands.pop();
 	}
