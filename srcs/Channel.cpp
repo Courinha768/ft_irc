@@ -33,7 +33,7 @@ Channel::Channel(std::string name, std::string password)	{
 }
 
 Channel::~Channel()	{
-	
+
 }
 
 Channel::Channel(Client const & src)	{
@@ -204,7 +204,7 @@ bool	Channel::addMode(char mode, std::string parameters) {
 			}
 			return true;
 		case 'o':
-			if (parameters.find_first_not_of(NUMERALS) != EOS) {
+			if (parameters.empty()) {
 				return false;
 			}
 			int c = -1;
