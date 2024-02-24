@@ -18,6 +18,12 @@ void Server::commandPRIVMSG(Client & client)	{
 	}
 	trimmed_message = message.substr(8, end - 8);
 
+	if (trimmed_message.empty())	{
+		std::string command = "PRIVMSG";
+		sendRPL(client, ERR_NEEDMOREPARAMS(command));
+		return ;
+	}
+
 	end = trimmed_message.find(" ");
 	channel_name = trimmed_message.substr(0, end);
 	trimmed_message = trimmed_message.substr(end + 2);
