@@ -28,6 +28,12 @@ void Server::commandPRIVMSG(Client & client)	{
 	channel_name = trimmed_message.substr(0, end);
 	trimmed_message = trimmed_message.substr(end + 2);
 
+	if (trimmed_message.empty())	{
+		std::string command = "PRIVMSG";
+		sendRPL(client, ERR_NEEDMOREPARAMS(command));
+		return ;
+	}
+
 	if (!isClientOnChannel(client.getNickname(), channel_name) && !isClientOnServer(channel_name)) {
         sendRPL(client, ERR_NOTONCHANNEL(client.getNickname(), channel_name));
         return ;
