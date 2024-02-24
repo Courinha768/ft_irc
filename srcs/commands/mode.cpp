@@ -118,6 +118,8 @@ static std::string getModes(std::string target, std::vector<Channel> channels)	{
 
 void Server::commandMODE(Client & client)	{
 
+	bool success = true;
+
 	if (!client.isRegistered())	{
 
 		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
@@ -170,9 +172,9 @@ void Server::commandMODE(Client & client)	{
 						if (client.getFd() == channels.at(c).getOperators().at(l).getFd())	{
 
 							if (command.modes.at(0) == '+')
-								channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
+								success =  channels.at(c).addMode(command.modes.at(j), command.parameters.at(k));
 							else
-								channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
+								success = channels.at(c).removeMode(command.modes.at(j), command.parameters[k]);
 							_operator = true;
 
 						}
@@ -188,17 +190,26 @@ void Server::commandMODE(Client & client)	{
 
 				}
 
-				char	symbol;
-				if (command.modes.at(0) == '+')
-					symbol = '+';
-				else
-					symbol = '-';
-				std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
-				for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
+				if (success) {
+					char	symbol;
+					if (command.modes.at(0) == '+')
+						symbol = '+';
+					else
+						symbol = '-';
+					std::string msg = ":" + client.getNickname() + " MODE " + command.targets.at(i) + " " + symbol + command.modes.at(j) + " " + command.parameters.at(k);
+					for (unsigned long l = 0; l < channels.at(c).getClients().size(); l++) {
 
-					sendRPL(channels.at(c).getClients().at(l), msg);
+						sendRPL(channels.at(c).getClients().at(l), msg);
 
+					}
+				} else if (!success && command.modes.at(j) == 'o') {
+					if (isClientOnServer(command.parameters.at(k))) {
+						sendRPL(client, ERR_USERNOTINCHANNEL(client.getNickname(), command.parameters.at(k), channels.at(c).getName()));
+					} else {
+						sendRPL(client, NOUSER);
+					}
 				}
+
 
 			}
 
