@@ -120,8 +120,14 @@ void	Channel::removeClient(Client & client) {
 
 	pos = findOperators(client);
 
-	if (pos != _operators.end())
+	if (pos != _operators.end()) {
 		_operators.erase(pos);
+		if (_operators.empty() && !_clients.empty()) {
+			addOperator(_clients.at(0));
+		}
+	}
+	
+
 }
 
 void	Channel::removeInvited(Client & client) {
