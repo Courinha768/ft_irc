@@ -11,7 +11,7 @@
 #define RPL_TOPICWHOTIME(nick, channel, topic, setat)	":ircserv.42.fr 333 " + nick + " "	+ channel + " " + nick + " " + setat				//333
 #define RPL_INVITING(nick, invited, channel)			":" + nick + " INVITING " + invited + " " + channel										//341
 #define RPL_NAMREPLY(nick, channel, list)				":ircserv.42.fr 353 " + nick + " = " + channel + " :" + list							//353
-#define RPL_ENDOFNAMES(nick, channel)					":ircserv.42.fr 366 " + nick + " "	+ channel + " :End of /NAMES list."					//366
+#define RPL_ENDOFNAMES(nick, channel)					":ircserv.42.fr 366 " + nick + " " + channel + " :End of /NAMES list."					//366
 
 #define RPL_CHANNELMODEIS(nick, channel, modes)			":ircserv.42.fr 324 " + nick + " "	+ channel + " " + modes								//324
 
