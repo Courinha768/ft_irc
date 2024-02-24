@@ -3,7 +3,7 @@
 
 void signalHandler(int sig) {
 	(void)sig;
-	throw std::runtime_error("Exiting.");
+	throw std::runtime_error("");
 }
 
 int main(int ac, char** av) {

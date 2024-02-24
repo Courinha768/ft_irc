@@ -52,15 +52,6 @@
 # define USER_COMMAND "USER"
 # define NICK_COMMAND "NICK"
 
-# define NOUSER	"FT_IRC Network: That user doesn't exist\r\n"
-
-# define COMMAND_NF	"FT_IRC Network: Command not found\r\n"
-
-# define PASS_COMMAND_USAGE "FT_IRC Network: Usage: PASS <password>\r\n"
-
-# define ALREADY_AUTHENTICATED "FT_IRC Network: You are already authenticated\r\n"
-# define ALREADY_USER "FT_IRC Network: You already have a username\r\n"
-
-# define NL "\n"
+# define NOUSER	"FT_IRC Network: That user doesn't exist"
 
 #endif

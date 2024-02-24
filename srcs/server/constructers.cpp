@@ -28,7 +28,6 @@ Server::Server(std::string port, std::string password) {
 }
 
 Server::~Server() {
-	std::cout << "ON DESTRUCTOR" << std::endl;
 
 	std::map<int, Client *>::iterator it = clients.begin();
 	while (it != clients.end()) {
