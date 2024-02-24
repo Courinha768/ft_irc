@@ -68,9 +68,12 @@ void Server::commandPRIVMSG(Client & client)	{
 			if (it->second && it->second->getNickname().compare(channel_name) == 0) {
 				std::string test = ":" + client.getNickname() + " " + message;
 				sendMsg(*it->second, test);
+				break;
 			}
 			it++;
 		}
+		std::string test = ":" + it->second->getNickname() + " " + message;
+		sendMsg(client, test);
 	}
 	
 }
