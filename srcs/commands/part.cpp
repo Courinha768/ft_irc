@@ -47,7 +47,7 @@ void Server::commandPART(Client & client)	{
 	if (end != EOS)
 		comment = to_cut.substr(end + 1);
 
-	std::string msg = ":ircserv.42.fr " + message; 
+	std::string msg = ":" + client.getNickname() + " " + message; 
 
 	for (size_t i = 0; i < channels.size(); i++) {
 		if (channels.at(i).getName().compare(channel_name) == 0) {
@@ -59,12 +59,14 @@ void Server::commandPART(Client & client)	{
 				if ((*it).getName().compare(channel_name) == 0) {
 					if ((*it).getClients().empty()) {
 						channels.erase(it);
+						break ;
 					} else {
 						for (size_t j = 0; j < (*it).getClients().size(); j++) {
 							sendMessageToClient(msg, (*it).getClients().at(j).getFd());
 						}
 					}
 				}
+				it++;
 			}
 
 
