@@ -255,3 +255,29 @@ bool	Channel::removeMode(char mode, std::string parameters) {
 
 }
 
+void	Channel::changeNickname(std::string oldNick, std::string newNick)	{
+
+	for (unsigned int i = 0; i < _clients.size(); i++)	{
+
+		if (_clients.at(i).getNickname() == oldNick)
+			_clients.at(i).setNickname(newNick);
+
+	}
+
+	for (unsigned int i = 0; i < _operators.size(); i++)	{
+
+		if (_operators.at(i).getNickname() == oldNick)
+			_operators.at(i).setNickname(newNick);
+
+	}
+
+	for (unsigned int i = 0; i < _invited.size(); i++)	{
+
+		if (_invited.at(i).getNickname() == oldNick)
+			_invited.at(i).setNickname(newNick);
+
+	}
+	std::cout << "-" << std::endl;
+
+}
+

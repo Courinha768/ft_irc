@@ -27,7 +27,7 @@ re:				fclean $(NAME)
 
 launch:			re
 				@clear
-				@./$(NAME) 8001 1
+				@./$(NAME) 8000 1
 
 run:			$(NAME)
 				@./$(NAME) 8000 1

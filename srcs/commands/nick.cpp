@@ -8,6 +8,9 @@ void Server::commandNICK(Client & client)	{
 
 	} else {
 
+
+		std::string oldNick;
+		std::string newNick;
 		size_t pos = message.find(NICK_COMMAND);
 		if (pos != EOS) {
 			size_t start, end;
@@ -22,7 +25,7 @@ void Server::commandNICK(Client & client)	{
 			end = message.find("\n", start);
 			if (isspace(message.at(end - 1))) end--; // to skip the \r when it exists
 			
-			std::string newNick = message.substr(start, end - start);
+			newNick = message.substr(start, end - start);
 			if (isMsgEmpty(newNick)) {
 				sendRPL(client, ERR_NONICKNAMEGIVEN(client.getUsername()));
 				return;
@@ -37,16 +40,13 @@ void Server::commandNICK(Client & client)	{
 			std::map<int, Client*>::iterator it = clients.begin();
 			while (it != clients.end()) {
 
-				if (!client.getNickname().empty() && it->second->getFd() != client.getFd() && it->second->getNickname() == newNick) {
+				if (it->second && !it->second->getNickname().empty() && it->second->getNickname() == newNick) {
 					sendRPL(client, ERR_NICKNAMEINUSE(client.getUsername(), newNick));
 					return ;
 				}
 				it++;
 
 			}
-			
-			// maybe we will need a list of nicknames to store this history
-			std::string oldNick;
 			if (client.hasNick()) oldNick = client.getNickname();
 			client.setNickname(newNick);
 			if (!client.isRegistered() && client.hasUser()) {
@@ -61,11 +61,22 @@ void Server::commandNICK(Client & client)	{
 				std::map<int, Client*>::iterator it = clients.begin();
 				while (it != clients.end()) {
 
-					sendRPL(*it->second, acknowledge);
+					if (it->second)
+						sendRPL(*it->second, acknowledge);
 					it++;
 
 				}
 
+			}
+		}
+
+		for (unsigned long i = 0; i < channels.size(); i++)	{
+
+			for (unsigned long j = 0; j < channels.at(i).getClients().size(); j++)	{
+
+				if (channels.at(i).getClients().at(j).getNickname() == oldNick)	{
+					channels.at(i).changeNickname(oldNick, newNick);
+				}
 			}
 		}
 	}
