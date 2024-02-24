@@ -54,8 +54,8 @@ class	Channel	{
 
 		bool				isInvitedEnd(std::vector<Client>::iterator pos);
 
-		void				addMode(char mode, std::string parameters);
-		void				removeMode(char mode, std::string parameters);
+		bool				addMode(char mode, std::string parameters);
+		bool				removeMode(char mode, std::string parameters);
 
 		std::vector<Client>::iterator	findClient(Client const & client);
 		std::vector<Client>::iterator	findOperators(Client const & client);

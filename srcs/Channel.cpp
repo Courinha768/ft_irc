@@ -176,24 +176,24 @@ std::vector<Client>::iterator	Channel::findInvited(Client const & client)	{
 	return (_invited.end());
 }
 
-void	Channel::addMode(char mode, std::string parameters) {
+bool	Channel::addMode(char mode, std::string parameters) {
 
 	switch (mode)	{
 
 		case 'i':
 			_mode._invite_only = true;
-			return ;
+			return true;
 		case 'k':
 			_mode._key = true;
 			_password = parameters;
-			return ;
+			return true;
 		case 't':
 			_mode._protected_topic = true;
-			return ;
+			return true;
 		case 'l':
 			_mode._user_limit = true;
 			_user_limit = atoi(parameters.c_str());
-			return ;
+			return true;
 		case 'o':
 
 			int c = -1;
@@ -206,30 +206,32 @@ void	Channel::addMode(char mode, std::string parameters) {
 			}
 			if (c != -1)	{
 				_operators.push_back(_clients.at(c));
+				return true;
 			}
-
-			return ;
+			return false;
 
 	}
 
+	return true;
+
 }
 
-void	Channel::removeMode(char mode, std::string parameters) {
+bool	Channel::removeMode(char mode, std::string parameters) {
 
 	switch (mode)	{
 
 		case 'i':
 			_mode._invite_only = false;
-			return ;
+			return true;
 		case 'k':
 			_mode._key = false;
-			return ;
+			return true;
 		case 't':
 			_mode._protected_topic = false;
-			return ;
+			return true;
 		case 'l':
 			_mode._user_limit = false;
-			return ;
+			return true;
 		case 'o':
 
 			int c = -1;
@@ -242,11 +244,14 @@ void	Channel::removeMode(char mode, std::string parameters) {
 			}
 			if (c != -1)	{
 				_operators.erase(_operators.begin() + c);
+				return true;
 			}
 
-			return ;
+			return false;
 
 	}
+
+	return true;
 
 }
 
