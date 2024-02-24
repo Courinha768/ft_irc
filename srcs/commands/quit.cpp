@@ -15,8 +15,7 @@ void Server::commandQUIT(Client & client)	{
 		reason = message.substr(pos + 1);
 	}
 	client.setStatus(false);
-	// this print on server side can be ommited when project is ready
-	std::cout << "connection lost with client " << client.getTextAddr() << "\n";
+	std::cout << "connection lost with client " << client.getNickname() << "\n";
 
 	std::vector<std::vector<Channel>::iterator> list_of_empty_channels;
 
@@ -28,8 +27,9 @@ void Server::commandQUIT(Client & client)	{
 		if ((*it).getClients().empty()) {
 			list_of_empty_channels.push_back(it);
 		} else {
+			std::string part_msg = ":" + client.getNickname() + " PART " + it->getName() + " :" + reason + "\r\n"; 
 			for (size_t j = 0; j < (*it).getClients().size(); j++) {
-				sendMessageToClient(msg, (*it).getClients().at(j).getFd());
+				sendMessageToClient(part_msg, (*it).getClients().at(j).getFd());
 			}
 		}
 		it++;

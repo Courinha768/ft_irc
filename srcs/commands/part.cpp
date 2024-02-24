@@ -47,7 +47,7 @@ void Server::commandPART(Client & client)	{
 	if (end != EOS)
 		comment = to_cut.substr(end + 1);
 
-	std::string msg = ":" + client.getNickname() + " " + message; 
+	std::string msg = ":" + client.getNickname() + " " + message;
 
 	for (size_t i = 0; i < channels.size(); i++) {
 		if (channels.at(i).getName().compare(channel_name) == 0) {

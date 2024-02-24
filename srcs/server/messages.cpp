@@ -5,16 +5,13 @@ void Server::receiveMessage(Client & client) {
 	memset(recv_buffer, 0, BUFFER_SIZE);
 
 	int bytes_recv = recv(client.getFd(), recv_buffer, BUFFER_SIZE, 0);
-	//? Is this necessary
-	// if (bytes_recv == -1) {
-
-	// 	Server::cout() << BRED << "ERROR READING SOCKET" << CRESET << "\n";
-
-	// } else 
 	if (bytes_recv == 0) {
 
 		client.setStatus(false);
-		Server::cout() << "connection lost with client " << client.getTextAddr() << "\n";
+		
+
+		message = "QUIT\r\n";
+		commandQUIT(client);
 
 	} else {
 
