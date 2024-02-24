@@ -13,7 +13,6 @@
 
 /* ----------------------------- MessageParsing ----------------------------- */
 # define MP_AVAILABLE_COMMANDS { \
-	"CAP", \
 	"PASS", \
 	"NICK", \
 	"USER", \
@@ -27,7 +26,6 @@
 	"PART", \
 }
 # define MP_COMMAND_FUNCTIONS { \
-	&Server::commandCAP, \
 	&Server::commandPASS, \
 	&Server::commandNICK, \
 	&Server::commandUSER, \

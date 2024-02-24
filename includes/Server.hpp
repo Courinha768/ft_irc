@@ -56,7 +56,6 @@ class Server {
 		bool isClientOnChannel(std::string client_nickname, std::string channel_name);
 		bool isClientOnServer(std::string client_nickname);
 
-		void commandCAP(Client & client);
 		void commandJOIN(Client & client);
 		void commandNICK(Client & client);
 		void commandPASS(Client & client);

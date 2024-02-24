@@ -2,6 +2,13 @@
 
 void Server::commandPRIVMSG(Client & client)	{
 
+	if (!client.isRegistered())	{
+
+		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
+		return ;
+
+	}
+
 	std::string trimmed_message;
 	std::string	channel_name;
 

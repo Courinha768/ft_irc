@@ -124,6 +124,7 @@ void Server::commandMODE(Client & client)	{
 		return ;
 
 	}
+	
 	t_command		command = parseMODEMessage(message);
 	Channel			channel;
 	unsigned long	c;

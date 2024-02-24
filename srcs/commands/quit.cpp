@@ -1,6 +1,14 @@
 #include "../../includes/ftIrc.hpp"
 
 void Server::commandQUIT(Client & client)	{
+
+	if (!client.isRegistered())	{
+
+		sendRPL(client, ERR_NOTREGISTERED(client.getNickname()));
+		return ;
+
+	}
+	
 	std::string reason = "";
 	size_t pos = message.find(":");
 	if (pos != EOS) {
