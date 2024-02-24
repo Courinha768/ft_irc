@@ -60,6 +60,7 @@ class	Channel	{
 		std::vector<Client>::iterator	findClient(Client const & client);
 		std::vector<Client>::iterator	findOperators(Client const & client);
 		std::vector<Client>::iterator	findInvited(Client const & client);
+		
 
 };
 

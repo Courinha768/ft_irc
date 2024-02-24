@@ -241,3 +241,4 @@ void	Channel::removeMode(char mode, std::string parameters) {
 	}
 
 }
+

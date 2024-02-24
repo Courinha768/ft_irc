@@ -85,3 +85,13 @@ void Server::sendMessageToClient(std::string msg, int client_fd) {
         }
     }
 }
+
+void Server::sendMsgToAllClientsOnChannel(std::string channel_name, std::string msg) {
+	for (size_t i = 0; i < channels.size(); i++) {
+		if (channels.at(i).getName().compare(channel_name) == 0) {
+			for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
+				sendMessageToClient(msg, channels.at(i).getClients().at(j).getFd());
+			}
+		}
+	}
+}

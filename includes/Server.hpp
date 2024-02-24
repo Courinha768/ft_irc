@@ -51,6 +51,7 @@ class Server {
 		bool hasInvalidChars(std::string msg);
 		void sendMessageToAllClients(std::string msg, int client_fd);
 		void sendMessageToClient(std::string msg, int client_fd);
+		void sendMsgToAllClientsOnChannel(std::string channel_name, std::string msg);
 		Channel & findChannelByName(const std::string& name);
 		Client* findClientByNickname(const std::string& nickname);
 		bool isClientOnChannel(std::string client_nickname, std::string channel_name);

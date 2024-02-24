@@ -75,6 +75,12 @@ void Server::commandKICK(Client &client)
 		return;
 	}
 
+	std::string client_notification = ":" + client.getNickname() + " KICK " + channel_name + " " + user_to_kick;
+	if (!comment.empty()) {
+		client_notification += " " + comment;
+	}
+	client_notification += "\r\n";
+
 	for (size_t i = 0; i < channels.size(); i++)
 	{
 		if (channels.at(i).getName().compare(channel_name) == 0)
@@ -83,16 +89,8 @@ void Server::commandKICK(Client &client)
 			{
 				if (channels.at(i).getClients().at(j).getNickname().compare(user_to_kick) == 0)
 				{
-					std::string client_notification = ":" + client.getNickname() + " KICK " + channel_name + " " + user_to_kick;
-					if (!comment.empty()) {
-						client_notification += " " + comment;
-					}
-					client_notification += "\r\n";
 					sendMessageToClient(client_notification, channels.at(i).getClients().at(j).getFd());
-
-
 					channels.at(i).removeClient(channels.at(i).getClients().at(j));
-
 
 					if (channels.at(i).getClients().size() == 0)	{
 
@@ -111,7 +109,7 @@ void Server::commandKICK(Client &client)
 			}
 		}
 	}
-
+	sendMsgToAllClientsOnChannel(channel_name, client_notification);
 }
 
 bool Server::isClientOnServer(std::string client_nickname) {
