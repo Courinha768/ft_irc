@@ -53,9 +53,22 @@ void Server::commandPART(Client & client)	{
 		if (channels.at(i).getName().compare(channel_name) == 0) {
 			channels.at(i).removeClient(client);
 			sendMessageToClient(msg, client.getFd());
-			for (size_t j = 0; j < channels.at(i).getClients().size(); j++) {
-				sendMessageToClient(msg, channels.at(i).getClients().at(j).getFd());
+			
+			std::vector<Channel>::iterator it = channels.begin();
+			while (it != channels.end()) {
+				if ((*it).getName().compare(channel_name) == 0) {
+					if ((*it).getClients().empty()) {
+						channels.erase(it);
+					} else {
+						for (size_t j = 0; j < (*it).getClients().size(); j++) {
+							sendMessageToClient(msg, (*it).getClients().at(j).getFd());
+						}
+					}
+				}
 			}
+
+
+			
 		}
 	}
 
