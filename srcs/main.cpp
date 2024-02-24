@@ -7,8 +7,16 @@ int main(int ac, char** av) {
 
 		Server server = Server(av[1], av[2]);
 
-		server.setup();
-		server.setupPoll();
+		try
+		{
+			server.setup();
+			server.setupPoll();
+		}
+		catch(std::exception &e)
+		{
+			std::cerr << e.what() << '\n';
+		}
+		
 
 	} else {
 		std::cout << "Usage: ./ircserv <port> <password>" << std::endl;
