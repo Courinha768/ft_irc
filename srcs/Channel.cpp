@@ -229,7 +229,7 @@ void	Channel::removeMode(char mode, std::string parameters) {
 		case 'o':
 
 			int c = -1;
-			for (unsigned long i = 0; i < _clients.size(); i++) {
+			for (unsigned long i = 0; i < _operators.size(); i++) {
 
 				if (_operators.at(i).getNickname() == parameters) {
 					c = i;

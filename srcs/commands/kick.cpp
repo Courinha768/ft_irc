@@ -83,6 +83,7 @@ void Server::commandKICK(Client &client)
 						client_notification += " " + comment;
 					}
 					client_notification += "\r\n";
+					//todo: msg to all clients
 					sendMessageToClient(client_notification, channels.at(i).getClients().at(j).getFd());
 
 
