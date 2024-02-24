@@ -33,6 +33,7 @@ Channel::Channel(std::string name, std::string password)	{
 }
 
 Channel::~Channel()	{
+	
 }
 
 Channel::Channel(Client const & src)	{

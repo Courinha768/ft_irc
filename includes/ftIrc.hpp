@@ -21,6 +21,7 @@
 # include <vector>
 # include <cctype>
 # include <stdexcept>
+# include <signal.h>
 
 
 //my include files

@@ -22,3 +22,4 @@ void sendMsg(Client & client, std::string message) {
 	message = message + "\r\n";
 	send(client.getFd(), message.c_str(), message.size(), MSG_NOSIGNAL);
 }
+

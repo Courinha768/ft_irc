@@ -30,6 +30,9 @@ class Server {
 		int						efd;
 
 		std::vector<Channel>	channels;
+
+		
+		
 		
 
 	public:

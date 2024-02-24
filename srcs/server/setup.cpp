@@ -47,9 +47,13 @@ void Server::setup() {
 	std::cout << std::endl;
 }
 
+
 void Server::setupPoll() {
 
+
+
 	while (true) {
+
 
 		int numEvents = epoll_wait(efd, events, 200, -1);
 		if (numEvents == EPPOL_WAIT_ERROR) {
